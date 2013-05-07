@@ -3,37 +3,59 @@ from pyftdi.pyftdi.usbtools import *
 import time
 import usb.core
 import usb.util
+from .event import event
+import threading
+
+class NoDeviceError(Exception):
+    pass
 
 class AD2USB(object):
-	@classmethod
-	def find_all(cls):
-		cls.__devices = Device.find_all()
+    on_test = event.Event('testing')
 
-		return cls.__devices
+    on_open = event.Event('Called when the device has been opened')
+    on_close = event.Event('Called when the device has been closed')
+    on_read = event.Event('Called when a line has been read from the device')
+    on_write = event.Event('Called when data has been written to the device')
 
-	def __init__(self):
-		self._device = None
+    __devices = []
 
-		AD2USB.find_all()
+    @classmethod
+    def find_all(cls):
+        cls.__devices = Device.find_all()
 
-	def __del__(self):
-		pass
+        return cls.__devices
 
-	def open(self, device=None):
-		if len(cls.__devices) == 0:
-			raise NoDeviceError
+    def __init__(self):
+        self._device = None
 
-		if device is None:
-			self._device = cls.__devices[0]
-		else
-			self._device = device
+        AD2USB.find_all()
+        pass
 
-		self._device.open()
+    def __del__(self):
+        pass
 
-	def close(self):
-		self._device.close()
-		self._device = None
+    def open(self, device=None):
+        if len(self.__devices) == 0:
+            raise NoDeviceError
 
+        if device is None:
+            device = self.__devices[0]
+
+        self._device = Device(serial=device[2], description=device[4])
+
+        self._wire_events()
+
+        self._device.open()
+
+    def close(self):
+        self._device.close()
+        self._device = None
+
+    def _wire_events(self):
+        self._device.on_open += self.on_open
+        self._device.on_close += self.on_close
+        self._device.on_read += self.on_read
+        self._device.on_write += self.on_write
 
 
 class Device(object):
@@ -41,14 +63,19 @@ class Device(object):
     FTDI_PRODUCT_ID = 0x6001
     BAUDRATE = 115200
 
+    on_open = event.Event('Called when the device has been opened')
+    on_close = event.Event('Called when the device has been closed')
+    on_read = event.Event('Called when a line has been read from the device')
+    on_write = event.Event('Called when data has been written to the device')
+
     @staticmethod
     def find_all():
         devices = []
 
         try:
-            devices = Ftdi.find_all([(FTDI_VENDOR_ID, FTDI_PRODUCT_ID)], nocache=True)
+            devices = Ftdi.find_all([(Device.FTDI_VENDOR_ID, Device.FTDI_PRODUCT_ID)], nocache=True)
         except usb.core.USBError, e:
-            pass
+            print e
 
         return devices
 
@@ -59,8 +86,13 @@ class Device(object):
         self._description = description
         self._buffer = ''
         self._device = Ftdi()
+        self._running = False
+
+        self._read_thread = Device.ReadThread(self)
 
     def open(self, baudrate=BAUDRATE, interface=0, index=0):
+        self._running = True
+
         self._device.open(self._vendor_id,
                          self._product_id,
                          interface,
@@ -68,16 +100,26 @@ class Device(object):
                          self._serial_number,
                          self._description)
 
-        self.device.set_baudrate(baudrate)
+        self._device.set_baudrate(baudrate)
+        self._read_thread.start()
+
+        self.on_open((self._serial_number, self._description))
 
     def close(self):
         try:
+            self._running = False
+            self._read_thread.stop()
+
             self._device.close()
         except FtdiError, e:
             pass
 
+        self.on_close()
+
     def write(self, data):
         self._device.write_data(data)
+
+        self.on_write(data)
 
     def read_line(self, timeout=0.0):
         start_time = time.time()
@@ -85,7 +127,7 @@ class Device(object):
         ret = None
 
         try:
-            while 1:
+            while self._running:
                 buf = self._device.read_data(1)
                 self._buffer += buf
 
@@ -112,4 +154,23 @@ class Device(object):
                 ret = self._buffer
                 self._buffer = ''
 
+                self.on_read(ret)
+
         return ret
+
+    class ReadThread(threading.Thread):
+        def __init__(self, device):
+            threading.Thread.__init__(self)
+            self._device = device
+            self._running = False
+
+        def stop(self):
+            self._running = False
+
+        def run(self):
+            self._running = True
+
+            while self._running:
+                self._device.read_line()
+
+                time.sleep(0.25)
