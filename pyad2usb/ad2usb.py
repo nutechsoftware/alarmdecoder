@@ -5,15 +5,30 @@ import usb.core
 import usb.util
 
 class AD2USB(object):
+	@classmethod
+	def find_all(cls):
+		cls.__devices = Device.find_all()
+
+		return cls.__devices
+
 	def __init__(self):
 		self._device = None
+
+		AD2USB.find_all()
 
 	def __del__(self):
 		pass
 
 	def open(self, device=None):
-		# If device is None, open first.
-		pass
+		if len(cls.__devices) == 0:
+			raise NoDeviceError
+
+		if device is None:
+			self._device = cls.__devices[0]
+		else
+			self._device = device
+
+		self._device.open()
 
 	def close(self):
 		self._device.close()
@@ -24,7 +39,7 @@ class AD2USB(object):
 class Device(object):
     FTDI_VENDOR_ID = 0x0403
     FTDI_PRODUCT_ID = 0x6001
-    AD2USB_BAUDRATE = 115200
+    BAUDRATE = 115200
 
     @staticmethod
     def find_all():
@@ -45,7 +60,7 @@ class Device(object):
         self._buffer = ''
         self._device = Ftdi()
 
-    def open(self, baudrate=AD2USB_BAUDRATE, interface=0, index=0):
+    def open(self, baudrate=BAUDRATE, interface=0, index=0):
         self._device.open(self._vendor_id,
                          self._product_id,
                          interface,
