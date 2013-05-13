@@ -9,6 +9,9 @@ import threading
 class NoDeviceError(Exception):
     pass
 
+class CommError(Exception):
+    pass
+
 class AD2USB(object):
     on_test = event.Event('testing')
 
@@ -73,8 +76,8 @@ class Device(object):
 
         try:
             devices = Ftdi.find_all([(Device.FTDI_VENDOR_ID, Device.FTDI_PRODUCT_ID)], nocache=True)
-        except usb.core.USBError, e:
-            raise
+        except (usb.core.USBError, FtdiError), err:
+            raise CommError('Error enumerating AD2USB devices: {0}'.format(str(err)))
 
         return devices
 
@@ -101,9 +104,10 @@ class Device(object):
                              self._description)
 
             self._device.set_baudrate(baudrate)
-        except (usb.core.USBError, FtdiError):
+        except (usb.core.USBError, FtdiError), err:
             self.on_close()
-            raise
+
+            raise CommError('Error opening AD2USB device: {0}'.format(str(err)))
         else:
             self._read_thread.start()
 
@@ -151,9 +155,10 @@ class Device(object):
                     break
 
                 time.sleep(0.01)
-        except FtdiError, e:
-            # TODO: I don't think we should be ignoring this
-            raise
+        except (usb.core.USBError, FtdiError), err:
+            self.close()
+
+            raise CommError('Error reading from AD2USB device: {0}'.format(str(err)))
         else:
             if got_line:
                 ret = self._buffer
@@ -178,8 +183,7 @@ class Device(object):
             while self._running:
                 try:
                     self._device.read_line()
-                except (usb.core.USBError, FtdiError):
+                except CommError, err:
                     self.stop()
-                    self._device.close()
 
                 time.sleep(0.25)
