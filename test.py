@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import pyad2usb.ad2usb
 import time
 import signal
+import traceback
 
 running = True
 
@@ -23,17 +26,20 @@ def handle_write(sender, args):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-#pyad2usb.ad2usb.AD2USB.find_all()
+try:
+    wut = pyad2usb.ad2usb.AD2USB()
 
-wut = pyad2usb.ad2usb.AD2USB()
-wut.on_open += handle_open
-wut.on_close += handle_close
-wut.on_read += handle_read
-wut.on_write += handle_write
+    wut.on_open += handle_open
+    wut.on_close += handle_close
+    wut.on_read += handle_read
+    wut.on_write += handle_write
 
-wut.open()
+    wut.open()
 
-while running:
-    time.sleep(0.1)
+    while running:
+        time.sleep(0.1)
 
-wut.close()
+    wut.close()
+except Exception, err:
+    print 'Error: {0}'.format(str(err))
+    #traceback.print_exc(err)

@@ -29,14 +29,13 @@ class AD2USB(object):
         self._device = None
 
         AD2USB.find_all()
-        pass
 
     def __del__(self):
         pass
 
     def open(self, device=None):
         if len(self.__devices) == 0:
-            raise NoDeviceError
+            raise NoDeviceError('No AD2USB devices present.')
 
         if device is None:
             device = self.__devices[0]
@@ -75,7 +74,7 @@ class Device(object):
         try:
             devices = Ftdi.find_all([(Device.FTDI_VENDOR_ID, Device.FTDI_PRODUCT_ID)], nocache=True)
         except usb.core.USBError, e:
-            print e
+            raise
 
         return devices
 
@@ -93,17 +92,22 @@ class Device(object):
     def open(self, baudrate=BAUDRATE, interface=0, index=0):
         self._running = True
 
-        self._device.open(self._vendor_id,
-                         self._product_id,
-                         interface,
-                         index,
-                         self._serial_number,
-                         self._description)
+        try:
+            self._device.open(self._vendor_id,
+                             self._product_id,
+                             interface,
+                             index,
+                             self._serial_number,
+                             self._description)
 
-        self._device.set_baudrate(baudrate)
-        self._read_thread.start()
+            self._device.set_baudrate(baudrate)
+        except (usb.core.USBError, FtdiError):
+            self.on_close()
+            raise
+        else:
+            self._read_thread.start()
 
-        self.on_open((self._serial_number, self._description))
+            self.on_open((self._serial_number, self._description))
 
     def close(self):
         try:
@@ -111,7 +115,7 @@ class Device(object):
             self._read_thread.stop()
 
             self._device.close()
-        except FtdiError, e:
+        except (FtdiError, usb.core.USBError):
             pass
 
         self.on_close()
@@ -148,7 +152,8 @@ class Device(object):
 
                 time.sleep(0.01)
         except FtdiError, e:
-            pass
+            # TODO: I don't think we should be ignoring this
+            raise
         else:
             if got_line:
                 ret = self._buffer
@@ -171,6 +176,10 @@ class Device(object):
             self._running = True
 
             while self._running:
-                self._device.read_line()
+                try:
+                    self._device.read_line()
+                except (usb.core.USBError, FtdiError):
+                    self.stop()
+                    self._device.close()
 
                 time.sleep(0.25)
