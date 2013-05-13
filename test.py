@@ -37,19 +37,21 @@ try:
     overseer = pyad2usb.ad2usb.Overseer(attached_event=handle_attached, detached_event=handle_detached)
     #overseer.start()
 
-    """wut = pyad2usb.ad2usb.AD2USB()
+    #dev = pyad2usb.ad2usb.AD2USB()
+    #dev = overseer.get_device()
 
-    wut.on_open += handle_open
-    wut.on_close += handle_close
-    wut.on_read += handle_read
-    wut.on_write += handle_write
-
-    wut.open()"""
+    dev = pyad2usb.ad2usb.Overseer.create()
+    dev.on_open += handle_open
+    dev.on_close += handle_close
+    dev.on_read += handle_read
+    dev.on_write += handle_write
+    dev.open()
 
     while running:
         time.sleep(0.1)
 
-    overseer.stop()
+    dev.close()
+    overseer.close()
 
     #wut.close()
 except Exception, err:

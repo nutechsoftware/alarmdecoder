@@ -16,6 +16,31 @@ class Overseer(object):
     on_attached = event.Event('Called when an AD2USB device has been detected.')
     on_detached = event.Event('Called when an AD2USB device has been removed.')
 
+    __devices = []
+
+    @classmethod
+    def find_all(cls):
+        cls.__devices = Device.find_all()
+
+        return cls.__devices
+
+    @classmethod
+    def devices(cls):
+        return cls.__devices
+
+    @classmethod
+    def create(cls, device=None):
+        if len(cls.__devices) == 0:
+            raise NoDeviceError('No AD2USB devices present.')
+
+        if device is None:
+            device = cls.__devices[0]
+
+        vendor, product, sernum, ifcount, description = device
+        device = Device(serial=sernum, description=description)
+
+        return AD2USB(device)
+
     def __init__(self, attached_event=None, detached_event=None):
         self._detect_thread = Overseer.DetectThread(self)
 
@@ -25,16 +50,25 @@ class Overseer(object):
         if detached_event:
             self.on_detached += detached_event
 
+        Overseer.find_all()
+
         self.start()
 
     def __del__(self):
         pass
+
+    def close(self):
+        self.stop()
 
     def start(self):
         self._detect_thread.start()
 
     def stop(self):
         self._detect_thread.stop()
+
+    def get_device(self, device=None):
+        return Overseer.create(device)
+
 
     class DetectThread(threading.Thread):
         def __init__(self, overseer):
@@ -53,10 +87,9 @@ class Overseer(object):
 
             while self._running:
                 try:
-                    AD2USB.find_all()
+                    Overseer.find_all()
 
-                    current_devices = set(AD2USB._AD2USB__devices)
-
+                    current_devices = set(Overseer.devices())
                     new_devices = [d for d in current_devices if d not in last_devices]
                     removed_devices = [d for d in last_devices if d not in current_devices]
                     last_devices = current_devices
@@ -78,33 +111,14 @@ class AD2USB(object):
     on_read = event.Event('Called when a line has been read from the device')
     on_write = event.Event('Called when data has been written to the device')
 
-    __devices = []
-
-    @classmethod
-    def find_all(cls):
-        cls.__devices = Device.find_all()
-
-        return cls.__devices
-
-    def __init__(self):
-        self._device = None
-
-        AD2USB.find_all()
+    def __init__(self, device):
+        self._device = device
 
     def __del__(self):
         pass
 
-    def open(self, device=None):
-        if len(self.__devices) == 0:
-            raise NoDeviceError('No AD2USB devices present.')
-
-        if device is None:
-            device = self.__devices[0]
-
-        self._device = Device(serial=device[2], description=device[4])
-
+    def open(self):
         self._wire_events()
-
         self._device.open()
 
     def close(self):
