@@ -55,5 +55,5 @@ try:
 
     #wut.close()
 except Exception, err:
-    print 'Error: {0}'.format(str(err))
-    #traceback.print_exc(err)
+    #print 'Error: {0}'.format(str(err))
+    traceback.print_exc(err)
