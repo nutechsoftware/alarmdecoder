@@ -2,6 +2,8 @@ import usb.core
 import usb.util
 import time
 import threading
+import serial
+import traceback
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from . import util
@@ -37,7 +39,7 @@ class Device(object):
                 except util.CommError, err:
                     self.stop()
 
-                time.sleep(0.25)
+                time.sleep(0.10)
 
 class USBDevice(Device):
     FTDI_VENDOR_ID = 0x0403
@@ -146,22 +148,94 @@ class USBDevice(Device):
 
 
 class SerialDevice(Device):
-    BAUDRATE = 9600
+    BAUDRATE = 19200
 
     def __init__(self):
         Device.__init__(self)
 
+        self._device = serial.Serial(timeout=0)
+        self._read_thread = Device.ReadThread(self)
+        self._buffer = ''
+        self._running = False
+
     def __del__(self):
         pass
 
-    def open(self, baudrate=BAUDRATE, interface="COM1", index=0):
-        pass
+    def open(self, baudrate=BAUDRATE, interface=0, index=0):
+        self._device.baudrate = baudrate
+        self._device.port = interface
+
+        try:
+            self._device.open()
+
+            self._running = True
+        except (serial.SerialException, ValueError), err:
+            self.on_close()
+
+            raise util.NoDeviceError('Error opening AD2SERIAL device on port {0}.'.format(interface))
+        else:
+            self.on_open((None, "AD2SERIAL"))   # TODO: Fixme.
+
+            self._read_thread.start()
 
     def close(self):
-        pass
+        try:
+            self._running = False
+            self._read_thread.stop()
+
+            self._device.close()
+        except Exception, err:
+            pass
+
+        self.on_close()
 
     def write(self, data):
-        pass
+        try:
+            self._device.write(data)
+        except serial.SerialTimeoutException, err:
+            pass
+        else:
+            self.on_write(data)
 
-    def read_line(self, data):
-        pass
+    def read_line(self, timeout=0.0):
+        start_time = time.time()
+        got_line = False
+        ret = None
+
+        try:
+            while self._running:
+                buf = self._device.read(1)
+
+                if buf != '' and buf != "\xff":     # WTF is this \xff and why is it in my buffer?!
+                    self._buffer += buf
+
+                    #print '{0:x}'.format(ord(buf))
+
+                    if buf == "\n":
+                        if len(self._buffer) > 1:
+                            if self._buffer[-2] == "\r":
+                                self._buffer = self._buffer[:-2]
+
+                                # ignore if we just got \r\n with nothing else in the buffer.
+                                if len(self._buffer) != 0:
+                                    got_line = True
+                                    break
+                        else:
+                            self._buffer = self._buffer[:-1]
+
+                if timeout > 0 and time.time() - start_time > timeout:
+                    break
+
+                time.sleep(0.01)
+        except serial.SerialException, err:
+            self.close()
+
+            raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
+        else:
+            if got_line:
+                ret = self._buffer
+                self._buffer = ''
+
+                self.on_read(ret)
+
+        return ret
