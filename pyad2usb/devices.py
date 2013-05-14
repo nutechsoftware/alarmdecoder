@@ -7,15 +7,42 @@ from pyftdi.pyftdi.usbtools import *
 from . import util
 from .event import event
 
-class USBDevice(object):
-    FTDI_VENDOR_ID = 0x0403
-    FTDI_PRODUCT_ID = 0x6001
-    BAUDRATE = 115200
-
+class Device(object):
     on_open = event.Event('Called when the device has been opened')
     on_close = event.Event('Called when the device has been closed')
     on_read = event.Event('Called when a line has been read from the device')
     on_write = event.Event('Called when data has been written to the device')
+
+    def __init__(self):
+        pass
+
+    def __del__(self):
+        pass
+
+    class ReadThread(threading.Thread):
+        def __init__(self, device):
+            threading.Thread.__init__(self)
+            self._device = device
+            self._running = False
+
+        def stop(self):
+            self._running = False
+
+        def run(self):
+            self._running = True
+
+            while self._running:
+                try:
+                    self._device.read_line()
+                except util.CommError, err:
+                    self.stop()
+
+                time.sleep(0.25)
+
+class USBDevice(Device):
+    FTDI_VENDOR_ID = 0x0403
+    FTDI_PRODUCT_ID = 0x6001
+    BAUDRATE = 115200
 
     @staticmethod
     def find_all():
@@ -29,6 +56,8 @@ class USBDevice(object):
         return devices
 
     def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None):
+        Device.__init__(self)
+
         self._vendor_id = vid
         self._product_id = pid
         self._serial_number = serial
@@ -37,7 +66,7 @@ class USBDevice(object):
         self._device = Ftdi()
         self._running = False
 
-        self._read_thread = USBDevice.ReadThread(self)
+        self._read_thread = Device.ReadThread(self)
 
     def open(self, baudrate=BAUDRATE, interface=0, index=0):
         self._running = True
@@ -115,37 +144,17 @@ class USBDevice(object):
 
         return ret
 
-    class ReadThread(threading.Thread):
-        def __init__(self, device):
-            threading.Thread.__init__(self)
-            self._device = device
-            self._running = False
 
-        def stop(self):
-            self._running = False
-
-        def run(self):
-            self._running = True
-
-            while self._running:
-                try:
-                    self._device.read_line()
-                except util.CommError, err:
-                    self.stop()
-
-                time.sleep(0.25)
-
-
-class SerialDevice(object):
+class SerialDevice(Device):
     BAUDRATE = 9600
 
     def __init__(self):
-        pass
+        Device.__init__(self)
 
     def __del__(self):
         pass
 
-    def open(self, port, baudrate=BAUDRATE):
+    def open(self, baudrate=BAUDRATE, interface="COM1", index=0):
         pass
 
     def close(self):
