@@ -115,19 +115,21 @@ class USBDevice(Device):
         try:
             while self._running:
                 buf = self._device.read_data(1)
-                self._buffer += buf
 
-                if buf == "\n":
-                    if len(self._buffer) > 1:
-                        if self._buffer[-2] == "\r":
-                            self._buffer = self._buffer[:-2]
+                if buf != '':
+                    self._buffer += buf
 
-                            # ignore if we just got \r\n with nothing else in the buffer.
-                            if len(self._buffer) != 0:
-                                got_line = True
-                                break
-                    else:
-                        self._buffer = self._buffer[:-1]
+                    if buf == "\n":
+                        if len(self._buffer) > 1:
+                            if self._buffer[-2] == "\r":
+                                self._buffer = self._buffer[:-2]
+
+                                # ignore if we just got \r\n with nothing else in the buffer.
+                                if len(self._buffer) != 0:
+                                    got_line = True
+                                    break
+                        else:
+                            self._buffer = self._buffer[:-1]
 
                 if timeout > 0 and time.time() - start_time > timeout:
                     break
@@ -208,8 +210,6 @@ class SerialDevice(Device):
 
                 if buf != '' and buf != "\xff":     # WTF is this \xff and why is it in my buffer?!
                     self._buffer += buf
-
-                    #print '{0:x}'.format(ord(buf))
 
                     if buf == "\n":
                         if len(self._buffer) > 1:
