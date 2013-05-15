@@ -22,6 +22,8 @@ class Overseer(object):
 
     @classmethod
     def create(cls, device=None):
+        cls.find_all()
+
         if len(cls.__devices) == 0:
             raise util.NoDeviceError('No AD2USB devices present.')
 
@@ -53,7 +55,8 @@ class Overseer(object):
         self.stop()
 
     def start(self):
-        self._detect_thread.start()
+        if not self._detect_thread.is_alive():
+            self._detect_thread.start()
 
     def stop(self):
         self._detect_thread.stop()
