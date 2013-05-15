@@ -58,7 +58,7 @@ class USBDevice(Device):
 
         return devices
 
-    def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None):
+    def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None, interface=0):
         Device.__init__(self)
 
         self._vendor_id = vid
@@ -68,23 +68,29 @@ class USBDevice(Device):
         self._buffer = ''
         self._device = Ftdi()
         self._running = False
+        self._interface = interface
 
         self._read_thread = Device.ReadThread(self)
 
-    def open(self, baudrate=BAUDRATE, interface=0, index=0):
+    def open(self, baudrate=BAUDRATE, interface=None, index=0):
         self._running = True
 
         if baudrate is None:
-            baudrate = BAUDRATE
-        if interface is None:
-            interface = 0
+            baudrate = USBDevice.BAUDRATE
+
+        if self._interface is None and interface is None:
+            self._interface = 0
+
+        if interface is not None:
+            self._interface = interface
+
         if index is None:
             index = 0
 
         try:
             self._device.open(self._vendor_id,
                              self._product_id,
-                             interface,
+                             self._interface,
                              index,
                              self._serial_number,
                              self._description)
@@ -171,27 +177,30 @@ class SerialDevice(Device):
 
         return devices
 
-    def __init__(self):
+    def __init__(self, interface=None):
         Device.__init__(self)
 
         self._device = serial.Serial(timeout=0)     # Timeout = non-blocking to match pyftdi.
         self._read_thread = Device.ReadThread(self)
         self._buffer = ''
         self._running = False
+        self._interface = interface
 
     def __del__(self):
         pass
 
-    def open(self, baudrate=BAUDRATE, interface=0, index=0):
+    def open(self, baudrate=BAUDRATE, interface=None, index=None):
         if baudrate is None:
-            baudrate = BAUDRATE
-        if interface is None:
-            interface = 0
-        if index is None:
-            index = 0
+            baudrate = SerialDevice.BAUDRATE
+
+        if self._interface is None and interface is None:
+            raise util.NoDeviceError('No AD2SERIAL device interface specified.')
+
+        if interface is not None:
+            self._interface = interface
 
         self._device.baudrate = baudrate
-        self._device.port = interface
+        self._device.port = self._interface
 
         try:
             self._device.open()

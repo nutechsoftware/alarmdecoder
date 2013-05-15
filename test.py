@@ -39,23 +39,19 @@ try:
 
     #print pyad2usb.ad2usb.devices.SerialDevice.find_all()
 
-    #dev = pyad2usb.ad2usb.AD2USB()
     #dev = overseer.get_device()
 
     #dev = pyad2usb.ad2usb.Overseer.create()
-    dev = pyad2usb.ad2usb.devices.SerialDevice()
-    #dev = pyad2usb.ad2usb.devices.USBDevice()#serial='A101A429', description='FT232R USB UART')
-    #dev.on_open += handle_open
-    #dev.on_close += handle_close
-    #dev.on_read += handle_read
-    #dev.on_write += handle_write
+    #dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB0')
+    dev = pyad2usb.ad2usb.devices.USBDevice()#serial='A101A429', description='FT232R USB UART')
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
     a2u.on_close += handle_close
     a2u.on_read += handle_read
     a2u.on_write += handle_write
-    a2u.open(baudrate=19200, interface='/dev/ttyUSB0')
+    #a2u.open(baudrate=19200, interface='/dev/ttyUSB0')
+    a2u.open()
     #dev.open(baudrate=115200, interface='/dev/ttyUSB5')
     #dev.open(baudrate=19200, interface='/dev/ttyUSB0')
     #dev.open()
