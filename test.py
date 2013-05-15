@@ -37,6 +37,8 @@ try:
     #overseer = pyad2usb.ad2usb.Overseer(attached_event=handle_attached, detached_event=handle_detached)
     #overseer.start()
 
+    print pyad2usb.ad2usb.devices.SerialDevice.find_all()
+
     #dev = pyad2usb.ad2usb.AD2USB()
     #dev = overseer.get_device()
 

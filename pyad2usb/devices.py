@@ -3,6 +3,7 @@ import usb.util
 import time
 import threading
 import serial
+import serial.tools.list_ports
 import traceback
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
@@ -39,7 +40,7 @@ class Device(object):
                 except util.CommError, err:
                     self.stop()
 
-                time.sleep(0.10)
+                time.sleep(0.01)
 
 class USBDevice(Device):
     FTDI_VENDOR_ID = 0x0403
@@ -152,10 +153,21 @@ class USBDevice(Device):
 class SerialDevice(Device):
     BAUDRATE = 19200
 
+    @staticmethod
+    def find_all():
+        devices = []
+
+        try:
+            devices = serial.tools.list_ports.comports()
+        except Exception, err:
+            raise util.CommError('Error enumerating AD2SERIAL devices: {0}'.format(str(err)))
+
+        return devices
+
     def __init__(self):
         Device.__init__(self)
 
-        self._device = serial.Serial(timeout=0)
+        self._device = serial.Serial(timeout=0)     # Timeout = non-blocking to match pyftdi.
         self._read_thread = Device.ReadThread(self)
         self._buffer = ''
         self._running = False
