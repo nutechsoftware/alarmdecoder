@@ -74,6 +74,13 @@ class USBDevice(Device):
     def open(self, baudrate=BAUDRATE, interface=0, index=0):
         self._running = True
 
+        if baudrate is None:
+            baudrate = BAUDRATE
+        if interface is None:
+            interface = 0
+        if index is None:
+            index = 0
+
         try:
             self._device.open(self._vendor_id,
                              self._product_id,
@@ -176,6 +183,13 @@ class SerialDevice(Device):
         pass
 
     def open(self, baudrate=BAUDRATE, interface=0, index=0):
+        if baudrate is None:
+            baudrate = BAUDRATE
+        if interface is None:
+            interface = 0
+        if index is None:
+            index = 0
+
         self._device.baudrate = baudrate
         self._device.port = interface
 

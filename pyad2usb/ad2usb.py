@@ -109,16 +109,36 @@ class AD2USB(object):
     def __del__(self):
         pass
 
-    def open(self):
+    def open(self, baudrate=None, interface=None, index=None):
         self._wire_events()
-        self._device.open()
+        self._device.open(baudrate=baudrate, interface=interface, index=index)
 
     def close(self):
         self._device.close()
         self._device = None
 
     def _wire_events(self):
-        self._device.on_open += self.on_open
-        self._device.on_close += self.on_close
-        self._device.on_read += self.on_read
-        self._device.on_write += self.on_write
+        self._device.on_open += self._on_open
+        self._device.on_close += self._on_close
+        self._device.on_read += self._on_read
+        self._device.on_write += self._on_write
+
+    def _on_open(self, sender, args):
+        print '_on_open: {0}'.format(args)
+
+        self.on_open(args)
+
+    def _on_close(self, sender, args):
+        print '_on_close: {0}'.format(args)
+
+        self.on_close(args)
+
+    def _on_read(self, sender, args):
+        print '_on_read: {0}'.format(args)
+
+        self.on_read(args)
+
+    def _on_write(self, sender, args):
+        print '_on_write: {0}'.format(args)
+
+        self.on_write(args)

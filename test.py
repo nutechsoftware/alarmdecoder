@@ -37,7 +37,7 @@ try:
     #overseer = pyad2usb.ad2usb.Overseer(attached_event=handle_attached, detached_event=handle_detached)
     #overseer.start()
 
-    print pyad2usb.ad2usb.devices.SerialDevice.find_all()
+    #print pyad2usb.ad2usb.devices.SerialDevice.find_all()
 
     #dev = pyad2usb.ad2usb.AD2USB()
     #dev = overseer.get_device()
@@ -45,18 +45,26 @@ try:
     #dev = pyad2usb.ad2usb.Overseer.create()
     dev = pyad2usb.ad2usb.devices.SerialDevice()
     #dev = pyad2usb.ad2usb.devices.USBDevice()#serial='A101A429', description='FT232R USB UART')
-    dev.on_open += handle_open
-    dev.on_close += handle_close
-    dev.on_read += handle_read
-    dev.on_write += handle_write
+    #dev.on_open += handle_open
+    #dev.on_close += handle_close
+    #dev.on_read += handle_read
+    #dev.on_write += handle_write
+
+    a2u = pyad2usb.ad2usb.AD2USB(dev)
+    a2u.on_open += handle_open
+    a2u.on_close += handle_close
+    a2u.on_read += handle_read
+    a2u.on_write += handle_write
+    a2u.open(baudrate=19200, interface='/dev/ttyUSB0')
     #dev.open(baudrate=115200, interface='/dev/ttyUSB5')
-    dev.open(baudrate=19200, interface='/dev/ttyUSB0')
+    #dev.open(baudrate=19200, interface='/dev/ttyUSB0')
     #dev.open()
 
     while running:
         time.sleep(0.1)
 
-    dev.close()
+    a2u.close()
+    #dev.close()
     #overseer.close()
 
     #wut.close()
