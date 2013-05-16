@@ -4,6 +4,7 @@ import pyad2usb.ad2usb
 import time
 import signal
 import traceback
+import sys
 
 running = True
 
@@ -30,6 +31,24 @@ def handle_attached(sender, args):
 def handle_detached(sender, args):
     print 'detached', args
 
+def handle_firmware(stage):
+    if stage == pyad2usb.ad2usb.util.Firmware.STAGE_BOOT:
+        print 'Rebooting device..'
+
+        handle_firmware.upload_tick = 0
+    elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_LOAD:
+        print 'Waiting for boot loader..'
+    elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_UPLOADING:
+        if handle_firmware.upload_tick == 0:
+            sys.stdout.write('Uploading firmware.')
+
+        handle_firmware.upload_tick += 1
+
+        if handle_firmware.upload_tick % 30 == 0:
+            sys.stdout.write('.')
+            sys.stdout.flush()
+    elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_DONE:
+        print "\r\nDone!"
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -55,7 +74,7 @@ try:
     dev.on_open += handle_open
     dev.on_close += handle_close
     #dev.on_read += handle_read
-    dev.on_write += handle_write
+    #dev.on_write += handle_write
 
 
     #a2u.open()
@@ -65,7 +84,7 @@ try:
     #dev.open(baudrate=19200, interface='/dev/ttyUSB0')
     dev.open()
 
-    pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex')
+    pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
 
     while running:
         time.sleep(0.1)

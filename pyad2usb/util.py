@@ -1,5 +1,6 @@
 import ad2usb
 import time
+import traceback
 
 class NoDeviceError(Exception):
     pass
@@ -11,6 +12,11 @@ class TimeoutError(Exception):
     pass
 
 class Firmware(object):
+    STAGE_BOOT = 1
+    STAGE_LOAD = 2
+    STAGE_UPLOADING = 3
+    STAGE_DONE = 4
+
     def __init__(self):
         pass
 
@@ -18,17 +24,17 @@ class Firmware(object):
         pass
 
     @staticmethod
-    def upload(dev, filename):
+    def upload(dev, filename, progress_callback=None):
         def do_upload():
             with open(filename) as f:
-                print 'firmwaring this mofo!'
                 for line in f:
                     line = line.rstrip()
                     if line[0] == ':':
-                        print "> {0}".format(line)
                         dev.write(line + "\r")
-                        crap = dev.read_line()
-                        print "< {0}".format(crap)
+                        res = dev.read_line()
+
+                        if progress_callback is not None:
+                            progress_callback(Firmware.STAGE_UPLOADING)
 
                         time.sleep(0.05)
 
@@ -58,16 +64,23 @@ class Firmware(object):
             raise NoDeviceError('No device specified for firmware upload.')
 
         dev.close_reader()
-        time.sleep(1)
+        time.sleep(5)
 
         try:
             dev.write("=\r\n")
+            if progress_callback is not None:
+                progress_callback(Firmware.STAGE_BOOT)
             read_until('!boot', timeout=10.0)
 
             dev.write("=\r\n")
+            if progress_callback is not None:
+                progress_callback(Firmware.STAGE_LOAD)
             read_until('!load', timeout=10.0)
 
             do_upload()
+            if progress_callback is not None:
+                progress_callback(Firmware.STAGE_DONE)
+
         except TimeoutError, err:
             print traceback.print_exc(err)
             pass
