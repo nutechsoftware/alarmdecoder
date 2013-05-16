@@ -38,7 +38,8 @@ class Device(object):
                 try:
                     self._device.read_line()
                 except util.CommError, err:
-                    self.stop()
+                    #self.stop()
+                    pass
 
                 time.sleep(0.01)
 
@@ -226,6 +227,9 @@ class SerialDevice(Device):
 
         self.on_close()
 
+    def close_reader(self):
+        self._read_thread.stop()
+
     def write(self, data):
         try:
             self._device.write(data)
@@ -233,6 +237,9 @@ class SerialDevice(Device):
             pass
         else:
             self.on_write(data)
+
+    def read(self):
+        return self._device.read(1)
 
     def read_line(self, timeout=0.0):
         start_time = time.time()
@@ -260,11 +267,7 @@ class SerialDevice(Device):
 
                 if timeout > 0 and time.time() - start_time > timeout:
                     break
-
-                time.sleep(0.01)
         except serial.SerialException, err:
-            self.close()
-
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
         else:
             if got_line:
