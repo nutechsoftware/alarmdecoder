@@ -70,13 +70,9 @@ try:
     while running:
         time.sleep(0.1)
 
-    print 'wat'
-
     #a2u.close()
     dev.close()
     #overseer.close()
 
 except Exception, err:
-    #print 'Error: {0}'.format(str(err))
-    print 'wtf'
     traceback.print_exc(err)
