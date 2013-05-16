@@ -268,7 +268,7 @@ class SerialDevice(Device):
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise util.TimeoutError('Timeout while waiting for line terminator.')
 
-        except serial.SerialException, err:
+        except (OSError, serial.SerialException), err:
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
         else:
             if got_line:
