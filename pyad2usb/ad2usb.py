@@ -127,21 +127,13 @@ class AD2USB(object):
         self._device.on_write += self._on_write
 
     def _on_open(self, sender, args):
-        print '_on_open: {0}'.format(args)
-
         self.on_open(args)
 
     def _on_close(self, sender, args):
-        print '_on_close: {0}'.format(args)
-
         self.on_close(args)
 
     def _on_read(self, sender, args):
-        print '_on_read: {0}'.format(args)
-
         self.on_read(args)
 
     def _on_write(self, sender, args):
-        print '_on_write: {0}'.format(args)
-
         self.on_write(args)
