@@ -36,9 +36,10 @@ class Device(object):
 
             while self._running:
                 try:
-                    self._device.read_line()
+                    self._device.read_line(timeout=10)
                 except util.CommError, err:
-                    #self.stop()
+                    traceback.print_exc(err)
+                except util.TimeoutError, err:
                     pass
 
                 time.sleep(0.01)
@@ -112,15 +113,24 @@ class USBDevice(Device):
             self._read_thread.stop()
 
             self._device.close()
+
+            # HACK: Probably should fork pyftdi and make this call in .close().
+            self._device.usb_dev.attach_kernel_driver(self._interface)
         except (FtdiError, usb.core.USBError):
             pass
 
         self.on_close()
 
+    def close_reader(self):
+        self._read_thread.stop()
+
     def write(self, data):
         self._device.write_data(data)
 
         self.on_write(data)
+
+    def read(self):
+        return self._device.read_data(1)
 
     def read_line(self, timeout=0.0):
         start_time = time.time()
@@ -147,12 +157,9 @@ class USBDevice(Device):
                             self._buffer = self._buffer[:-1]
 
                 if timeout > 0 and time.time() - start_time > timeout:
-                    break
+                    raise util.TimeoutError('Timeout while waiting for line terminator.')
 
-                time.sleep(0.01)
         except (usb.core.USBError, FtdiError), err:
-            self.close()
-
             raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
         else:
             if got_line:
