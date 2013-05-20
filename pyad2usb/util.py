@@ -12,10 +12,12 @@ class TimeoutError(Exception):
     pass
 
 class Firmware(object):
-    STAGE_BOOT = 1
-    STAGE_LOAD = 2
-    STAGE_UPLOADING = 3
-    STAGE_DONE = 4
+    STAGE_START = 0
+    STAGE_WAITING = 1
+    STAGE_BOOT = 2
+    STAGE_LOAD = 3
+    STAGE_UPLOADING = 4
+    STAGE_DONE = 5
 
     def __init__(self):
         pass
@@ -29,6 +31,7 @@ class Firmware(object):
             with open(filename) as f:
                 for line in f:
                     line = line.rstrip()
+
                     if line[0] == ':':
                         dev.write(line + "\r")
                         res = dev.read_line()
@@ -54,8 +57,9 @@ class Firmware(object):
                                 break
                         else:
                             position = 0
+
                 except Exception, err:
-                    pass
+                    traceback.print_exc(err)
 
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise TimeoutError('Timed out waiting for pattern: {0}'.format(pattern))
@@ -63,18 +67,27 @@ class Firmware(object):
         if dev is None:
             raise NoDeviceError('No device specified for firmware upload.')
 
+        if progress_callback is not None:
+            progress_callback(Firmware.STAGE_START)
+
         dev.close_reader()
-        time.sleep(5)
+        while dev._read_thread.is_alive():
+            if progress_callback is not None:
+                progress_callback(Firmware.STAGE_WAITING)
+
+            time.sleep(1)
 
         try:
-            dev.write("=\r\n")
             if progress_callback is not None:
                 progress_callback(Firmware.STAGE_BOOT)
+
+            dev.write("=")
             read_until('!boot', timeout=10.0)
 
-            dev.write("=\r\n")
             if progress_callback is not None:
                 progress_callback(Firmware.STAGE_LOAD)
+
+            dev.write("=")
             read_until('!load', timeout=10.0)
 
             do_upload()
@@ -84,5 +97,3 @@ class Firmware(object):
         except TimeoutError, err:
             print traceback.print_exc(err)
             pass
-
-
