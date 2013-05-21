@@ -166,11 +166,11 @@ try:
     #test_serial()
     #upload_serial()
 
-    test_usb()
+    #test_usb()
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    #upload_usb()
+    upload_usb()
     #upload_usb_serial()
 
 except Exception, err:

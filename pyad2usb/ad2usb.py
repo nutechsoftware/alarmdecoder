@@ -480,7 +480,7 @@ class Message(object):
         """
         return self._raw
 
-    @raw_text.setter
+    @raw.setter
     def raw(self, value):
         """
         Sets the raw representation of the message data from the panel.

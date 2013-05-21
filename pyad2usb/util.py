@@ -99,41 +99,37 @@ class Firmware(object):
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise TimeoutError('Timed out waiting for pattern: {0}'.format(pattern))
 
+        def stage_callback(stage):
+            if progress_callback is not None:
+                progress_callback(stage)
+
         if dev is None:
             raise NoDeviceError('No device specified for firmware upload.')
 
-        if progress_callback is not None:
-            progress_callback(Firmware.STAGE_START)
+        stage_callback(Firmware.STAGE_START)
 
         # Close the reader thread and wait for it to die, otherwise
         # it interferes with our reading.
         dev.close_reader()
         while dev._read_thread.is_alive():
-            if progress_callback is not None:
-                progress_callback(Firmware.STAGE_WAITING)
-
+            stage_callback(Firmware.STAGE_WAITING)
             time.sleep(1)
 
         try:
-            if progress_callback is not None:
-                progress_callback(Firmware.STAGE_BOOT)
-
             # Reboot the device and wait for the boot loader.
+            stage_callback(Firmware.STAGE_BOOT)
             dev.write("=")
             read_until('!boot', timeout=10.0)
 
-            if progress_callback is not None:
-                progress_callback(Firmware.STAGE_LOAD)
-
             # Get ourselves into the boot loader and wait for indication
             # that it's ready for the firmware upload.
+            stage_callback(Firmware.STAGE_LOAD)
             dev.write("=")
             read_until('!load', timeout=10.0)
 
             # And finally do the upload.
             do_upload()
-            if progress_callback is not None:
-                progress_callback(Firmware.STAGE_DONE)
+            stage_callback(Firmware.STAGE_DONE)
 
         except TimeoutError, err:
             print traceback.print_exc(err)              # TEMP
