@@ -1,3 +1,7 @@
+"""
+Contains different types of devices belonging to the AD2USB family.
+"""
+
 import usb.core
 import usb.util
 import time
@@ -11,6 +15,10 @@ from . import util
 from .event import event
 
 class Device(object):
+    """
+    Generic parent device to all AD2USB products.
+    """
+
     on_open = event.Event('Called when the device has been opened')
     on_close = event.Event('Called when the device has been closed')
     on_read = event.Event('Called when a line has been read from the device')
@@ -23,15 +31,28 @@ class Device(object):
         pass
 
     class ReadThread(threading.Thread):
+        """
+        Reader thread which processes messages from the device.
+        """
+
         def __init__(self, device):
+            """
+            Constructor
+            """
             threading.Thread.__init__(self)
             self._device = device
             self._running = False
 
         def stop(self):
+            """
+            Stops the running thread.
+            """
             self._running = False
 
         def run(self):
+            """
+            The actual read process.
+            """
             self._running = True
 
             while self._running:
@@ -45,12 +66,20 @@ class Device(object):
                 time.sleep(0.01)
 
 class USBDevice(Device):
+    """
+    AD2USB device exposed with PyFTDI's interface.
+    """
+
     FTDI_VENDOR_ID = 0x0403
     FTDI_PRODUCT_ID = 0x6001
     BAUDRATE = 115200
 
     @staticmethod
     def find_all():
+        """
+        Returns all FTDI devices matching our vendor and product IDs.
+        """
+
         devices = []
 
         try:
@@ -61,6 +90,10 @@ class USBDevice(Device):
         return devices
 
     def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None, interface=0):
+        """
+        Constructor
+        """
+
         Device.__init__(self)
 
         self._vendor_id = vid
@@ -75,6 +108,9 @@ class USBDevice(Device):
         self._read_thread = Device.ReadThread(self)
 
     def open(self, baudrate=BAUDRATE, interface=None, index=0):
+        """
+        Opens the device.
+        """
         self._running = True
 
         if baudrate is None:
@@ -108,6 +144,9 @@ class USBDevice(Device):
             self.on_open((self._serial_number, self._description))
 
     def close(self):
+        """
+        Closes the device.
+        """
         try:
             self._running = False
             self._read_thread.stop()
@@ -122,17 +161,29 @@ class USBDevice(Device):
         self.on_close()
 
     def close_reader(self):
+        """
+        Stops the reader thread.
+        """
         self._read_thread.stop()
 
     def write(self, data):
+        """
+        Writes data to the device.
+        """
         self._device.write_data(data)
 
         self.on_write(data)
 
     def read(self):
+        """
+        Reads a single character from the device.
+        """
         return self._device.read_data(1)
 
     def read_line(self, timeout=0.0):
+        """
+        Reads a line from the device.
+        """
         start_time = time.time()
         got_line = False
         ret = None
@@ -172,10 +223,16 @@ class USBDevice(Device):
 
 
 class SerialDevice(Device):
+    """
+    AD2USB or AD2SERIAL device exposed with the pyserial interface.
+    """
     BAUDRATE = 19200
 
     @staticmethod
     def find_all():
+        """
+        Returns all serial ports present.
+        """
         devices = []
 
         try:
@@ -186,6 +243,9 @@ class SerialDevice(Device):
         return devices
 
     def __init__(self, interface=None):
+        """
+        Constructor
+        """
         Device.__init__(self)
 
         self._device = serial.Serial(timeout=0)     # Timeout = non-blocking to match pyftdi.
@@ -195,9 +255,15 @@ class SerialDevice(Device):
         self._interface = interface
 
     def __del__(self):
+        """
+        Destructor
+        """
         pass
 
     def open(self, baudrate=BAUDRATE, interface=None, index=None):
+        """
+        Opens the device.
+        """
         if baudrate is None:
             baudrate = SerialDevice.BAUDRATE
 
@@ -224,6 +290,9 @@ class SerialDevice(Device):
             self._read_thread.start()
 
     def close(self):
+        """
+        Closes the device.
+        """
         try:
             self._running = False
             self._read_thread.stop()
@@ -235,9 +304,15 @@ class SerialDevice(Device):
         self.on_close()
 
     def close_reader(self):
+        """
+        Stops the reader thread.
+        """
         self._read_thread.stop()
 
     def write(self, data):
+        """
+        Writes data to the device.
+        """
         try:
             self._device.write(data)
         except serial.SerialTimeoutException, err:
@@ -246,9 +321,15 @@ class SerialDevice(Device):
             self.on_write(data)
 
     def read(self):
+        """
+        Reads a single character from the device.
+        """
         return self._device.read(1)
 
     def read_line(self, timeout=0.0):
+        """
+        Reads a line from the device.
+        """
         start_time = time.time()
         got_line = False
         ret = None

@@ -1,17 +1,34 @@
+"""
+Provides utility classes for the AD2USB devices.
+"""
+
 import ad2usb
 import time
 import traceback
 
 class NoDeviceError(Exception):
+    """
+    No devices found.
+    """
     pass
 
 class CommError(Exception):
+    """
+    There was an error communicating with the device.
+    """
     pass
 
 class TimeoutError(Exception):
+    """
+    There was a timeout while trying to communicate with the device.
+    """
     pass
 
 class Firmware(object):
+    """
+    Represents firmware for the AD2USB/AD2SERIAL devices.
+    """
+
     STAGE_START = 0
     STAGE_WAITING = 1
     STAGE_BOOT = 2
@@ -20,13 +37,22 @@ class Firmware(object):
     STAGE_DONE = 5
 
     def __init__(self):
+        """
+        Constructor
+        """
         pass
 
     def __del__(self):
+        """
+        Destructor
+        """
         pass
 
     @staticmethod
     def upload(dev, filename, progress_callback=None):
+        """
+        Uploads firmware to an AD2USB/AD2SERIAL device.
+        """
         def do_upload():
             with open(filename) as f:
                 for line in f:
