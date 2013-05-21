@@ -59,7 +59,6 @@ class Firmware(object):
             """
             Perform the actual firmware upload to the device.
             """
-
             with open(filename) as f:
                 for line in f:
                     line = line.rstrip()
