@@ -8,6 +8,7 @@ import time
 import threading
 import serial
 import serial.tools.list_ports
+import socket
 import traceback
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
@@ -113,8 +114,6 @@ class USBDevice(Device):
         """
         Opens the device.
         """
-        self._running = True
-
         # Set up defaults
         if baudrate is None:
             baudrate = USBDevice.BAUDRATE
@@ -143,6 +142,7 @@ class USBDevice(Device):
 
             raise util.CommError('Error opening AD2USB device: {0}'.format(str(err)))
         else:
+            self._running = True
             self._read_thread.start()
 
             self.on_open((self._serial_number, self._description))
@@ -270,7 +270,6 @@ class SerialDevice(Device):
         """
         Opens the device.
         """
-
         # Set up the defaults
         if baudrate is None:
             baudrate = SerialDevice.BAUDRATE
@@ -287,13 +286,12 @@ class SerialDevice(Device):
         # Open the device and start up the reader thread.
         try:
             self._device.open()
-
-            self._running = True
         except (serial.SerialException, ValueError), err:
             self.on_close()
 
             raise util.NoDeviceError('Error opening AD2SERIAL device on port {0}.'.format(interface))
         else:
+            self._running = True
             self.on_open((None, "AD2SERIAL"))   # TODO: Fixme.
 
             self._read_thread.start()
@@ -367,6 +365,129 @@ class SerialDevice(Device):
 
         except (OSError, serial.SerialException), err:
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
+        else:
+            if got_line:
+                ret = self._buffer
+                self._buffer = ''
+
+                self.on_read(ret)
+
+        return ret
+
+class SocketDevice(Device):
+    """
+    Device that supports communication with an AD2USB that is exposed via ser2sock or another
+    Serial to IP interface.
+    """
+
+    def __init__(self, interface=None):
+        """
+        Constructor
+        """
+        self._host = "localhost"
+        self._port = 10000
+        self._socket = None
+        self._buffer = ''
+        self._running = False
+
+        self._read_thread = Device.ReadThread(self)
+
+    def __del__(self):
+        """
+        Destructor
+        """
+        pass
+
+    def open(self, baudrate=None, interface=None, index=0):
+        """
+        Opens the device.
+        """
+        if interface is not None:
+            self._host, self._port = interface
+
+        try:
+            self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._socket.connect((self._host, self._port))
+        except socket.error, err:
+            self.on_close()
+
+            traceback.print_exc(err)            # TEMP
+        else:
+            self._running = True
+
+            self.on_open((None, "AD2SOCKET"))   # TEMP: Change me.
+            self._read_thread.start()
+
+    def close(self):
+        """
+        Closes the device.
+        """
+        self._running = False
+
+        try:
+            self._read_thread.stop()
+            self._socket.shutdown(socket.SHUT_RDWR)
+            self._socket.close()
+        except:
+            pass
+
+        self.on_close()
+
+    def close_reader(self):
+        """
+        Stops the reader thread.
+        """
+        self._read_thread.stop()    # TODO: make this actually work with socket code.
+
+    def write(self, data):
+        """
+        Writes data to the device.
+        """
+        data_sent = self._socket.send(data)
+
+        if data_sent == 0:
+            raise util.CommError('Error while sending data.')
+        else:
+            self.on_write(data)
+
+    def read(self):
+        """
+        Reads a single character from the device.
+        """
+        return self._socket.recv(1)
+
+    def read_line(self, timeout=0.0):
+        """
+        Reads a line from the device.
+        """
+        start_time = time.time()
+        got_line = False
+        ret = None
+
+        try:
+            while self._running:
+                buf = self._socket.recv(1)
+
+                if buf != '':     # AD2SERIAL specifically apparently sends down \xFF on boot.
+                    self._buffer += buf
+
+                    if buf == "\n":
+                        if len(self._buffer) > 1:
+                            if self._buffer[-2] == "\r":
+                                self._buffer = self._buffer[:-2]
+
+                                # ignore if we just got \r\n with nothing else in the buffer.
+                                if len(self._buffer) != 0:
+                                    got_line = True
+                                    break
+                        else:
+                            self._buffer = self._buffer[:-1]
+
+                if timeout > 0 and time.time() - start_time > timeout:
+                    raise util.TimeoutError('Timeout while waiting for line terminator.')
+
+        except socket.error, err:
+            raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
         else:
             if got_line:
                 ret = self._buffer

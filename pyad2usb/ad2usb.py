@@ -205,9 +205,7 @@ class AD2USB(object):
             return None
 
         msg = Message()
-        msg.ignore_packet = True
-
-        print msg.ignore_packet
+        # parse and build stuff
 
     def _on_open(self, sender, args):
         """

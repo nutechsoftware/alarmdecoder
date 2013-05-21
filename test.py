@@ -79,6 +79,13 @@ def upload_usb_serial():
     pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
     dev.close()
 
+def upload_socket():
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=('localhost', 10000))
+
+    dev.open()
+    pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
+    dev.close()
+
 def test_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -160,6 +167,22 @@ def test_factory_watcher():
     a2u.close()
     overseer.close()
 
+def test_socket():
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("localhost", 10000))
+
+    a2u = pyad2usb.ad2usb.AD2USB(dev)
+    a2u.on_open += handle_open
+    a2u.on_close += handle_close
+    a2u.on_read += handle_read
+    a2u.on_write += handle_write
+
+    a2u.open()
+
+    while running:
+        time.sleep(0.1)
+
+    a2u.close()
+
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
@@ -170,8 +193,11 @@ try:
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    upload_usb()
+    #upload_usb()
     #upload_usb_serial()
+
+    test_socket()
+    #upload_socket()
 
 except Exception, err:
     traceback.print_exc(err)
