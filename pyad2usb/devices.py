@@ -19,6 +19,7 @@ class Device(object):
     Generic parent device to all AD2USB products.
     """
 
+    # Generic device events
     on_open = event.Event('Called when the device has been opened')
     on_close = event.Event('Called when the device has been closed')
     on_read = event.Event('Called when a line has been read from the device')
@@ -59,7 +60,7 @@ class Device(object):
                 try:
                     self._device.read_line(timeout=10)
                 except util.CommError, err:
-                    traceback.print_exc(err)
+                    traceback.print_exc(err)    # TEMP
                 except util.TimeoutError, err:
                     pass
 
@@ -70,6 +71,7 @@ class USBDevice(Device):
     AD2USB device exposed with PyFTDI's interface.
     """
 
+    # Constants
     FTDI_VENDOR_ID = 0x0403
     FTDI_PRODUCT_ID = 0x6001
     BAUDRATE = 115200
@@ -113,6 +115,7 @@ class USBDevice(Device):
         """
         self._running = True
 
+        # Set up defaults
         if baudrate is None:
             baudrate = USBDevice.BAUDRATE
 
@@ -125,6 +128,7 @@ class USBDevice(Device):
         if index is None:
             index = 0
 
+        # Open the device and start up the thread.
         try:
             self._device.open(self._vendor_id,
                              self._product_id,
@@ -226,6 +230,8 @@ class SerialDevice(Device):
     """
     AD2USB or AD2SERIAL device exposed with the pyserial interface.
     """
+
+    # Constants
     BAUDRATE = 19200
 
     @staticmethod
@@ -264,6 +270,8 @@ class SerialDevice(Device):
         """
         Opens the device.
         """
+
+        # Set up the defaults
         if baudrate is None:
             baudrate = SerialDevice.BAUDRATE
 
@@ -276,6 +284,7 @@ class SerialDevice(Device):
         self._device.baudrate = baudrate
         self._device.port = self._interface
 
+        # Open the device and start up the reader thread.
         try:
             self._device.open()
 
@@ -338,7 +347,7 @@ class SerialDevice(Device):
             while self._running:
                 buf = self._device.read(1)
 
-                if buf != '' and buf != "\xff":     # WTF is this \xff and why is it in my buffer?!
+                if buf != '' and buf != "\xff":     # AD2SERIAL specifically apparently sends down \xFF on boot.
                     self._buffer += buf
 
                     if buf == "\n":

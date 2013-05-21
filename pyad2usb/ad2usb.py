@@ -13,6 +13,7 @@ class Overseer(object):
     Factory for creation of AD2USB devices as well as provide4s attach/detach events."
     """
 
+    # Factory events
     on_attached = event.Event('Called when an AD2USB device has been detected.')
     on_detached = event.Event('Called when an AD2USB device has been removed.')
 
@@ -152,12 +153,14 @@ class AD2USB(object):
     High-level wrapper around AD2USB/AD2SERIAL devices.
     """
 
+    # High-level Events
     on_open = event.Event('Called when the device has been opened')
     on_close = event.Event('Called when the device has been closed')
+    on_message = event.Event('Called when a message has been received from the device.')
+
+    # Low-level Events
     on_read = event.Event('Called when a line has been read from the device')
     on_write = event.Event('Called when data has been written to the device')
-
-    on_message = event.Event('Called when a message has been received from the device.')
 
     def __init__(self, device):
         """
@@ -198,7 +201,7 @@ class AD2USB(object):
         """
         Parses messages from the panel.
         """
-        if data[0] == '!':
+        if data[0] == '!':      # TEMP: Remove this.
             return None
 
         msg = Message()

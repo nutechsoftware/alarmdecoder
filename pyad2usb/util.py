@@ -29,6 +29,7 @@ class Firmware(object):
     Represents firmware for the AD2USB/AD2SERIAL devices.
     """
 
+    # Constants
     STAGE_START = 0
     STAGE_WAITING = 1
     STAGE_BOOT = 2
@@ -53,7 +54,12 @@ class Firmware(object):
         """
         Uploads firmware to an AD2USB/AD2SERIAL device.
         """
+
         def do_upload():
+            """
+            Perform the actual firmware upload to the device.
+            """
+
             with open(filename) as f:
                 for line in f:
                     line = line.rstrip()
@@ -68,6 +74,9 @@ class Firmware(object):
                         time.sleep(0.05)
 
         def read_until(pattern, timeout=0.0):
+            """
+            Read characters until a specific pattern is found or the timeout is hit.
+            """
             start_time = time.time()
             buf = ''
             position = 0
@@ -96,6 +105,8 @@ class Firmware(object):
         if progress_callback is not None:
             progress_callback(Firmware.STAGE_START)
 
+        # Close the reader thread and wait for it to die, otherwise
+        # it interferes with our reading.
         dev.close_reader()
         while dev._read_thread.is_alive():
             if progress_callback is not None:
@@ -107,19 +118,23 @@ class Firmware(object):
             if progress_callback is not None:
                 progress_callback(Firmware.STAGE_BOOT)
 
+            # Reboot the device and wait for the boot loader.
             dev.write("=")
             read_until('!boot', timeout=10.0)
 
             if progress_callback is not None:
                 progress_callback(Firmware.STAGE_LOAD)
 
+            # Get ourselves into the boot loader and wait for indication
+            # that it's ready for the firmware upload.
             dev.write("=")
             read_until('!load', timeout=10.0)
 
+            # And finally do the upload.
             do_upload()
             if progress_callback is not None:
                 progress_callback(Firmware.STAGE_DONE)
 
         except TimeoutError, err:
-            print traceback.print_exc(err)
+            print traceback.print_exc(err)              # TEMP
             pass
