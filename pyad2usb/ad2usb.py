@@ -240,7 +240,7 @@ class Message(object):
     Represents a message from the alarm panel.
     """
 
-    def __init__(self):
+    def __init__(self, data=None):
         """
         Constructor
         """
@@ -260,6 +260,17 @@ class Message(object):
         self._text = ""
         self._cursor = -1
         self._raw = ""
+
+        if data is not None:
+            self._parse_message(data)
+
+    def _parse_message(self, data):
+        pattern = '("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)'
+
+
+
+
+        pass
 
     @property
     def ignore_packet(self):
