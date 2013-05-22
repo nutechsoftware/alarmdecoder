@@ -437,7 +437,7 @@ class SocketDevice(Device):
         """
         Stops the reader thread.
         """
-        self._read_thread.stop()    # TODO: make this actually work with socket code.
+        self._read_thread.stop()
 
     def write(self, data):
         """
@@ -449,6 +449,8 @@ class SocketDevice(Device):
             raise util.CommError('Error while sending data.')
         else:
             self.on_write(data)
+
+        return data_sent
 
     def read(self):
         """
@@ -468,7 +470,7 @@ class SocketDevice(Device):
             while self._running:
                 buf = self._socket.recv(1)
 
-                if buf != '':     # AD2SERIAL specifically apparently sends down \xFF on boot.
+                if buf != '':
                     self._buffer += buf
 
                     if buf == "\n":
