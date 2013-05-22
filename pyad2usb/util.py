@@ -93,7 +93,7 @@ class Firmware(object):
                             position = 0
 
                 except Exception, err:
-                    traceback.print_exc(err)
+                    traceback.print_exc(err)    # TEMP
 
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise TimeoutError('Timed out waiting for pattern: {0}'.format(pattern))
