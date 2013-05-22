@@ -456,7 +456,14 @@ class SocketDevice(Device):
         """
         Reads a single character from the device.
         """
-        return self._device.recv(1)
+        try:
+            data = self._device.recv(1)
+        except socket.error, err:
+            raise util.CommError('Error while reading from device: {0}'.format(str(err)))
+
+        # ??? - Should we trigger an on_read here as well?
+
+        return data
 
     def read_line(self, timeout=0.0):
         """
