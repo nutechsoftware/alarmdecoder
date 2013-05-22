@@ -386,7 +386,7 @@ class SocketDevice(Device):
         """
         self._host = "localhost"
         self._port = 10000
-        self._socket = None
+        self._device = None
         self._buffer = ''
         self._running = False
 
@@ -406,8 +406,8 @@ class SocketDevice(Device):
             self._host, self._port = interface
 
         try:
-            self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._socket.connect((self._host, self._port))
+            self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._device.connect((self._host, self._port))
         except socket.error, err:
             self.on_close()
 
@@ -426,8 +426,8 @@ class SocketDevice(Device):
 
         try:
             self._read_thread.stop()
-            self._socket.shutdown(socket.SHUT_RDWR)
-            self._socket.close()
+            self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
+            self._device.close()
         except:
             pass
 
@@ -443,7 +443,7 @@ class SocketDevice(Device):
         """
         Writes data to the device.
         """
-        data_sent = self._socket.send(data)
+        data_sent = self._device.send(data)
 
         if data_sent == 0:
             raise util.CommError('Error while sending data.')
@@ -456,7 +456,7 @@ class SocketDevice(Device):
         """
         Reads a single character from the device.
         """
-        return self._socket.recv(1)
+        return self._device.recv(1)
 
     def read_line(self, timeout=0.0):
         """
@@ -468,7 +468,7 @@ class SocketDevice(Device):
 
         try:
             while self._running:
-                buf = self._socket.recv(1)
+                buf = self._device.recv(1)
 
                 if buf != '':
                     self._buffer += buf
