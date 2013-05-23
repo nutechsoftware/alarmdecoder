@@ -179,6 +179,9 @@ class AD2USB(object):
         self._bypass_status = None
         self._device = device
 
+
+        self._address_mask = 0xFF80     # TEMP
+
     def __del__(self):
         """
         Destructor
@@ -212,35 +215,37 @@ class AD2USB(object):
         """
         Parses messages from the panel.
         """
-        if data[0] == '!':      # TEMP: Remove this.
-            return None
+        msg = None
 
-        msg = Message(data)
+        if data[0] != '!':
+            msg = Message(data)
 
-        # parse and build stuff
+            # parse and build stuff
+            if self._address_mask & msg.mask > 0:
+                if msg.ac != self._power_status:
+                    self._power_status, old_status = msg.ac, self._power_status
 
-        # TEMP
-        address_mask = 0xFF80
+                    if old_status is not None:
+                        self.on_power_changed(self._power_status)
 
-        if address_mask & msg.mask > 0:
-            #print 'ac={0}, alarm={1}, bypass={2}'.format(msg.ac, msg.alarm_bell, msg.bypass)
-            if msg.ac != self._power_status:
-                self._power_status, old_status = msg.ac, self._power_status
-                #print '\tpower: new={0}, old={1}'.format(self._power_status, old_status)
-                if old_status is not None:
-                    self.on_power_changed(self._power_status)
+                if msg.alarm_bell != self._alarm_status:
+                    self._alarm_status, old_status = msg.alarm_bell, self._alarm_status
 
-            if msg.alarm_bell != self._alarm_status:
-                self._alarm_status, old_status = msg.alarm_bell, self._alarm_status
-                #print '\talarm: new={0}, old={1}'.format(self._alarm_status, old_status)
-                if old_status is not None:
-                    self.on_alarm(self._alarm_status)
+                    if old_status is not None:
+                        self.on_alarm(self._alarm_status)
 
-            if msg.bypass != self._bypass_status:
-                self._bypass_status, old_status = msg.bypass, self._bypass_status
-                #print '\tbypass: new={0}, old={1}'.format(self._bypass_status, old_status)
-                if old_status is not None:
-                    self.on_bypass(self._bypass_status)
+                if msg.bypass != self._bypass_status:
+                    self._bypass_status, old_status = msg.bypass, self._bypass_status
+
+                    if old_status is not None:
+                        self.on_bypass(self._bypass_status)
+        else:
+            # specialty messages
+            if data[0:4] == '!EXP':
+                msg = ZoneExpanderMessage(data)
+
+        if msg:
+            self.on_message(msg)
 
     def _on_open(self, sender, args):
         """
@@ -308,6 +313,9 @@ class Message(object):
             self._parse_message(data)
 
     def _parse_message(self, data):
+        """
+        Parse the raw message from the device.
+        """
         m = self._regex.match(data)
 
         if m is None:
@@ -366,6 +374,12 @@ class Message(object):
         #            self.numeric,
         #            self.text
         #        )
+
+    def __str__(self):
+        """
+        String conversion operator.
+        """
+        return 'msg > {0:0<9} [{1}{2}{3}] -- ({4}) {5}'.format(hex(self.mask), 1 if self.ready else 0, 1 if self.armed_away else 0, 1 if self.armed_home else 0, self.numeric, self.text)
 
     @property
     def ignore_packet(self):
@@ -604,3 +618,77 @@ class Message(object):
         Sets the panel mask for which this message is intended.
         """
         self._mask = value
+
+def ZoneExpanderMessage(object):
+    def __init__(self, data=None):
+        """
+        Constructor
+        """
+        self._address = None
+        self._channel = None
+        self._value = None
+        self._raw = None
+
+        if data is not None:
+            self._parse_message(data)
+
+    def __str__(self):
+        """
+        String conversion operator.
+        """
+        return 'zonemsg > {0}:{1} -- {2}'.format(self.address, self.channel, self.value)
+
+    def _parse_message(self, data):
+        """
+        Parse the raw message from the device.
+        """
+        if data[0:4] == '!EXP':
+            header, address, channel, value = data.split(',')
+
+            self.address = address
+            self.channel = channel
+            self.value = value
+
+        self._raw = data
+
+    @property
+    def address(self):
+        """
+        The relay address from which the message originated.
+        """
+        return self._address
+
+    @address.setter
+    def address(self, value):
+        """
+        Sets the relay address from which the message originated.
+        """
+        self._address = value
+
+    @property
+    def channel(self):
+        """
+        The zone expander channel from which the message originated.
+        """
+        return self._channel
+
+    @channel.setter
+    def channel(self, value):
+        """
+        Sets the zone expander channel from which the message originated.
+        """
+        self._channel = value
+
+    @property
+    def value(self):
+        """
+        The value associated with the message.
+        """
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        """
+        Sets the value associated with the message.
+        """
+        self._value = value

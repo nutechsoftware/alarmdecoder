@@ -40,6 +40,9 @@ def handle_alarm_bell(sender, args):
 def handle_bypass(sender, args):
     print 'bypass', args
 
+def handle_message(sender, args):
+    print args
+
 def handle_firmware(stage):
     if stage == pyad2usb.ad2usb.util.Firmware.STAGE_START:
         handle_firmware.wait_tick = 0
@@ -186,9 +189,10 @@ def test_socket():
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
     a2u.on_close += handle_close
-    a2u.on_read += handle_read
-    a2u.on_write += handle_write
+    #a2u.on_read += handle_read
+    #a2u.on_write += handle_write
 
+    a2u.on_message += handle_message
     a2u.on_power_changed += handle_power_changed
     a2u.on_alarm += handle_alarm_bell
     a2u.on_bypass += handle_bypass
