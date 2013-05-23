@@ -188,12 +188,12 @@ class AD2USB(object):
         """
         pass
 
-    def open(self, baudrate=None, interface=None, index=None):
+    def open(self, baudrate=None, interface=None, index=None, no_read_thread=False):
         """
         Opens the device.
         """
         self._wire_events()
-        self._device.open(baudrate=baudrate, interface=interface, index=index)
+        self._device.open(baudrate=baudrate, interface=interface, index=index, no_read_thread=no_read_thread)
 
     def close(self):
         """

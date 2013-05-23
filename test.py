@@ -55,7 +55,8 @@ def handle_firmware(stage):
         sys.stdout.write('.')
         sys.stdout.flush()
     elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_BOOT:
-        print "\r\nRebooting device.."
+        if handle_firmware.wait_tick > 0: print ""
+        print "Rebooting device.."
     elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_LOAD:
         print 'Waiting for boot loader..'
     elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_UPLOADING:
@@ -73,7 +74,7 @@ def handle_firmware(stage):
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
-    dev.open()
+    dev.open(no_read_thread=True)
     pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
     dev.close()
 
@@ -204,6 +205,20 @@ def test_socket():
 
     a2u.close()
 
+def test_no_read_thread():
+    a2u = pyad2usb.ad2usb.Overseer.create()
+
+    a2u.on_open += handle_open
+    a2u.on_close += handle_close
+    a2u.on_read += handle_read
+    a2u.on_write += handle_write
+
+    a2u.open(no_read_thread=True)
+
+    print 'alive?', a2u._device._read_thread.is_alive()
+
+    a2u.close()
+
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
@@ -214,11 +229,13 @@ try:
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    #upload_usb()
+    upload_usb()
     #upload_usb_serial()
 
-    test_socket()
+    #test_socket()
     #upload_socket()
+
+    #test_no_read_thread()
 
 except Exception, err:
     traceback.print_exc(err)

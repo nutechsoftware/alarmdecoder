@@ -113,12 +113,13 @@ class Firmware(object):
 
         stage_callback(Firmware.STAGE_START)
 
-        # Close the reader thread and wait for it to die, otherwise
-        # it interferes with our reading.
-        dev.close_reader()
-        while dev._read_thread.is_alive():
-            stage_callback(Firmware.STAGE_WAITING)
-            time.sleep(1)
+        if dev.is_reader_alive():
+            # Close the reader thread and wait for it to die, otherwise
+            # it interferes with our reading.
+            dev.stop_reader()
+            while dev._read_thread.is_alive():
+                stage_callback(Firmware.STAGE_WAITING)
+                time.sleep(1)
 
         try:
             # Reboot the device and wait for the boot loader.

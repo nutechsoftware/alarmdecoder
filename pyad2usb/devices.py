@@ -110,7 +110,7 @@ class USBDevice(Device):
 
         self._read_thread = Device.ReadThread(self)
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=0):
+    def open(self, baudrate=BAUDRATE, interface=None, index=0, no_read_thread=False):
         """
         Opens the device.
         """
@@ -143,7 +143,8 @@ class USBDevice(Device):
             raise util.CommError('Error opening AD2USB device: {0}'.format(str(err)))
         else:
             self._running = True
-            self._read_thread.start()
+            if not no_read_thread:
+                self._read_thread.start()
 
             self.on_open((self._serial_number, self._description))
 
@@ -164,7 +165,13 @@ class USBDevice(Device):
 
         self.on_close()
 
-    def close_reader(self):
+    def is_reader_alive(self):
+        """
+        Indicates whether or not the reader thread is alive.
+        """
+        return self._read_thread.is_alive()
+
+    def stop_reader(self):
         """
         Stops the reader thread.
         """
@@ -266,7 +273,7 @@ class SerialDevice(Device):
         """
         pass
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=None):
+    def open(self, baudrate=BAUDRATE, interface=None, index=None, no_read_thread=False):
         """
         Opens the device.
         """
@@ -294,7 +301,8 @@ class SerialDevice(Device):
             self._running = True
             self.on_open((None, "AD2SERIAL"))   # TODO: Fixme.
 
-            self._read_thread.start()
+            if not no_read_thread:
+                self._read_thread.start()
 
     def close(self):
         """
@@ -310,7 +318,13 @@ class SerialDevice(Device):
 
         self.on_close()
 
-    def close_reader(self):
+    def is_reader_alive(self):
+        """
+        Indicates whether or not the reader thread is alive.
+        """
+        return self._read_thread.is_alive()
+
+    def stop_reader(self):
         """
         Stops the reader thread.
         """
@@ -398,7 +412,7 @@ class SocketDevice(Device):
         """
         pass
 
-    def open(self, baudrate=None, interface=None, index=0):
+    def open(self, baudrate=None, interface=None, index=0, no_read_thread=False):
         """
         Opens the device.
         """
@@ -416,7 +430,9 @@ class SocketDevice(Device):
             self._running = True
 
             self.on_open((None, "AD2SOCKET"))   # TEMP: Change me.
-            self._read_thread.start()
+
+            if not no_read_thread:
+                self._read_thread.start()
 
     def close(self):
         """
@@ -433,7 +449,13 @@ class SocketDevice(Device):
 
         self.on_close()
 
-    def close_reader(self):
+    def is_reader_alive(self):
+        """
+        Indicates whether or not the reader thread is alive.
+        """
+        return self._read_thread.is_alive()
+
+    def stop_reader(self):
         """
         Stops the reader thread.
         """
