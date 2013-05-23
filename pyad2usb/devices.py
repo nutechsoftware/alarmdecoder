@@ -110,7 +110,7 @@ class USBDevice(Device):
 
         self._read_thread = Device.ReadThread(self)
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=0, no_read_thread=False):
+    def open(self, baudrate=BAUDRATE, interface=None, index=0, no_reader_thread=False):
         """
         Opens the device.
         """
@@ -143,7 +143,7 @@ class USBDevice(Device):
             raise util.CommError('Error opening AD2USB device: {0}'.format(str(err)))
         else:
             self._running = True
-            if not no_read_thread:
+            if not no_reader_thread:
                 self._read_thread.start()
 
             self.on_open((self._serial_number, self._description))
@@ -273,7 +273,7 @@ class SerialDevice(Device):
         """
         pass
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=None, no_read_thread=False):
+    def open(self, baudrate=BAUDRATE, interface=None, index=None, no_reader_thread=False):
         """
         Opens the device.
         """
@@ -301,7 +301,7 @@ class SerialDevice(Device):
             self._running = True
             self.on_open((None, "AD2SERIAL"))   # TODO: Fixme.
 
-            if not no_read_thread:
+            if not no_reader_thread:
                 self._read_thread.start()
 
     def close(self):
@@ -412,7 +412,7 @@ class SocketDevice(Device):
         """
         pass
 
-    def open(self, baudrate=None, interface=None, index=0, no_read_thread=False):
+    def open(self, baudrate=None, interface=None, index=0, no_reader_thread=False):
         """
         Opens the device.
         """
@@ -431,7 +431,7 @@ class SocketDevice(Device):
 
             self.on_open((None, "AD2SOCKET"))   # TEMP: Change me.
 
-            if not no_read_thread:
+            if not no_reader_thread:
                 self._read_thread.start()
 
     def close(self):
