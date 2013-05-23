@@ -239,10 +239,16 @@ class AD2USB(object):
 
                     if old_status is not None:
                         self.on_bypass(self._bypass_status)
+
         else:
             # specialty messages
-            if data[0:4] == '!EXP':
-                msg = ZoneExpanderMessage(data)
+            header = data[0:4]
+            #print data
+
+            if header == '!EXP' or header == '!REL':
+                msg = ExpanderMessage(data)
+            elif header == '!RFX':
+                msg = RFMessage(data)
 
         if msg:
             self.on_message(msg)
@@ -619,11 +625,19 @@ class Message(object):
         """
         self._mask = value
 
-def ZoneExpanderMessage(object):
+class ExpanderMessage(object):
+    """
+    Represents a message from a zone or relay expansion module.
+    """
+
+    ZONE = 0
+    RELAY = 1
+
     def __init__(self, data=None):
         """
         Constructor
         """
+        self._type = None
         self._address = None
         self._channel = None
         self._value = None
@@ -636,20 +650,30 @@ def ZoneExpanderMessage(object):
         """
         String conversion operator.
         """
-        return 'zonemsg > {0}:{1} -- {2}'.format(self.address, self.channel, self.value)
+        expander_type = 'UNKWN'
+        if self.type == ExpanderMessage.ZONE:
+            expander_type = 'ZONE'
+        elif self.type  == ExpanderMessage.RELAY:
+            expander_type = 'RELAY'
+
+        return 'exp > [{0: <5}] {1}/{2} -- {3}'.format(expander_type, self.address, self.channel, self.value)
 
     def _parse_message(self, data):
         """
         Parse the raw message from the device.
         """
-        if data[0:4] == '!EXP':
-            header, address, channel, value = data.split(',')
+        header, values = data.split(':')
+        address, channel, value = values.split(',')
 
-            self.address = address
-            self.channel = channel
-            self.value = value
+        self.raw = data
+        self.address = address
+        self.channel = channel
+        self.value = value
 
-        self._raw = data
+        if header == '!EXP':
+            self.type = ExpanderMessage.ZONE
+        elif header == '!REL':
+            self.type = ExpanderMessage.RELAY
 
     @property
     def address(self):
@@ -692,3 +716,100 @@ def ZoneExpanderMessage(object):
         Sets the value associated with the message.
         """
         self._value = value
+
+    @property
+    def raw(self):
+        """
+        The raw message from the expander device.
+        """
+        return self._raw
+
+    @raw.setter
+    def raw(self, value):
+        """
+        Sets the raw message from the expander device.
+        """
+        self._value = value
+
+    @property
+    def type(self):
+        """
+        The type of expander associated with this message.
+        """
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        """
+        Sets the type of expander associated with this message.
+        """
+        self._type = value
+
+class RFMessage(object):
+    """
+    Represents a message from an RF receiver.
+    """
+    def __init__(self, data=None):
+        """
+        Constructor
+        """
+        self._raw = None
+        self._serial_number = None
+        self._value = None
+
+        if data is not None:
+            self._parse_message(data)
+
+    def __str__(self):
+        """
+        String conversion operator.
+        """
+        return 'rf > {0}: {1}'.format(self.serial_number, self.value)
+
+    def _parse_message(self, data):
+        """
+        Parses the raw message from the device.
+        """
+        self.raw = data
+
+        _, values = data.split(':')
+        self.serial_number, self.value = values.split(',')
+
+    @property
+    def serial_number(self):
+        """
+        The serial number for the RF receiver.
+        """
+        return self._serial_number
+
+    @serial_number.setter
+    def serial_number(self, value):
+        self._serial_number = value
+
+    @property
+    def value(self):
+        """
+        The value of the RF message.
+        """
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        """
+        Sets the value of the RF message.
+        """
+        self._value = value
+
+    @property
+    def raw(self):
+        """
+        The raw message from the RF receiver.
+        """
+        return self._raw
+
+    @raw.setter
+    def raw(self, value):
+        """
+        Sets the raw message from the RF receiver.
+        """
+        self._raw = value
