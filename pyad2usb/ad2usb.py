@@ -220,30 +220,11 @@ class AD2USB(object):
         if data[0] != '!':
             msg = Message(data)
 
-            # parse and build stuff
             if self._address_mask & msg.mask > 0:
-                if msg.ac != self._power_status:
-                    self._power_status, old_status = msg.ac, self._power_status
+                self._update_internal_states(msg)
 
-                    if old_status is not None:
-                        self.on_power_changed(self._power_status)
-
-                if msg.alarm_bell != self._alarm_status:
-                    self._alarm_status, old_status = msg.alarm_bell, self._alarm_status
-
-                    if old_status is not None:
-                        self.on_alarm(self._alarm_status)
-
-                if msg.bypass != self._bypass_status:
-                    self._bypass_status, old_status = msg.bypass, self._bypass_status
-
-                    if old_status is not None:
-                        self.on_bypass(self._bypass_status)
-
-        else:
-            # specialty messages
+        else:   # specialty messages
             header = data[0:4]
-            #print data
 
             if header == '!EXP' or header == '!REL':
                 msg = ExpanderMessage(data)
@@ -252,6 +233,25 @@ class AD2USB(object):
 
         if msg:
             self.on_message(msg)
+
+    def _update_internal_states(self, message):
+        if message.ac != self._power_status:
+            self._power_status, old_status = message.ac, self._power_status
+
+            if old_status is not None:
+                self.on_power_changed(self._power_status)
+
+        if message.alarm_bell != self._alarm_status:
+            self._alarm_status, old_status = message.alarm_bell, self._alarm_status
+
+            if old_status is not None:
+                self.on_alarm(self._alarm_status)
+
+        if message.bypass != self._bypass_status:
+            self._bypass_status, old_status = message.bypass, self._bypass_status
+
+            if old_status is not None:
+                self.on_bypass(self._bypass_status)
 
     def _on_open(self, sender, args):
         """
