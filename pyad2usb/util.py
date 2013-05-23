@@ -24,6 +24,12 @@ class TimeoutError(Exception):
     """
     pass
 
+class InvalidMessageError(Exception):
+    """
+    The format of the panel message was invalid.
+    """
+    pass
+
 class Firmware(object):
     """
     Represents firmware for the AD2USB/AD2SERIAL devices.

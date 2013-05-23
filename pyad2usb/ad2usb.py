@@ -4,6 +4,7 @@ Provides the full AD2USB class and factory.
 
 import time
 import threading
+import re
 from .event import event
 from . import devices
 from . import util
@@ -154,18 +155,28 @@ class AD2USB(object):
     """
 
     # High-level Events
-    on_open = event.Event('Called when the device has been opened')
-    on_close = event.Event('Called when the device has been closed')
+    on_open = event.Event('Called when the device has been opened.')
+    on_close = event.Event('Called when the device has been closed.')
+
+    on_status_changed = event.Event('Called when the panel status changes.')
+    on_power_changed = event.Event('Called when panel power switches between AC and DC.')
+    on_alarm = event.Event('Called when the alarm is triggered.')
+    on_bypass = event.Event('Called when a zone is bypassed.')
+
+    # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
 
     # Low-level Events
-    on_read = event.Event('Called when a line has been read from the device')
-    on_write = event.Event('Called when data has been written to the device')
+    on_read = event.Event('Called when a line has been read from the device.')
+    on_write = event.Event('Called when data has been written to the device.')
 
     def __init__(self, device):
         """
         Constructor
         """
+        self._power_status = None
+        self._alarm_status = None
+        self._bypass_status = None
         self._device = device
 
     def __del__(self):
@@ -204,8 +215,32 @@ class AD2USB(object):
         if data[0] == '!':      # TEMP: Remove this.
             return None
 
-        msg = Message()
+        msg = Message(data)
+
         # parse and build stuff
+
+        # TEMP
+        address_mask = 0xFF80
+
+        if address_mask & msg.mask > 0:
+            #print 'ac={0}, alarm={1}, bypass={2}'.format(msg.ac, msg.alarm_bell, msg.bypass)
+            if msg.ac != self._power_status:
+                self._power_status, old_status = msg.ac, self._power_status
+                #print '\tpower: new={0}, old={1}'.format(self._power_status, old_status)
+                if old_status is not None:
+                    self.on_power_changed(self._power_status)
+
+            if msg.alarm_bell != self._alarm_status:
+                self._alarm_status, old_status = msg.alarm_bell, self._alarm_status
+                #print '\talarm: new={0}, old={1}'.format(self._alarm_status, old_status)
+                if old_status is not None:
+                    self.on_alarm(self._alarm_status)
+
+            if msg.bypass != self._bypass_status:
+                self._bypass_status, old_status = msg.bypass, self._bypass_status
+                #print '\tbypass: new={0}, old={1}'.format(self._bypass_status, old_status)
+                if old_status is not None:
+                    self.on_bypass(self._bypass_status)
 
     def _on_open(self, sender, args):
         """
@@ -260,17 +295,77 @@ class Message(object):
         self._text = ""
         self._cursor = -1
         self._raw = ""
+        self._mask = ""
+
+        self._msg_bitfields = ""
+        self._msg_zone = ""
+        self._msg_binary = ""
+        self._msg_alpha = ""
+
+        self._regex = re.compile('("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)')
 
         if data is not None:
             self._parse_message(data)
 
     def _parse_message(self, data):
-        pattern = '("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)'
+        m = self._regex.match(data)
 
+        if m is None:
+            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
 
+        self._msg_bitfields, self._msg_zone, self._msg_binary, self._msg_alpha = m.group(1, 2, 3, 4)
+        self.mask = int(self._msg_binary[3:3+8], 16)
 
+        self.raw = data
+        self.ready = not self._msg_bitfields[1:2] == "0"
+        self.armed_away = not self._msg_bitfields[2:3] == "0"
+        self.armed_home = not self._msg_bitfields[3:4] == "0"
+        self.backlight = not self._msg_bitfields[4:5] == "0"
+        self.programming_mode = not self._msg_bitfields[5:6] == "0"
+        self.beeps = int(self._msg_bitfields[6:7], 16)
+        self.bypass = not self._msg_bitfields[7:8] == "0"
+        self.ac = not self._msg_bitfields[8:9] == "0"
+        self.chime_mode = not self._msg_bitfields[9:10] == "0"
+        self.alarm_event_occurred = not self._msg_bitfields[10:11] == "0"
+        self.alarm_bell = not self._msg_bitfields[11:12] == "0"
+        self.numeric = self._msg_zone
+        self.text = self._msg_alpha.strip('"')
 
-        pass
+        if int(self._msg_binary[19:21], 16) & 0x01 > 0:
+            self.cursor = int(self._msg_bitfields[21:23], 16)
+
+        #print "Message:\r\n" \
+        #        "\tmask: {0}\r\n" \
+        #        "\tready: {1}\r\n" \
+        #        "\tarmed_away: {2}\r\n" \
+        #        "\tarmed_home: {3}\r\n" \
+        #        "\tbacklight: {4}\r\n" \
+        #        "\tprogramming_mode: {5}\r\n" \
+        #        "\tbeeps: {6}\r\n" \
+        #        "\tbypass: {7}\r\n" \
+        #        "\tac: {8}\r\n" \
+        #        "\tchime_mode: {9}\r\n" \
+        #        "\talarm_event_occurred: {10}\r\n" \
+        #        "\talarm_bell: {11}\r\n" \
+        #        "\tcursor: {12}\r\n" \
+        #        "\tnumeric: {13}\r\n" \
+        #        "\ttext: {14}\r\n".format(
+        #            self.mask,
+        #            self.ready,
+        #            self.armed_away,
+        #            self.armed_home,
+        #            self.backlight,
+        #            self.programming_mode,
+        #            self.beeps,
+        #            self.bypass,
+        #            self.ac,
+        #            self.chime_mode,
+        #            self.alarm_event_occurred,
+        #            self.alarm_bell,
+        #            self.cursor,
+        #            self.numeric,
+        #            self.text
+        #        )
 
     @property
     def ignore_packet(self):
@@ -495,3 +590,17 @@ class Message(object):
         Sets the raw representation of the message data from the panel.
         """
         self._raw = value
+
+    @property
+    def mask(self):
+        """
+        The panel mask for which this message is intended.
+        """
+        return self._mask
+
+    @mask.setter
+    def mask(self, value):
+        """
+        Sets the panel mask for which this message is intended.
+        """
+        self._mask = value
