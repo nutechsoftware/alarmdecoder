@@ -114,6 +114,8 @@ def test_usb():
 
     a2u.open()
 
+    print dev._id
+
     while running:
         time.sleep(0.1)
 
@@ -130,6 +132,8 @@ def test_serial():
 
     a2u.open()
 
+    print dev._id
+
     while running:
         time.sleep(0.1)
 
@@ -145,6 +149,7 @@ def test_usb_serial():
     a2u.on_write += handle_write
 
     a2u.open(baudrate=115200)
+    print dev._id
 
     while running:
         time.sleep(0.1)
@@ -200,6 +205,8 @@ def test_socket():
 
     a2u.open()
 
+    print dev._id
+
     while running:
         time.sleep(0.1)
 
@@ -229,7 +236,7 @@ try:
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    upload_usb()
+    #upload_usb()
     #upload_usb_serial()
 
     #test_socket()

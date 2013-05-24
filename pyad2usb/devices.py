@@ -107,6 +107,7 @@ class USBDevice(Device):
         self._device = Ftdi()
         self._running = False
         self._interface = interface
+        self._id = ''
 
         self._read_thread = Device.ReadThread(self)
 
@@ -137,6 +138,8 @@ class USBDevice(Device):
                              self._description)
 
             self._device.set_baudrate(baudrate)
+
+            self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
         except (usb.core.USBError, FtdiError), err:
             self.on_close()
 
@@ -266,6 +269,7 @@ class SerialDevice(Device):
         self._buffer = ''
         self._running = False
         self._interface = interface
+        self._id = ''
 
     def __del__(self):
         """
@@ -293,6 +297,8 @@ class SerialDevice(Device):
         # Open the device and start up the reader thread.
         try:
             self._device.open()
+            self._id = '{0}'.format(self._interface)
+
         except (serial.SerialException, ValueError), err:
             self.on_close()
 
@@ -403,6 +409,7 @@ class SocketDevice(Device):
         self._device = None
         self._buffer = ''
         self._running = False
+        self._id = ''
 
         self._read_thread = Device.ReadThread(self)
 
@@ -422,6 +429,8 @@ class SocketDevice(Device):
         try:
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._device.connect((self._host, self._port))
+            self._id = '{0}:{1}'.format(self._host, self._port)
+
         except socket.error, err:
             self.on_close()
 
