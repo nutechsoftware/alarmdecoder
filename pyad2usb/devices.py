@@ -168,6 +168,10 @@ class USBDevice(Device):
 
         self.on_close()
 
+    @property
+    def id(self):
+        return self._id
+
     def is_reader_alive(self):
         """
         Indicates whether or not the reader thread is alive.
@@ -324,6 +328,10 @@ class SerialDevice(Device):
 
         self.on_close()
 
+    @property
+    def id(self):
+        return self._id
+
     def is_reader_alive(self):
         """
         Indicates whether or not the reader thread is alive.
@@ -457,6 +465,10 @@ class SocketDevice(Device):
             pass
 
         self.on_close()
+
+    @property
+    def id(self):
+        return self._id
 
     def is_reader_alive(self):
         """

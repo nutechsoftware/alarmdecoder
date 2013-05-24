@@ -202,6 +202,10 @@ class AD2USB(object):
         self._device.close()
         self._device = None
 
+    @property
+    def id(self):
+        return self._device.id
+
     def _wire_events(self):
         """
         Wires up the internal device events.
