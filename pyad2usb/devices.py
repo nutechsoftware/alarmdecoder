@@ -358,6 +358,8 @@ class SerialDevice(Device):
             self._device.write(data)
         except serial.SerialTimeoutException, err:
             pass
+        except serial.SerialException, err:
+            raise util.CommError('Error writing to serial device.')
         else:
             self.on_write(data)
 
