@@ -226,6 +226,11 @@ def test_no_read_thread():
 
     a2u.close()
 
+def test_serial_grep():
+    re =  pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=067b:2303')
+    for x in re:
+        print x
+
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
@@ -236,13 +241,14 @@ try:
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    upload_usb()
+    #upload_usb()
     #upload_usb_serial()
 
     #test_socket()
     #upload_socket()
 
     #test_no_read_thread()
+    test_serial_grep()
 
 except Exception, err:
     traceback.print_exc(err)

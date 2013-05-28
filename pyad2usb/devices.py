@@ -249,14 +249,17 @@ class SerialDevice(Device):
     BAUDRATE = 19200
 
     @staticmethod
-    def find_all():
+    def find_all(pattern=None):
         """
         Returns all serial ports present.
         """
         devices = []
 
         try:
-            devices = serial.tools.list_ports.comports()
+            if pattern:
+                devices = serial.tools.list_ports.grep(pattern)
+            else:
+                devices = serial.tools.list_ports.comports()
         except Exception, err:
             raise util.CommError('Error enumerating AD2SERIAL devices: {0}'.format(str(err)))
 
