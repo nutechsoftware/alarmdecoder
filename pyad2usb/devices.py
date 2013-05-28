@@ -276,7 +276,7 @@ class SerialDevice(Device):
         self._buffer = ''
         self._running = False
         self._interface = interface
-        self._id = ''
+        self._id = interface
 
     def __del__(self):
         """
