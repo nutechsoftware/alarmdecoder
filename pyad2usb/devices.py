@@ -188,9 +188,12 @@ class USBDevice(Device):
         """
         Writes data to the device.
         """
-        self._device.write_data(data)
+        try:
+            self._device.write_data(data)
 
-        self.on_write(data)
+            self.on_write(data)
+        except FtdiError, err:
+            raise util.CommError('Error writing to AD2USB device.')
 
     def read(self):
         """
