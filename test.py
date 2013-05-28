@@ -74,7 +74,7 @@ def handle_firmware(stage):
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
-    dev.open(no_read_thread=True)
+    dev.open(no_reader_thread=True)
     pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
     dev.close()
 
@@ -220,7 +220,7 @@ def test_no_read_thread():
     a2u.on_read += handle_read
     a2u.on_write += handle_write
 
-    a2u.open(no_read_thread=True)
+    a2u.open(no_reader_thread=True)
 
     print 'alive?', a2u._device._read_thread.is_alive()
 
@@ -236,7 +236,7 @@ try:
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
-    #upload_usb()
+    upload_usb()
     #upload_usb_serial()
 
     #test_socket()
