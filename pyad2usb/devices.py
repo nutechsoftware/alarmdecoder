@@ -301,12 +301,17 @@ class SerialDevice(Device):
         if interface is not None:
             self._interface = interface
 
-        self._device.baudrate = baudrate
         self._device.port = self._interface
 
         # Open the device and start up the reader thread.
         try:
             self._device.open()
+            self._device.baudrate = baudrate            # NOTE: Setting the baudrate before opening the
+                                                        #       port caused issues with Moschip 7840/7820
+                                                        #       USB Serial Driver converter. (mos7840)
+                                                        #
+                                                        #       Moving it to this point seems to resolve
+                                                        #       all issues with it.
             self._id = '{0}'.format(self._interface)
 
         except (serial.SerialException, ValueError), err:
