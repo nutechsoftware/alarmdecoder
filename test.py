@@ -127,10 +127,18 @@ def test_serial():
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
     a2u.on_close += handle_close
-    a2u.on_read += handle_read
-    a2u.on_write += handle_write
+    #a2u.on_read += handle_read
+    #a2u.on_write += handle_write
 
-    a2u.open()
+    a2u.on_message += handle_message
+    a2u.on_power_changed += handle_power_changed
+    a2u.on_alarm += handle_alarm_bell
+    a2u.on_bypass += handle_bypass
+
+    a2u.open(no_reader_thread=False)
+    print a2u._device._device
+    #print a2u._device.read_line()
+    #dev.open()
 
     print dev._id
 
@@ -138,6 +146,7 @@ def test_serial():
         time.sleep(0.1)
 
     a2u.close()
+    #dev.close()
 
 def test_usb_serial():
     dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB5')
@@ -227,14 +236,14 @@ def test_no_read_thread():
     a2u.close()
 
 def test_serial_grep():
-    re =  pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=067b:2303')
+    re =  pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=9710:7840')
     for x in re:
         print x
 
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
-    #test_serial()
+    test_serial()
     #upload_serial()
 
     #test_usb()
@@ -248,7 +257,7 @@ try:
     #upload_socket()
 
     #test_no_read_thread()
-    test_serial_grep()
+    #test_serial_grep()
 
 except Exception, err:
     traceback.print_exc(err)
