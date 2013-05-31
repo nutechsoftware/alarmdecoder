@@ -231,6 +231,8 @@ class USBDevice(Device):
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise util.TimeoutError('Timeout while waiting for line terminator.')
 
+                time.sleep(0.1)
+
         except (usb.core.USBError, FtdiError), err:
             raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
         else:

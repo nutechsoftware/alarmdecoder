@@ -240,10 +240,37 @@ def test_serial_grep():
     for x in re:
         print x
 
+def test_double_panel_write():
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB4')
+    dev2 = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB5')
+
+    dev.open(no_reader_thread=True)
+    print dev._device
+
+    dev2.open(no_reader_thread=True)
+    print dev2._device
+    #print a2u._device.read_line()
+    #dev.open()
+
+    print 'Writing characters..'
+    dev.write('*****')
+    dev2.write('*****')
+
+    print 'Reading..'
+
+    dev_res = dev.read_line()
+    print dev.id, dev_res
+
+    dev2_res = dev2.read_line()
+    print dev2.id, dev2_res
+
+    dev.close()
+    dev2.close()
+
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
-    test_serial()
+    #test_serial()
     #upload_serial()
 
     #test_usb()
@@ -258,6 +285,8 @@ try:
 
     #test_no_read_thread()
     #test_serial_grep()
+
+    test_double_panel_write()
 
 except Exception, err:
     traceback.print_exc(err)
