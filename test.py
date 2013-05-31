@@ -222,18 +222,28 @@ def test_socket():
     a2u.close()
 
 def test_no_read_thread():
-    a2u = pyad2usb.ad2usb.Overseer.create()
+    #a2u = pyad2usb.ad2usb.Overseer.create()
 
-    a2u.on_open += handle_open
-    a2u.on_close += handle_close
-    a2u.on_read += handle_read
-    a2u.on_write += handle_write
 
-    a2u.open(no_reader_thread=True)
+    #a2u.on_open += handle_open
+    #a2u.on_close += handle_close
+    #a2u.on_read += handle_read
+    #a2u.on_write += handle_write
 
-    print 'alive?', a2u._device._read_thread.is_alive()
+    #a2u.open(no_reader_thread=True)
 
-    a2u.close()
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB0')
+    dev.open(no_reader_thread=True)
+
+    #print 'alive?', a2u._device._read_thread.is_alive()
+    while 1:
+        line = dev.read_line(timeout=5)
+        print line
+        line = dev.read_line(timeout=5)
+        print line
+        #time.sleep(0.1)
+
+    dev.close()
 
 def test_serial_grep():
     re =  pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=9710:7840')
@@ -283,10 +293,10 @@ try:
     #test_socket()
     #upload_socket()
 
-    #test_no_read_thread()
+    test_no_read_thread()
     #test_serial_grep()
 
-    test_double_panel_write()
+    #test_double_panel_write()
 
 except Exception, err:
     traceback.print_exc(err)

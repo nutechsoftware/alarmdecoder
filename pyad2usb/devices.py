@@ -205,12 +205,21 @@ class USBDevice(Device):
         """
         Reads a line from the device.
         """
-        start_time = time.time()
+        def timeout_event():
+            timeout_event.reading = False
+
+        timeout_event.reading = True
+
         got_line = False
         ret = None
 
+        timer = None
+        if timeout > 0:
+            timer = threading.Timer(timeout, timeout_event)
+            timer.start()
+
         try:
-            while self._running:
+            while timeout_event.reading:
                 buf = self._device.read_data(1)
 
                 if buf != '':
@@ -228,10 +237,7 @@ class USBDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                if timeout > 0 and time.time() - start_time > timeout:
-                    raise util.TimeoutError('Timeout while waiting for line terminator.')
-
-                time.sleep(0.1)
+                time.sleep(0.001)
 
         except (usb.core.USBError, FtdiError), err:
             raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
@@ -241,6 +247,9 @@ class USBDevice(Device):
                 self._buffer = ''
 
                 self.on_read(ret)
+
+        if timer:
+            timer.cancel()
 
         return ret
 
@@ -380,12 +389,22 @@ class SerialDevice(Device):
         """
         Reads a line from the device.
         """
-        start_time = time.time()
+
+        def timeout_event():
+            timeout_event.reading = False
+
+        timeout_event.reading = True
+
         got_line = False
         ret = None
 
+        timer = None
+        if timeout > 0:
+            timer = threading.Timer(timeout, timeout_event)
+            timer.start()
+
         try:
-            while self._running:
+            while timeout_event.reading:
                 buf = self._device.read(1)
 
                 if buf != '' and buf != "\xff":     # AD2SERIAL specifically apparently sends down \xFF on boot.
@@ -403,8 +422,7 @@ class SerialDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                if timeout > 0 and time.time() - start_time > timeout:
-                    raise util.TimeoutError('Timeout while waiting for line terminator.')
+                time.sleep(0.001)
 
         except (OSError, serial.SerialException), err:
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
@@ -414,6 +432,9 @@ class SerialDevice(Device):
                 self._buffer = ''
 
                 self.on_read(ret)
+
+        if timer:
+            timer.cancel()
 
         return ret
 
@@ -527,12 +548,21 @@ class SocketDevice(Device):
         """
         Reads a line from the device.
         """
-        start_time = time.time()
+        def timeout_event():
+            timeout_event.reading = False
+
+        timeout_event.reading = True
+
         got_line = False
         ret = None
 
+        timer = None
+        if timeout > 0:
+            timer = threading.Timer(timeout, timeout_event)
+            timer.start()
+
         try:
-            while self._running:
+            while timeout_event.reading:
                 buf = self._device.recv(1)
 
                 if buf != '':
@@ -550,8 +580,7 @@ class SocketDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                if timeout > 0 and time.time() - start_time > timeout:
-                    raise util.TimeoutError('Timeout while waiting for line terminator.')
+                time.sleep(0.001)
 
         except socket.error, err:
             raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
@@ -561,5 +590,8 @@ class SocketDevice(Device):
                 self._buffer = ''
 
                 self.on_read(ret)
+
+        if timer:
+            timer.cancel()
 
         return ret
