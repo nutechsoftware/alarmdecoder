@@ -207,7 +207,6 @@ class USBDevice(Device):
         """
         def timeout_event():
             timeout_event.reading = False
-            raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         timeout_event.reading = True
 
@@ -250,7 +249,10 @@ class USBDevice(Device):
                 self.on_read(ret)
 
         if timer:
-            timer.cancel()
+            if timer.is_alive():
+                timer.cancel()
+            else:
+                raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
 
@@ -393,7 +395,6 @@ class SerialDevice(Device):
 
         def timeout_event():
             timeout_event.reading = False
-            raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         timeout_event.reading = True
 
@@ -436,7 +437,10 @@ class SerialDevice(Device):
                 self.on_read(ret)
 
         if timer:
-            timer.cancel()
+            if timer.is_alive():
+                timer.cancel()
+            else:
+                raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
 
@@ -552,7 +556,6 @@ class SocketDevice(Device):
         """
         def timeout_event():
             timeout_event.reading = False
-            raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         timeout_event.reading = True
 
@@ -595,6 +598,9 @@ class SocketDevice(Device):
                 self.on_read(ret)
 
         if timer:
-            timer.cancel()
+            if timer.is_alive():
+                timer.cancel()
+            else:
+                raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
