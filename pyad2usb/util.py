@@ -99,7 +99,7 @@ class Firmware(object):
                             position = 0
 
                 except Exception, err:
-                    traceback.print_exc(err)    # TEMP
+                    pass
 
                 if timeout > 0 and time.time() - start_time > timeout:
                     raise TimeoutError('Timed out waiting for pattern: {0}'.format(pattern))
@@ -121,22 +121,17 @@ class Firmware(object):
                 stage_callback(Firmware.STAGE_WAITING)
                 time.sleep(1)
 
-        try:
-            # Reboot the device and wait for the boot loader.
-            stage_callback(Firmware.STAGE_BOOT)
-            dev.write("=")
-            read_until('!boot', timeout=10.0)
+        # Reboot the device and wait for the boot loader.
+        stage_callback(Firmware.STAGE_BOOT)
+        dev.write("=")
+        read_until('!boot', timeout=10.0)
 
-            # Get ourselves into the boot loader and wait for indication
-            # that it's ready for the firmware upload.
-            stage_callback(Firmware.STAGE_LOAD)
-            dev.write("=")
-            read_until('!load', timeout=10.0)
+        # Get ourselves into the boot loader and wait for indication
+        # that it's ready for the firmware upload.
+        stage_callback(Firmware.STAGE_LOAD)
+        dev.write("=")
+        read_until('!load', timeout=10.0)
 
-            # And finally do the upload.
-            do_upload()
-            stage_callback(Firmware.STAGE_DONE)
-
-        except TimeoutError, err:
-            print traceback.print_exc(err)              # TEMP
-            pass
+        # And finally do the upload.
+        do_upload()
+        stage_callback(Firmware.STAGE_DONE)
