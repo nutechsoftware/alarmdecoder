@@ -428,6 +428,8 @@ class SerialDevice(Device):
                 time.sleep(0.001)
 
         except (OSError, serial.SerialException), err:
+            timer.cancel()
+
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
         else:
             if got_line:
