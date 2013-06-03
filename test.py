@@ -79,7 +79,7 @@ def upload_usb():
     dev.close()
 
 def upload_serial():
-    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB0')
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB2')
 
     dev.open()
     pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
@@ -281,7 +281,7 @@ try:
     signal.signal(signal.SIGINT, signal_handler)
 
     #test_serial()
-    #upload_serial()
+    upload_serial()
 
     #test_usb()
     #test_usb_serial()
@@ -293,7 +293,7 @@ try:
     #test_socket()
     #upload_socket()
 
-    test_no_read_thread()
+    #test_no_read_thread()
     #test_serial_grep()
 
     #test_double_panel_write()

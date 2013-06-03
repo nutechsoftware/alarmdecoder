@@ -5,6 +5,7 @@ Provides utility classes for the AD2USB devices.
 import ad2usb
 import time
 import traceback
+import threading
 
 class NoDeviceError(Exception):
     """
@@ -71,7 +72,7 @@ class Firmware(object):
 
                     if line[0] == ':':
                         dev.write(line + "\r")
-                        res = dev.read_line()
+                        res = dev.read_line(timeout=10.0)
 
                         if progress_callback is not None:
                             progress_callback(Firmware.STAGE_UPLOADING)
@@ -82,11 +83,20 @@ class Firmware(object):
             """
             Read characters until a specific pattern is found or the timeout is hit.
             """
-            start_time = time.time()
+            def timeout_event():
+                timeout_event.reading = False
+
+            timeout_event.reading = True
+
+            timer = None
+            if timeout > 0:
+                timer = threading.Timer(timeout, timeout_event)
+                timer.start()
+
             buf = ''
             position = 0
 
-            while True:
+            while timeout_event.reading:
                 try:
                     char = dev.read()
 
@@ -101,8 +111,11 @@ class Firmware(object):
                 except Exception, err:
                     pass
 
-                if timeout > 0 and time.time() - start_time > timeout:
-                    raise TimeoutError('Timed out waiting for pattern: {0}'.format(pattern))
+            if timer:
+                if timer.is_alive():
+                    timer.cancel()
+                else:
+                    raise TimeoutError('Timeout while waiting for line terminator.')
 
         def stage_callback(stage):
             if progress_callback is not None:
@@ -124,13 +137,13 @@ class Firmware(object):
         # Reboot the device and wait for the boot loader.
         stage_callback(Firmware.STAGE_BOOT)
         dev.write("=")
-        read_until('!boot', timeout=10.0)
+        read_until('!boot', timeout=15.0)
 
         # Get ourselves into the boot loader and wait for indication
         # that it's ready for the firmware upload.
         stage_callback(Firmware.STAGE_LOAD)
         dev.write("=")
-        read_until('!load', timeout=10.0)
+        read_until('!load', timeout=15.0)
 
         # And finally do the upload.
         do_upload()
