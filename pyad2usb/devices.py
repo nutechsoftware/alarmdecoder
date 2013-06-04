@@ -288,7 +288,7 @@ class SerialDevice(Device):
         """
         Device.__init__(self)
 
-        self._device = serial.Serial(timeout=0)     # Timeout = non-blocking to match pyftdi.
+        self._device = serial.Serial(timeout=0, writeTimeout=0)     # Timeout = non-blocking to match pyftdi.
         self._read_thread = Device.ReadThread(self)
         self._buffer = ''
         self._running = False
