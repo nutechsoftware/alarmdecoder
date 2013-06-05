@@ -9,7 +9,6 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
-import traceback
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from . import util
@@ -60,8 +59,6 @@ class Device(object):
             while self._running:
                 try:
                     self._device.read_line(timeout=10)
-                except util.CommError, err:
-                    traceback.print_exc(err)    # TEMP
                 except util.TimeoutError, err:
                     pass
 
@@ -143,7 +140,7 @@ class USBDevice(Device):
         except (usb.core.USBError, FtdiError), err:
             self.on_close()
 
-            raise util.CommError('Error opening AD2USB device: {0}'.format(str(err)))
+            raise util.NoDeviceError('Error opening AD2USB device: {0}'.format(str(err)))
         else:
             self._running = True
             if not no_reader_thread:
@@ -486,7 +483,7 @@ class SocketDevice(Device):
         except socket.error, err:
             self.on_close()
 
-            traceback.print_exc(err)            # TEMP
+            raise util.NoDeviceError('Error opening AD2SOCKET device at {0}:{1}'.format(self._host, self._port))
         else:
             self._running = True
 
