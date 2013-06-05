@@ -44,18 +44,6 @@ class Firmware(object):
     STAGE_UPLOADING = 4
     STAGE_DONE = 5
 
-    def __init__(self):
-        """
-        Constructor
-        """
-        pass
-
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
-
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
