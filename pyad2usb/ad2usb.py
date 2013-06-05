@@ -70,12 +70,6 @@ class Overseer(object):
 
         self.start()
 
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
-
     def close(self):
         """
         Clean up and shut down.
@@ -143,6 +137,7 @@ class Overseer(object):
 
                     for d in removed_devices:
                         self._overseer.on_detached(d)
+
                 except util.CommError, err:
                     pass
 
@@ -155,9 +150,6 @@ class AD2USB(object):
     """
 
     # High-level Events
-    on_open = event.Event('Called when the device has been opened.')
-    on_close = event.Event('Called when the device has been closed.')
-
     on_status_changed = event.Event('Called when the panel status changes.')
     on_power_changed = event.Event('Called when panel power switches between AC and DC.')
     on_alarm = event.Event('Called when the alarm is triggered.')
@@ -167,6 +159,8 @@ class AD2USB(object):
     on_message = event.Event('Called when a message has been received from the device.')
 
     # Low-level Events
+    on_open = event.Event('Called when the device has been opened.')
+    on_close = event.Event('Called when the device has been closed.')
     on_read = event.Event('Called when a line has been read from the device.')
     on_write = event.Event('Called when data has been written to the device.')
 
@@ -174,19 +168,12 @@ class AD2USB(object):
         """
         Constructor
         """
+        self._device = device
         self._power_status = None
         self._alarm_status = None
         self._bypass_status = None
-        self._device = device
-
 
         self._address_mask = 0xFF80     # TEMP
-
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
 
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
         """
@@ -219,6 +206,9 @@ class AD2USB(object):
         """
         Parses messages from the panel.
         """
+        if data is None:
+            return None
+
         msg = None
 
         if data[0] != '!':
@@ -293,24 +283,24 @@ class Message(object):
         """
         Constructor
         """
-        self._ready = False
-        self._armed_away = False
-        self._armed_home = False
-        self._backlight_on = False
-        self._programming_mode = False
-        self._beeps = -1
-        self._zone_bypassed = False
-        self._ac_power = False
-        self._chime_on = False
-        self._alarm_event_occurred = False
-        self._alarm_sounding = False
-        self._numeric_code = ""
-        self._text = ""
-        self._cursor_location = -1
-        self._data = ""
-        self._mask = ""
-        self._bitfield = ""
-        self._panel_data = ""
+        self.ready = False
+        self.armed_away = False
+        self.armed_home = False
+        self.backlight_on = False
+        self.programming_mode = False
+        self.beeps = -1
+        self.zone_bypassed = False
+        self.ac_power = False
+        self.chime_on = False
+        self.alarm_event_occurred = False
+        self.alarm_sounding = False
+        self.numeric_code = ""
+        self.text = ""
+        self.cursor_location = -1
+        self.data = ""
+        self.mask = ""
+        self.bitfield = ""
+        self.panel_data = ""
 
         self._regex = re.compile('("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)')
 
@@ -326,283 +316,31 @@ class Message(object):
         if m is None:
             raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
 
-        self._bitfield, self._numeric_code, self._panel_data, alpha = m.group(1, 2, 3, 4)
-        self._mask = int(self._panel_data[3:3+8], 16)
+        self.bitfield, self.numeric_code, self.panel_data, alpha = m.group(1, 2, 3, 4)
+        self.mask = int(self.panel_data[3:3+8], 16)
 
-        self._data = data
-        self._ready = not self._bitfield[1:2] == "0"
-        self._armed_away = not self._bitfield[2:3] == "0"
-        self._armed_home = not self._bitfield[3:4] == "0"
-        self._backlight_on = not self._bitfield[4:5] == "0"
-        self._programming_mode = not self._bitfield[5:6] == "0"
-        self._beeps = int(self._bitfield[6:7], 16)
-        self._zone_bypassed = not self._bitfield[7:8] == "0"
-        self._ac_power = not self._bitfield[8:9] == "0"
-        self._chime_on = not self._bitfield[9:10] == "0"
-        self._alarm_event_occurred = not self._bitfield[10:11] == "0"
-        self._alarm_sounding = not self._bitfield[11:12] == "0"
-        self._text = alpha.strip('"')
+        self.data = data
+        self.ready = not self.bitfield[1:2] == "0"
+        self.armed_away = not self.bitfield[2:3] == "0"
+        self.armed_home = not self.bitfield[3:4] == "0"
+        self.backlight_on = not self.bitfield[4:5] == "0"
+        self.programming_mode = not self.bitfield[5:6] == "0"
+        self.beeps = int(self.bitfield[6:7], 16)
+        self.zone_bypassed = not self.bitfield[7:8] == "0"
+        self.ac_power = not self.bitfield[8:9] == "0"
+        self.chime_on = not self.bitfield[9:10] == "0"
+        self.alarm_event_occurred = not self.bitfield[10:11] == "0"
+        self.alarm_sounding = not self.bitfield[11:12] == "0"
+        self.text = alpha.strip('"')
 
-        if int(self._panel_data[19:21], 16) & 0x01 > 0:
-            self._cursor_location = int(self._bitfield[21:23], 16)    # Alpha character index that the cursor is on.
+        if int(self.panel_data[19:21], 16) & 0x01 > 0:
+            self.cursor_location = int(self.bitfield[21:23], 16)    # Alpha character index that the cursor is on.
 
     def __str__(self):
         """
         String conversion operator.
         """
         return 'msg > {0:0<9} [{1}{2}{3}] -- ({4}) {5}'.format(hex(self.mask), 1 if self.ready else 0, 1 if self.armed_away else 0, 1 if self.armed_home else 0, self.numeric_code, self.text)
-
-    @property
-    def ready(self):
-        """
-        Indicates whether or not the panel is ready.
-        """
-        return self._ready
-
-    @ready.setter
-    def ready(self, value):
-        """
-        Sets the value indicating whether or not the panel is ready.
-        """
-        self._ready = value
-
-    @property
-    def armed_away(self):
-        """
-        Indicates whether or not the panel is armed in away mode.
-        """
-        return self._armed_away
-
-    @armed_away.setter
-    def armed_away(self, value):
-        """
-        Sets the value indicating whether or not the panel is armed in away mode.
-        """
-        self._armed_away = value
-
-    @property
-    def armed_home(self):
-        """
-        Indicates whether or not the panel is armed in home/stay mode.
-        """
-        return self._armed_home
-
-    @armed_home.setter
-    def armed_home(self, value):
-        """
-        Sets the value indicating whether or not the panel is armed in home/stay mode.
-        """
-        self._armed_home = value
-
-    @property
-    def backlight_on(self):
-        """
-        Indicates whether or not the panel backlight is on.
-        """
-        return self._backlight_on
-
-    @backlight_on.setter
-    def backlight_on(self, value):
-        """
-        Sets the value indicating whether or not the panel backlight is on.
-        """
-        self._backlight_on = value
-
-    @property
-    def programming_mode(self):
-        """
-        Indicates whether or not the panel is in programming mode.
-        """
-        return self._programming_mode
-
-    @programming_mode.setter
-    def programming_mode(self, value):
-        """
-        Sets the value indicating whether or not the panel is in programming mode.
-        """
-        self._programming_mode = value
-
-    @property
-    def beeps(self):
-        """
-        Returns the number of beeps associated with this message.
-        """
-        return self._beeps
-
-    @beeps.setter
-    def beeps(self, value):
-        """
-        Sets the number of beeps associated with this message.
-        """
-        self._beeps = value
-
-    @property
-    def zone_bypassed(self):
-        """
-        Indicates whether or not zones have been bypassed.
-        """
-        return self._zone_bypassed
-
-    @zone_bypassed.setter
-    def zone_bypassed(self, value):
-        """
-        Sets the value indicating whether or not zones have been bypassed.
-        """
-        self._zone_bypassed = value
-
-    @property
-    def ac_power(self):
-        """
-        Indicates whether or not the system is on AC power.
-        """
-        return self._ac_power
-
-    @ac_power.setter
-    def ac_power(self, value):
-        """
-        Sets the value indicating whether or not the system is on AC power.
-        """
-        self._ac_power = value
-
-    @property
-    def chime_on(self):
-        """
-        Indicates whether or not panel chimes are enabled.
-        """
-        return self._chime_on
-
-    @chime_on.setter
-    def chime_on(self, value):
-        """
-        Sets the value indicating whether or not the panel chimes are enabled.
-        """
-        self._chime_on = value
-
-    @property
-    def alarm_event_occurred(self):
-        """
-        Indicates whether or not an alarm event has occurred.
-        """
-        return self._alarm_event_occurred
-
-    @alarm_event_occurred.setter
-    def alarm_event_occurred(self, value):
-        """
-        Sets the value indicating whether or not an alarm event has occurred.
-        """
-        self._alarm_event_occurred = value
-
-    @property
-    def alarm_sounding(self):
-        """
-        Indicates whether or not an alarm is currently sounding.
-        """
-        return self._alarm_sounding
-
-    @alarm_sounding.setter
-    def alarm_sounding(self, value):
-        """
-        Sets the value indicating whether or not an alarm is currently sounding.
-        """
-        self._alarm_sounding = value
-
-    @property
-    def numeric_code(self):
-        """
-        Numeric indicator of associated with message.  For example: If zone #3 is faulted, this value is 003.
-        """
-        return self._numeric_code
-
-    @numeric_code.setter
-    def numeric_code(self, value):
-        """
-        Sets the numeric indicator associated with this message.
-        """
-        self._numeric_code = value
-
-    @property
-    def text(self):
-        """
-        Alphanumeric text associated with this message.
-        """
-        return self._text
-
-    @text.setter
-    def text(self, value):
-        """
-        Sets the alphanumeric text associated with this message.
-        """
-        self._text = value
-
-    @property
-    def cursor_location(self):
-        """
-        Indicates which text position has the cursor underneath it.
-        """
-        return self._cursor_location
-
-    @cursor_location.setter
-    def cursor_location(self, value):
-        """
-        Sets the value indicating which text position has the cursor underneath it.
-        """
-        self._cursor_location = value
-
-    @property
-    def data(self):
-        """
-        Raw representation of the message from the panel.
-        """
-        return self._data
-
-    @data.setter
-    def data(self, value):
-        """
-        Sets the raw representation of the message from the panel.
-        """
-        self._data = value
-
-    @property
-    def mask(self):
-        """
-        The panel mask for which this message is intended.
-        """
-        return self._mask
-
-    @mask.setter
-    def mask(self, value):
-        """
-        Sets the panel mask for which this message is intended.
-        """
-        self._mask = value
-
-    @property
-    def bitfield(self):
-        """
-        The bit field associated with this message.
-        """
-        return self._bitfield
-
-    @bitfield.setter
-    def bitfield(self, value):
-        """
-        Sets the bit field associated with this message.
-        """
-        self._bitfield = value
-
-    @property
-    def panel_data(self):
-        """
-        The binary field associated with this message.
-        """
-        return self._panel_data
-
-    @panel_data.setter
-    def panel_data(self, value):
-        """
-        Sets the binary field associated with this message.
-        """
-        self._panel_data = value
 
 class ExpanderMessage(object):
     """
@@ -615,11 +353,11 @@ class ExpanderMessage(object):
         """
         Constructor
         """
-        self._type = None
-        self._address = None
-        self._channel = None
-        self._value = None
-        self._raw = None
+        self.type = None
+        self.address = None
+        self.channel = None
+        self.value = None
+        self.raw = None
 
         if data is not None:
             self._parse_message(data)
@@ -653,76 +391,6 @@ class ExpanderMessage(object):
         elif header == '!REL':
             self.type = ExpanderMessage.RELAY
 
-    @property
-    def address(self):
-        """
-        The relay address from which the message originated.
-        """
-        return self._address
-
-    @address.setter
-    def address(self, value):
-        """
-        Sets the relay address from which the message originated.
-        """
-        self._address = value
-
-    @property
-    def channel(self):
-        """
-        The zone expander channel from which the message originated.
-        """
-        return self._channel
-
-    @channel.setter
-    def channel(self, value):
-        """
-        Sets the zone expander channel from which the message originated.
-        """
-        self._channel = value
-
-    @property
-    def value(self):
-        """
-        The value associated with the message.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """
-        Sets the value associated with the message.
-        """
-        self._value = value
-
-    @property
-    def raw(self):
-        """
-        The raw message from the expander device.
-        """
-        return self._raw
-
-    @raw.setter
-    def raw(self, value):
-        """
-        Sets the raw message from the expander device.
-        """
-        self._value = value
-
-    @property
-    def type(self):
-        """
-        The type of expander associated with this message.
-        """
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        """
-        Sets the type of expander associated with this message.
-        """
-        self._type = value
-
 class RFMessage(object):
     """
     Represents a message from an RF receiver.
@@ -731,9 +399,9 @@ class RFMessage(object):
         """
         Constructor
         """
-        self._raw = None
-        self._serial_number = None
-        self._value = None
+        self.raw = None
+        self.serial_number = None
+        self.value = None
 
         if data is not None:
             self._parse_message(data)
@@ -752,42 +420,3 @@ class RFMessage(object):
 
         _, values = data.split(':')
         self.serial_number, self.value = values.split(',')
-
-    @property
-    def serial_number(self):
-        """
-        The serial number for the RF receiver.
-        """
-        return self._serial_number
-
-    @serial_number.setter
-    def serial_number(self, value):
-        self._serial_number = value
-
-    @property
-    def value(self):
-        """
-        The value of the RF message.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """
-        Sets the value of the RF message.
-        """
-        self._value = value
-
-    @property
-    def raw(self):
-        """
-        The raw message from the RF receiver.
-        """
-        return self._raw
-
-    @raw.setter
-    def raw(self, value):
-        """
-        Sets the raw message from the RF receiver.
-        """
-        self._raw = value
