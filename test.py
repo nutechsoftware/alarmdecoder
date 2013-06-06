@@ -199,7 +199,7 @@ def test_factory_watcher():
     overseer.close()
 
 def test_socket():
-    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("localhost", 10000))
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("singularity.corp.nutech.com", 10000))
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -281,7 +281,7 @@ try:
     signal.signal(signal.SIGINT, signal_handler)
 
     #test_serial()
-    upload_serial()
+    #upload_serial()
 
     #test_usb()
     #test_usb_serial()
@@ -290,7 +290,7 @@ try:
     #upload_usb()
     #upload_usb_serial()
 
-    #test_socket()
+    test_socket()
     #upload_socket()
 
     #test_no_read_thread()

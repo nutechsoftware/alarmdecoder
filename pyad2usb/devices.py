@@ -31,7 +31,7 @@ class Device(object):
         self._interface = None
         self._device = None
         self._running = False
-        self._read_thread = ReadThread(self)    # NOTE: not sure this is going to work..
+        self._read_thread = Device.ReadThread(self)    # NOTE: not sure this is going to work..
 
     def __del__(self):
         pass
@@ -432,6 +432,8 @@ class SocketDevice(Device):
         """
         Constructor
         """
+        Device.__init__(self)
+
         self._interface = interface
         self._host, self._port = interface
 
