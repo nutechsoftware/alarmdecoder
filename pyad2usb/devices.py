@@ -240,6 +240,9 @@ class USBDevice(Device):
                 time.sleep(0.001)
 
         except (usb.core.USBError, FtdiError), err:
+            self._buffer = ''
+            timer.cancel()
+
             raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
         else:
             if got_line:
@@ -428,6 +431,7 @@ class SerialDevice(Device):
                 time.sleep(0.001)
 
         except (OSError, serial.SerialException), err:
+            self._buffer = ''
             timer.cancel()
 
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
@@ -591,6 +595,9 @@ class SocketDevice(Device):
                 time.sleep(0.001)
 
         except socket.error, err:
+            self._buffer = ''
+            timer.cancel()
+
             raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
         else:
             if got_line:
