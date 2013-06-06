@@ -154,6 +154,7 @@ class AD2USB(object):
     on_power_changed = event.Event('Called when panel power switches between AC and DC.')
     on_alarm = event.Event('Called when the alarm is triggered.')
     on_bypass = event.Event('Called when a zone is bypassed.')
+    on_boot = event.Event('Called when the device finishes bootings.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -188,6 +189,12 @@ class AD2USB(object):
         """
         self._device.close()
         self._device = None
+
+    def reboot(self):
+        """
+        Reboots the device.
+        """
+        self._device.write('=')
 
     @property
     def id(self):
@@ -224,6 +231,8 @@ class AD2USB(object):
                 msg = ExpanderMessage(data)
             elif header == '!RFX':
                 msg = RFMessage(data)
+            elif data.startswith('!Ready'):
+                self.on_boot()
 
         return msg
 
