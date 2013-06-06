@@ -231,6 +231,8 @@ class AD2USB(object):
                 msg = ExpanderMessage(data)
             elif header == '!RFX':
                 msg = RFMessage(data)
+            elif header == '!LRR':
+                msg = LRRMessage(data)
             elif data.startswith('!Ready'):
                 self.on_boot()
 
@@ -429,3 +431,34 @@ class RFMessage(object):
 
         _, values = data.split(':')
         self.serial_number, self.value = values.split(',')
+
+class LRRMessage(object):
+    """
+    Represent a message from a Long Range Radio.
+    """
+    def __init__(self, data=None):
+        """
+        Constructor
+        """
+        self.raw = None
+        self._event_data = None
+        self._partition = None
+        self._event_type = None
+
+        if data is not None:
+            self._parse_message(data)
+
+    def __str__(self):
+        """
+        String conversion operator.
+        """
+        return 'lrr > {0} @ {1} -- {2}'.format()
+
+    def _parse_message(self, data):
+        """
+        Parses the raw message from the device.
+        """
+        self.raw = data
+
+        _, values = data.split(':')
+        self._event_data, self._partition, self._event_type = values.split(',')
