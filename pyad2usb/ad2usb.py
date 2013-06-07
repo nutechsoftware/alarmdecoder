@@ -155,6 +155,7 @@ class AD2USB(object):
     on_alarm = event.Event('Called when the alarm is triggered.')
     on_bypass = event.Event('Called when a zone is bypassed.')
     on_boot = event.Event('Called when the device finishes bootings.')
+    on_config_received = event.Event('Called when the device receives its configuration.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -165,6 +166,12 @@ class AD2USB(object):
     on_read = event.Event('Called when a line has been read from the device.')
     on_write = event.Event('Called when data has been written to the device.')
 
+    # Constants
+    F1 = str(1) + str(1) + str(1)
+    F2 = str(2) + str(2) + str(2)
+    F3 = str(3) + str(3) + str(3)
+    F4 = str(4) + str(4) + str(4)
+
     def __init__(self, device):
         """
         Constructor
@@ -173,6 +180,8 @@ class AD2USB(object):
         self._power_status = None
         self._alarm_status = None
         self._bypass_status = None
+
+        self._settings = {}
 
         self._address_mask = 0xFF80     # TEMP
 
@@ -189,6 +198,18 @@ class AD2USB(object):
         """
         self._device.close()
         self._device = None
+
+    def get_config(self):
+        """
+        Retrieves the configuration from the device.
+        """
+        self._device.write("C\r")
+
+    def set_config(self, settings):
+        """
+
+        """
+        pass
 
     def reboot(self):
         """
@@ -235,8 +256,19 @@ class AD2USB(object):
                 msg = LRRMessage(data)
             elif data.startswith('!Ready'):
                 self.on_boot()
+            elif data.startswith('!CONFIG'):
+                self._handle_config(data)
 
         return msg
+
+    def _handle_config(self, data):
+        _, config_string = data.split('>')
+        for setting in config_string.split('&'):
+            k, v = setting.split('=')
+
+            self._settings[k] = v
+
+        self.on_config_received(self._settings)
 
     def _update_internal_states(self, message):
         if message.ac_power != self._power_status:

@@ -74,6 +74,9 @@ def handle_firmware(stage):
 def handle_boot(sender, args):
     print 'boot', args
 
+def handle_config(sender, args):
+    print 'config', args
+
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -215,9 +218,12 @@ def test_socket():
     a2u.on_alarm += handle_alarm_bell
     a2u.on_bypass += handle_bypass
     a2u.on_boot += handle_boot
+    a2u.on_config_received += handle_config
 
     a2u.open()
-    a2u.reboot()
+    #a2u.reboot()
+    time.sleep(2)
+    a2u.get_config()
 
     print dev._id
 
