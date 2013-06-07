@@ -222,8 +222,8 @@ def test_socket():
 
     a2u.open()
     #a2u.reboot()
-    time.sleep(2)
     a2u.get_config()
+    print pyad2usb.ad2usb.AD2USB.F1
 
     print dev._id
 

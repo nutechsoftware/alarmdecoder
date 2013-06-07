@@ -167,10 +167,10 @@ class AD2USB(object):
     on_write = event.Event('Called when data has been written to the device.')
 
     # Constants
-    F1 = str(1) + str(1) + str(1)
-    F2 = str(2) + str(2) + str(2)
-    F3 = str(3) + str(3) + str(3)
-    F4 = str(4) + str(4) + str(4)
+    F1 = unichr(1) + unichr(1) + unichr(1)
+    F2 = unichr(2) + unichr(2) + unichr(2)
+    F3 = unichr(3) + unichr(3) + unichr(3)
+    F4 = unichr(4) + unichr(4) + unichr(4)
 
     def __init__(self, device):
         """
