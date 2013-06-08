@@ -1,0 +1,691 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyad2usb Package &mdash; pyad2usb  documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyad2usb  documentation" href="index.html" />
+    <link rel="next" title="event Package" href="pyad2usb.event.html" />
+    <link rel="prev" title="Welcome to pyad2usb’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyad2usb.event.html" title="event Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyad2usb’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyad2usb  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyad2usb-package">
+<h1>pyad2usb Package<a class="headerlink" href="#pyad2usb-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">pyad2usb</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-pyad2usb.__init__"></span><p>The PyAD2USB module.</p>
+</div>
+<div class="section" id="module-pyad2usb.ad2usb">
+<span id="ad2usb-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">ad2usb</span></tt> Module<a class="headerlink" href="#module-pyad2usb.ad2usb" title="Permalink to this headline">¶</a></h2>
+<p>Provides the full AD2USB class and factory.</p>
+<dl class="class">
+<dt id="pyad2usb.ad2usb.AD2USB">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">AD2USB</tt><big>(</big><em>device</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>High-level wrapper around AD2USB/AD2SERIAL devices.</p>
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.F1">
+<tt class="descname">F1</tt><em class="property"> = u'\x01\x01\x01'</em><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.F1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.F2">
+<tt class="descname">F2</tt><em class="property"> = u'\x02\x02\x02'</em><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.F2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.F3">
+<tt class="descname">F3</tt><em class="property"> = u'\x03\x03\x03'</em><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.F3" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.F4">
+<tt class="descname">F4</tt><em class="property"> = u'\x04\x04\x04'</em><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.F4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.AD2USB.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.AD2USB.get_config">
+<tt class="descname">get_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the configuration from the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.id">
+<tt class="descname">id</tt><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_alarm">
+<tt class="descname">on_alarm</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the alarm is triggered.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_boot">
+<tt class="descname">on_boot</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_boot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device finishes bootings.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_bypass">
+<tt class="descname">on_bypass</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_bypass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a zone is bypassed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_close">
+<tt class="descname">on_close</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device has been closed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_config_received">
+<tt class="descname">on_config_received</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_config_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device receives its configuration.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_message">
+<tt class="descname">on_message</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a message has been received from the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_open">
+<tt class="descname">on_open</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device has been opened.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_power_changed">
+<tt class="descname">on_power_changed</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_power_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when panel power switches between AC and DC.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_read">
+<tt class="descname">on_read</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a line has been read from the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_status_changed">
+<tt class="descname">on_status_changed</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_status_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the panel status changes.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.AD2USB.on_write">
+<tt class="descname">on_write</tt><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.on_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when data has been written to the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.AD2USB.open">
+<tt class="descname">open</tt><big>(</big><em>baudrate=None</em>, <em>interface=None</em>, <em>index=None</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.AD2USB.reboot">
+<tt class="descname">reboot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.reboot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.reboot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboots the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.AD2USB.set_config">
+<tt class="descname">set_config</tt><big>(</big><em>settings</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#AD2USB.set_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.AD2USB.set_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets configuration entries on the device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.ad2usb.ExpanderMessage">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">ExpanderMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#ExpanderMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.ExpanderMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a message from a zone or relay expansion module.</p>
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.ExpanderMessage.RELAY">
+<tt class="descname">RELAY</tt><em class="property"> = 1</em><a class="headerlink" href="#pyad2usb.ad2usb.ExpanderMessage.RELAY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.ExpanderMessage.ZONE">
+<tt class="descname">ZONE</tt><em class="property"> = 0</em><a class="headerlink" href="#pyad2usb.ad2usb.ExpanderMessage.ZONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.ad2usb.LRRMessage">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">LRRMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#LRRMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.LRRMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represent a message from a Long Range Radio.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.ad2usb.Message">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">Message</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a message from the alarm panel.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.ad2usb.Overseer">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">Overseer</tt><big>(</big><em>attached_event=None</em>, <em>detached_event=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Factory for creation of AD2USB devices as well as provide4s attach/detach events.&#8221;</p>
+<dl class="class">
+<dt id="pyad2usb.ad2usb.Overseer.DetectThread">
+<em class="property">class </em><tt class="descname">DetectThread</tt><big>(</big><em>overseer</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.DetectThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.DetectThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt></p>
+<p>Thread that handles detection of added/removed devices.</p>
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.DetectThread.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.DetectThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.DetectThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual detection process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.DetectThread.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.DetectThread.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.DetectThread.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.close">
+<tt class="descclassname">Overseer.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up and shut down.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyad2usb.ad2usb.Overseer.create">
+<em class="property">classmethod </em><tt class="descclassname">Overseer.</tt><tt class="descname">create</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory method that returns the requested AD2USB device, or the first device.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyad2usb.ad2usb.Overseer.devices">
+<em class="property">classmethod </em><tt class="descclassname">Overseer.</tt><tt class="descname">devices</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a cached list of AD2USB devices located on the system.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyad2usb.ad2usb.Overseer.find_all">
+<em class="property">classmethod </em><tt class="descclassname">Overseer.</tt><tt class="descname">find_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.find_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.find_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all AD2USB devices located on the system.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.get_device">
+<tt class="descclassname">Overseer.</tt><tt class="descname">get_device</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.get_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.get_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory method that returns the requested AD2USB device, or the first device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.Overseer.on_attached">
+<tt class="descclassname">Overseer.</tt><tt class="descname">on_attached</tt><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.on_attached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when an AD2USB device has been detected.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.ad2usb.Overseer.on_detached">
+<tt class="descclassname">Overseer.</tt><tt class="descname">on_detached</tt><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.on_detached" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when an AD2USB device has been removed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.start">
+<tt class="descclassname">Overseer.</tt><tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the detection thread, if not already running.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.ad2usb.Overseer.stop">
+<tt class="descclassname">Overseer.</tt><tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#Overseer.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.Overseer.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the detection thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.ad2usb.RFMessage">
+<em class="property">class </em><tt class="descclassname">pyad2usb.ad2usb.</tt><tt class="descname">RFMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/ad2usb.html#RFMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.ad2usb.RFMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a message from an RF receiver.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyad2usb.devices">
+<span id="devices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">devices</span></tt> Module<a class="headerlink" href="#module-pyad2usb.devices" title="Permalink to this headline">¶</a></h2>
+<p>Contains different types of devices belonging to the AD2USB family.</p>
+<dl class="class">
+<dt id="pyad2usb.devices.Device">
+<em class="property">class </em><tt class="descclassname">pyad2usb.devices.</tt><tt class="descname">Device</tt><a class="reference internal" href="_modules/pyad2usb/devices.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Generic parent device to all AD2USB products.</p>
+<dl class="class">
+<dt id="pyad2usb.devices.Device.ReadThread">
+<em class="property">class </em><tt class="descname">ReadThread</tt><big>(</big><em>device</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.ReadThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.ReadThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt></p>
+<p>Reader thread which processes messages from the device.</p>
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.ReadThread.READ_TIMEOUT">
+<tt class="descname">READ_TIMEOUT</tt><em class="property"> = 10</em><a class="headerlink" href="#pyad2usb.devices.Device.ReadThread.READ_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.Device.ReadThread.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.ReadThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.ReadThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>The actual read process.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.Device.ReadThread.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.ReadThread.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.ReadThread.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the running thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.id">
+<tt class="descclassname">Device.</tt><tt class="descname">id</tt><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.Device.is_reader_alive">
+<tt class="descclassname">Device.</tt><tt class="descname">is_reader_alive</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.is_reader_alive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.is_reader_alive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the reader thread is alive.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.on_close">
+<tt class="descclassname">Device.</tt><tt class="descname">on_close</tt><a class="headerlink" href="#pyad2usb.devices.Device.on_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device has been closed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.on_open">
+<tt class="descclassname">Device.</tt><tt class="descname">on_open</tt><a class="headerlink" href="#pyad2usb.devices.Device.on_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the device has been opened</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.on_read">
+<tt class="descclassname">Device.</tt><tt class="descname">on_read</tt><a class="headerlink" href="#pyad2usb.devices.Device.on_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a line has been read from the device</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.Device.on_write">
+<tt class="descclassname">Device.</tt><tt class="descname">on_write</tt><a class="headerlink" href="#pyad2usb.devices.Device.on_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when data has been written to the device</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.Device.stop_reader">
+<tt class="descclassname">Device.</tt><tt class="descname">stop_reader</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#Device.stop_reader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.Device.stop_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the reader thread.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.devices.SerialDevice">
+<em class="property">class </em><tt class="descclassname">pyad2usb.devices.</tt><tt class="descname">SerialDevice</tt><big>(</big><em>interface=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyad2usb.devices.Device" title="pyad2usb.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">pyad2usb.devices.Device</span></tt></a></p>
+<p>AD2USB or AD2SERIAL device exposed with the pyserial interface.</p>
+<dl class="attribute">
+<dt id="pyad2usb.devices.SerialDevice.BAUDRATE">
+<tt class="descname">BAUDRATE</tt><em class="property"> = 19200</em><a class="headerlink" href="#pyad2usb.devices.SerialDevice.BAUDRATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SerialDevice.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the device.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyad2usb.devices.SerialDevice.find_all">
+<em class="property">static </em><tt class="descname">find_all</tt><big>(</big><em>pattern=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.find_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.find_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all serial ports present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SerialDevice.open">
+<tt class="descname">open</tt><big>(</big><em>baudrate=19200</em>, <em>interface=None</em>, <em>index=None</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SerialDevice.read">
+<tt class="descname">read</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a single character from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SerialDevice.read_line">
+<tt class="descname">read_line</tt><big>(</big><em>timeout=0.0</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.read_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a line from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SerialDevice.write">
+<tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SerialDevice.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SerialDevice.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes data to the device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.devices.SocketDevice">
+<em class="property">class </em><tt class="descclassname">pyad2usb.devices.</tt><tt class="descname">SocketDevice</tt><big>(</big><em>interface=('localhost'</em>, <em>10000)</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyad2usb.devices.Device" title="pyad2usb.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">pyad2usb.devices.Device</span></tt></a></p>
+<p>Device that supports communication with an AD2USB that is exposed via ser2sock or another
+Serial to IP interface.</p>
+<dl class="method">
+<dt id="pyad2usb.devices.SocketDevice.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SocketDevice.open">
+<tt class="descname">open</tt><big>(</big><em>baudrate=None</em>, <em>interface=None</em>, <em>index=0</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SocketDevice.read">
+<tt class="descname">read</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a single character from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SocketDevice.read_line">
+<tt class="descname">read_line</tt><big>(</big><em>timeout=0.0</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice.read_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a line from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.SocketDevice.write">
+<tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#SocketDevice.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.SocketDevice.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes data to the device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.devices.USBDevice">
+<em class="property">class </em><tt class="descclassname">pyad2usb.devices.</tt><tt class="descname">USBDevice</tt><big>(</big><em>vid=1027</em>, <em>pid=24577</em>, <em>serial=None</em>, <em>description=None</em>, <em>interface=0</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyad2usb.devices.Device" title="pyad2usb.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">pyad2usb.devices.Device</span></tt></a></p>
+<p>AD2USB device exposed with PyFTDI&#8217;s interface.</p>
+<dl class="attribute">
+<dt id="pyad2usb.devices.USBDevice.BAUDRATE">
+<tt class="descname">BAUDRATE</tt><em class="property"> = 115200</em><a class="headerlink" href="#pyad2usb.devices.USBDevice.BAUDRATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.USBDevice.FTDI_PRODUCT_ID">
+<tt class="descname">FTDI_PRODUCT_ID</tt><em class="property"> = 24577</em><a class="headerlink" href="#pyad2usb.devices.USBDevice.FTDI_PRODUCT_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.devices.USBDevice.FTDI_VENDOR_ID">
+<tt class="descname">FTDI_VENDOR_ID</tt><em class="property"> = 1027</em><a class="headerlink" href="#pyad2usb.devices.USBDevice.FTDI_VENDOR_ID" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.USBDevice.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the device.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyad2usb.devices.USBDevice.find_all">
+<em class="property">static </em><tt class="descname">find_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.find_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.find_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all FTDI devices matching our vendor and product IDs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.USBDevice.open">
+<tt class="descname">open</tt><big>(</big><em>baudrate=115200</em>, <em>interface=None</em>, <em>index=0</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.USBDevice.read">
+<tt class="descname">read</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a single character from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.USBDevice.read_line">
+<tt class="descname">read_line</tt><big>(</big><em>timeout=0.0</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.read_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.read_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a line from the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyad2usb.devices.USBDevice.write">
+<tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/devices.html#USBDevice.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.devices.USBDevice.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes data to the device.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyad2usb.util">
+<span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-pyad2usb.util" title="Permalink to this headline">¶</a></h2>
+<p>Provides utility classes for the AD2USB devices.</p>
+<dl class="exception">
+<dt id="pyad2usb.util.CommError">
+<em class="property">exception </em><tt class="descclassname">pyad2usb.util.</tt><tt class="descname">CommError</tt><a class="reference internal" href="_modules/pyad2usb/util.html#CommError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.CommError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>There was an error communicating with the device.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyad2usb.util.Firmware">
+<em class="property">class </em><tt class="descclassname">pyad2usb.util.</tt><tt class="descname">Firmware</tt><a class="reference internal" href="_modules/pyad2usb/util.html#Firmware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.Firmware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents firmware for the AD2USB/AD2SERIAL devices.</p>
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_BOOT">
+<tt class="descname">STAGE_BOOT</tt><em class="property"> = 2</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_BOOT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_DONE">
+<tt class="descname">STAGE_DONE</tt><em class="property"> = 5</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_DONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_LOAD">
+<tt class="descname">STAGE_LOAD</tt><em class="property"> = 3</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_LOAD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_START">
+<tt class="descname">STAGE_START</tt><em class="property"> = 0</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_START" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_UPLOADING">
+<tt class="descname">STAGE_UPLOADING</tt><em class="property"> = 4</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_UPLOADING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2usb.util.Firmware.STAGE_WAITING">
+<tt class="descname">STAGE_WAITING</tt><em class="property"> = 1</em><a class="headerlink" href="#pyad2usb.util.Firmware.STAGE_WAITING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyad2usb.util.Firmware.upload">
+<em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/pyad2usb/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads firmware to an AD2USB/AD2SERIAL device.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="pyad2usb.util.InvalidMessageError">
+<em class="property">exception </em><tt class="descclassname">pyad2usb.util.</tt><tt class="descname">InvalidMessageError</tt><a class="reference internal" href="_modules/pyad2usb/util.html#InvalidMessageError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.InvalidMessageError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>The format of the panel message was invalid.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pyad2usb.util.NoDeviceError">
+<em class="property">exception </em><tt class="descclassname">pyad2usb.util.</tt><tt class="descname">NoDeviceError</tt><a class="reference internal" href="_modules/pyad2usb/util.html#NoDeviceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.NoDeviceError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>No devices found.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="pyad2usb.util.TimeoutError">
+<em class="property">exception </em><tt class="descclassname">pyad2usb.util.</tt><tt class="descname">TimeoutError</tt><a class="reference internal" href="_modules/pyad2usb/util.html#TimeoutError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2usb.util.TimeoutError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>There was a timeout while trying to communicate with the device.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyad2usb.event.html">event Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyad2usb.event.html#id1"><tt class="docutils literal"><span class="pre">event</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyad2usb.event.html#module-pyad2usb.event.event"><tt class="docutils literal"><span class="pre">event</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyad2usb Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">pyad2usb</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-pyad2usb.ad2usb"><tt class="docutils literal"><span class="pre">ad2usb</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-pyad2usb.devices"><tt class="docutils literal"><span class="pre">devices</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-pyad2usb.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to pyad2usb&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyad2usb.event.html"
+                        title="next chapter">event Package</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pyad2usb.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyad2usb.event.html" title="event Package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to pyad2usb’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">pyad2usb  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
