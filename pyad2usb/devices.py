@@ -201,10 +201,14 @@ class USBDevice(Device):
         """
         return self._device.read_data(1)
 
-    def read_line(self, timeout=0.0):
+    def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
         """
+
+        if purge_buffer:
+            self._buffer = ''
+
         def timeout_event():
             timeout_event.reading = False
 
@@ -237,10 +241,7 @@ class USBDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                time.sleep(0.001)
-
         except (usb.core.USBError, FtdiError), err:
-            self._buffer = ''
             timer.cancel()
 
             raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
@@ -391,10 +392,12 @@ class SerialDevice(Device):
         """
         return self._device.read(1)
 
-    def read_line(self, timeout=0.0):
+    def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
         """
+        if purge_buffer:
+            self._buffer = ''
 
         def timeout_event():
             timeout_event.reading = False
@@ -428,13 +431,11 @@ class SerialDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                time.sleep(0.001)
-
         except (OSError, serial.SerialException), err:
-            self._buffer = ''
             timer.cancel()
 
             raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
+
         else:
             if got_line:
                 ret = self._buffer
@@ -556,10 +557,14 @@ class SocketDevice(Device):
 
         return data
 
-    def read_line(self, timeout=0.0):
+    def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
         """
+
+        if purge_buffer:
+            self._buffer = ''
+
         def timeout_event():
             timeout_event.reading = False
 
@@ -592,10 +597,7 @@ class SocketDevice(Device):
                         else:
                             self._buffer = self._buffer[:-1]
 
-                time.sleep(0.001)
-
         except socket.error, err:
-            self._buffer = ''
             timer.cancel()
 
             raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
