@@ -5,6 +5,7 @@ import time
 import signal
 import traceback
 import sys
+import logging
 
 running = True
 
@@ -221,11 +222,9 @@ def test_socket():
     a2u.on_config_received += handle_config
 
     a2u.open()
+    #a2u.save_config()
     #a2u.reboot()
     a2u.get_config()
-    print pyad2usb.ad2usb.AD2USB.F1
-
-    print dev._id
 
     while running:
         time.sleep(0.1)
@@ -289,6 +288,7 @@ def test_double_panel_write():
     dev2.close()
 
 try:
+    logging.basicConfig(level=logging.DEBUG)
     signal.signal(signal.SIGINT, signal_handler)
 
     #test_serial()

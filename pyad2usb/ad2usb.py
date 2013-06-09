@@ -5,6 +5,7 @@ Provides the full AD2USB class and factory.
 import time
 import threading
 import re
+import logging
 from .event import event
 from . import devices
 from . import util
@@ -181,9 +182,13 @@ class AD2USB(object):
         self._alarm_status = None
         self._bypass_status = None
 
-        self._settings = {}
-
-        self._address_mask = 0xFF80     # TEMP
+        self.address = 18
+        self.configbits = 0xFF00
+        self.address_mask = 0x00000000
+        self.emulate_zone = [False for x in range(5)]
+        self.emulate_relay = [False for x in range(4)]
+        self.emulate_lrr = False
+        self.deduplicate = False
 
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
         """
@@ -205,11 +210,34 @@ class AD2USB(object):
         """
         self._device.write("C\r")
 
-    def set_config(self, settings):
+    def save_config(self):
         """
+        Sets configuration entries on the device.
+        """
+        config_string = ''
 
-        """
-        pass
+        # HACK: Both of these methods are ugly.. but I can't think of an elegant way of doing it.
+
+        #config_string += 'ADDRESS={0}&'.format(self.address)
+        #config_string += 'CONFIGBITS={0:x}&'.format(self.configbits)
+        #config_string += 'MASK={0:x}&'.format(self.address_mask)
+        #config_string += 'EXP={0}&'.format(''.join(['Y' if z else 'N' for z in self.emulate_zone]))
+        #config_string += 'REL={0}&'.format(''.join(['Y' if r else 'N' for r in self.emulate_relay]))
+        #config_string += 'LRR={0}&'.format('Y' if self.emulate_lrr else 'N')
+        #config_string += 'DEDUPLICATE={0}'.format('Y' if self.deduplicate else 'N')
+
+        config_entries = []
+        config_entries.append(('ADDRESS', '{0}'.format(self.address)))
+        config_entries.append(('CONFIGBITS', '{0:x}'.format(self.configbits)))
+        config_entries.append(('MASK', '{0:x}'.format(self.address_mask)))
+        config_entries.append(('EXP', ''.join(['Y' if z else 'N' for z in self.emulate_zone])))
+        config_entries.append(('REL', ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
+        config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
+        config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
+
+        config_string = '&'.join(['='.join(t) for t in config_entries])
+
+        self._device.write("C{0}\r".format(config_string))
 
     def reboot(self):
         """
@@ -242,7 +270,7 @@ class AD2USB(object):
         if data[0] != '!':
             msg = Message(data)
 
-            if self._address_mask & msg.mask > 0:
+            if self.address_mask & msg.mask > 0:
                 self._update_internal_states(msg)
 
         else:   # specialty messages
@@ -266,9 +294,24 @@ class AD2USB(object):
         for setting in config_string.split('&'):
             k, v = setting.split('=')
 
-            self._settings[k] = v
+            if k == 'ADDRESS':
+                self.address = int(v)
+            elif k == 'CONFIGBITS':
+                self.configbits = int(v, 16)
+            elif k == 'MASK':
+                self.address_mask = int(v, 16)
+            elif k == 'EXP':
+                for z in range(5):
+                    self.emulate_zone[z] = True if v[z] == 'Y' else False
+            elif k == 'REL':
+                for r in range(4):
+                    self.emulate_relay[r] = True if v[r] == 'Y' else False
+            elif k == 'LRR':
+                self.emulate_lrr = True if v == 'Y' else False
+            elif k == 'DEDUPLICATE':
+                self.deduplicate = True if v == 'Y' else False
 
-        self.on_config_received(self._settings)
+        self.on_config_received()
 
     def _update_internal_states(self, message):
         if message.ac_power != self._power_status:
