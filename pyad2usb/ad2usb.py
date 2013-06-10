@@ -190,6 +190,10 @@ class AD2USB(object):
         self.emulate_lrr = False
         self.deduplicate = False
 
+    @property
+    def id(self):
+        return self._device.id
+
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
         """
         Opens the device.
@@ -245,9 +249,19 @@ class AD2USB(object):
         """
         self._device.write('=')
 
-    @property
-    def id(self):
-        return self._device.id
+    def fault_zone(self, zone, simulate_wire_problem=False):
+        """
+        Faults a zone if we are emulating a zone expander.
+        """
+        status = 2 if simulate_wire_problem else 1
+
+        self._device.write("L{0:02}{1}".format(zone, status))
+
+    def clear_zone(self, zone):
+        """
+        Clears a zone if we are emulating a zone expander.
+        """
+        self._device.write("L{0:02}0".format(zone))
 
     def _wire_events(self):
         """
