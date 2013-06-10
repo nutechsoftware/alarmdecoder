@@ -44,6 +44,12 @@ def handle_bypass(sender, args):
 def handle_message(sender, args):
     print args
 
+def handle_arm(sender, args):
+    print 'armed', args
+
+def handle_disarm(sender, args):
+    print 'disarmed', args
+
 def handle_firmware(stage):
     if stage == pyad2usb.ad2usb.util.Firmware.STAGE_START:
         handle_firmware.wait_tick = 0
@@ -220,6 +226,8 @@ def test_socket():
     a2u.on_bypass += handle_bypass
     a2u.on_boot += handle_boot
     a2u.on_config_received += handle_config
+    a2u.on_arm += handle_arm
+    a2u.on_disarm += handle_disarm
 
     a2u.open()
     #a2u.save_config()

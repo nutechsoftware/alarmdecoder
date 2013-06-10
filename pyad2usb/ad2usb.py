@@ -151,6 +151,8 @@ class AD2USB(object):
     """
 
     # High-level Events
+    on_arm = event.Event('Called when the panel is armed.')
+    on_disarm = event.Event('Called when the panel is disarmed.')
     on_status_changed = event.Event('Called when the panel status changes.')
     on_power_changed = event.Event('Called when panel power switches between AC and DC.')
     on_alarm = event.Event('Called when the alarm is triggered.')
@@ -345,6 +347,15 @@ class AD2USB(object):
 
             if old_status is not None:
                 self.on_bypass(self._bypass_status)
+
+        if (message.armed_away | message.armed_home) != self._armed_status:
+            self._armed_status, old_status = message.armed_away | message.armed_home, self._armed_status
+
+            if old_status is not None:
+                if self._armed_status:
+                    self.on_arm()
+                else:
+                    self.on_disarm()
 
     def _on_open(self, sender, args):
         """
