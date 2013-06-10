@@ -77,7 +77,7 @@ class Firmware(object):
                         if progress_callback is not None:
                             progress_callback(Firmware.STAGE_UPLOADING)
 
-                        time.sleep(0.05)
+                        time.sleep(0.0)
 
         def read_until(pattern, timeout=0.0):
             """
@@ -134,10 +134,12 @@ class Firmware(object):
                 stage_callback(Firmware.STAGE_WAITING)
                 time.sleep(1)
 
+        time.sleep(1)
+
         # Reboot the device and wait for the boot loader.
         stage_callback(Firmware.STAGE_BOOT)
         dev.write("=")
-        read_until('!boot', timeout=15.0)
+        read_until('......', timeout=15.0)
 
         # Get ourselves into the boot loader and wait for indication
         # that it's ready for the firmware upload.

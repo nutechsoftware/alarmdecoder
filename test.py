@@ -75,14 +75,15 @@ def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
     dev.open(no_reader_thread=True)
-    pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
+    #pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
     dev.close()
 
 def upload_serial():
-    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB2')
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB0')
 
-    dev.open()
+    dev.open(no_reader_thread=True)
     pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu_V2_2a_6.hex', handle_firmware)
+    #pyad2usb.ad2usb.util.Firmware.upload(dev, 'tmp/ademcoemu-V2-2a-5-beta20-C4.hex', handle_firmware)
     dev.close()
 
 def upload_usb_serial():
