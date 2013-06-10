@@ -153,9 +153,9 @@ class AD2USB(object):
     # High-level Events
     on_arm = event.Event('Called when the panel is armed.')
     on_disarm = event.Event('Called when the panel is disarmed.')
-    on_status_changed = event.Event('Called when the panel status changes.')
     on_power_changed = event.Event('Called when panel power switches between AC and DC.')
     on_alarm = event.Event('Called when the alarm is triggered.')
+    on_fire = event.Event('Called when a fire is detected.')
     on_bypass = event.Event('Called when a zone is bypassed.')
     on_boot = event.Event('Called when the device finishes bootings.')
     on_config_received = event.Event('Called when the device receives its configuration.')
@@ -357,6 +357,12 @@ class AD2USB(object):
                 else:
                     self.on_disarm()
 
+        if message.fire_alarm != self._fire_status:
+            self._fire_status, old_status = message.fire_alarm, self._fire_status
+
+            if old_status is not None:
+                self.on_fire(self._fire_status)
+
     def _on_open(self, sender, args):
         """
         Internal handler for opening the device.
@@ -405,6 +411,7 @@ class Message(object):
         self.chime_on = False
         self.alarm_event_occurred = False
         self.alarm_sounding = False
+        self.fire_alarm = False
         self.numeric_code = ""
         self.text = ""
         self.cursor_location = -1
@@ -442,6 +449,7 @@ class Message(object):
         self.chime_on = not self.bitfield[9:10] == "0"
         self.alarm_event_occurred = not self.bitfield[10:11] == "0"
         self.alarm_sounding = not self.bitfield[11:12] == "0"
+        self.fire_alarm = not self.bitfield[13:14] == "0"
         self.text = alpha.strip('"')
 
         if int(self.panel_data[19:21], 16) & 0x01 > 0:
