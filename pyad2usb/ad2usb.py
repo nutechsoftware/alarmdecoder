@@ -183,6 +183,8 @@ class AD2USB(object):
         self._power_status = None
         self._alarm_status = None
         self._bypass_status = None
+        self._armed_status = None
+        self._fire_status = None
 
         self.address = 18
         self.configbits = 0xFF00
