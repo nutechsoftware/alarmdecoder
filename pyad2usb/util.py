@@ -134,7 +134,7 @@ class Firmware(object):
                 stage_callback(Firmware.STAGE_WAITING)
                 time.sleep(1)
 
-        time.sleep(1)
+        time.sleep(2)
 
         # Reboot the device and wait for the boot loader.
         stage_callback(Firmware.STAGE_BOOT)
