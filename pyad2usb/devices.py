@@ -92,6 +92,7 @@ class Device(object):
             while self._running:
                 try:
                     self._device.read_line(timeout=self.READ_TIMEOUT)
+
                 except util.TimeoutError, err:
                     pass
 
@@ -116,6 +117,7 @@ class USBDevice(Device):
 
         try:
             devices = Ftdi.find_all([(USBDevice.FTDI_VENDOR_ID, USBDevice.FTDI_PRODUCT_ID)], nocache=True)
+
         except (usb.core.USBError, FtdiError), err:
             raise util.CommError('Error enumerating AD2USB devices: {0}'.format(str(err)))
 
@@ -163,8 +165,10 @@ class USBDevice(Device):
             self._device.set_baudrate(baudrate)
 
             self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
+
         except (usb.core.USBError, FtdiError), err:
             raise util.NoDeviceError('Error opening device: {0}'.format(str(err)))
+
         else:
             self._running = True
             if not no_reader_thread:
@@ -184,7 +188,8 @@ class USBDevice(Device):
 
             # HACK: Probably should fork pyftdi and make this call in .close().
             self._device.usb_dev.attach_kernel_driver(self._interface)
-        except (FtdiError, usb.core.USBError):
+
+        except:
             pass
 
         self.on_close()
@@ -256,6 +261,7 @@ class USBDevice(Device):
             timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
         else:
             if got_line:
                 ret = self._buffer
@@ -292,6 +298,7 @@ class SerialDevice(Device):
                 devices = serial.tools.list_ports.grep(pattern)
             else:
                 devices = serial.tools.list_ports.comports()
+
         except SerialException, err:
             raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)))
 
@@ -335,6 +342,7 @@ class SerialDevice(Device):
 
         except (serial.SerialException, ValueError), err:
             raise util.NoDeviceError('Error opening device on port {0}.'.format(interface))
+
         else:
             self._running = True
             self.on_open(('N/A', "AD2SERIAL"))
@@ -351,7 +359,8 @@ class SerialDevice(Device):
             self._read_thread.stop()
 
             self._device.close()
-        except Exception, err:
+
+        except:
             pass
 
         self.on_close()
@@ -362,10 +371,13 @@ class SerialDevice(Device):
         """
         try:
             self._device.write(data)
+
         except serial.SerialTimeoutException, err:
             pass
+
         except serial.SerialException, err:
             raise util.CommError('Error writing to device.')
+
         else:
             self.on_write(data)
 
@@ -425,6 +437,7 @@ class SerialDevice(Device):
             timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
         else:
             if got_line:
                 ret = self._buffer
@@ -471,6 +484,7 @@ class SocketDevice(Device):
 
         except socket.error, err:
             raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port))
+
         else:
             self._running = True
 
@@ -489,6 +503,7 @@ class SocketDevice(Device):
             self._read_thread.stop()
             self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
             self._device.close()
+
         except:
             pass
 
@@ -521,6 +536,7 @@ class SocketDevice(Device):
 
         try:
             data = self._device.recv(1)
+
         except socket.error, err:
             raise util.CommError('Error while reading from device: {0}'.format(str(err)))
 
@@ -568,6 +584,7 @@ class SocketDevice(Device):
             timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            
         else:
             if got_line:
                 ret = self._buffer
