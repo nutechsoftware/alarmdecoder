@@ -212,6 +212,7 @@ class AD2USB(object):
         Closes the device.
         """
         self._device.close()
+        del self._device
         self._device = None
 
     def get_config(self):
