@@ -96,7 +96,6 @@ class Overseer(object):
         """
         return Overseer.create(device)
 
-
     class DetectThread(threading.Thread):
         """
         Thread that handles detection of added/removed devices.
@@ -196,6 +195,9 @@ class AD2USB(object):
 
     @property
     def id(self):
+        """
+        The ID of the AD2USB device.
+        """
         return self._device.id
 
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
@@ -308,6 +310,9 @@ class AD2USB(object):
         return msg
 
     def _handle_config(self, data):
+        """
+        Handles received configuration data.
+        """
         _, config_string = data.split('>')
         for setting in config_string.split('&'):
             k, v = setting.split('=')
@@ -332,6 +337,9 @@ class AD2USB(object):
         self.on_config_received()
 
     def _update_internal_states(self, message):
+        """
+        Updates internal device states.
+        """
         if message.ac_power != self._power_status:
             self._power_status, old_status = message.ac_power, self._power_status
 
@@ -467,6 +475,7 @@ class ExpanderMessage(object):
     """
     Represents a message from a zone or relay expansion module.
     """
+
     ZONE = 0
     RELAY = 1
 
@@ -516,6 +525,7 @@ class RFMessage(object):
     """
     Represents a message from an RF receiver.
     """
+
     def __init__(self, data=None):
         """
         Constructor
@@ -546,6 +556,7 @@ class LRRMessage(object):
     """
     Represent a message from a Long Range Radio.
     """
+
     def __init__(self, data=None):
         """
         Constructor
