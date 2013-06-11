@@ -26,22 +26,28 @@ class Device(object):
     on_write = event.Event('Called when data has been written to the device')
 
     def __init__(self):
+        """
+        Constructor
+        """
         self._id = ''
         self._buffer = ''
         self._interface = None
         self._device = None
         self._running = False
-        self._read_thread = Device.ReadThread(self)    # NOTE: not sure this is going to work..
-
-    def __del__(self):
-        pass
+        self._read_thread = Device.ReadThread(self)
 
     @property
     def id(self):
+        """
+        Retrieve the device ID.
+        """
         return self._id
 
     @id.setter
     def id(self, value):
+        """
+        Sets the device ID.
+        """
         self._id = value
 
     def is_reader_alive(self):
@@ -158,9 +164,7 @@ class USBDevice(Device):
 
             self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
         except (usb.core.USBError, FtdiError), err:
-            self.on_close()
-
-            raise util.NoDeviceError('Error opening AD2USB device: {0}'.format(str(err)))
+            raise util.NoDeviceError('Error opening device: {0}'.format(str(err)))
         else:
             self._running = True
             if not no_reader_thread:
@@ -194,13 +198,21 @@ class USBDevice(Device):
 
             self.on_write(data)
         except FtdiError, err:
-            raise util.CommError('Error writing to AD2USB device.')
+            raise util.CommError('Error writing to device: {0}'.format(str(err)))
 
     def read(self):
         """
         Reads a single character from the device.
         """
-        return self._device.read_data(1)
+        ret = None
+
+        try:
+            ret = self._device.read_data(1)
+
+        except (usb.core.USBError, FtdiError), err:
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
+        return ret
 
     def read_line(self, timeout=0.0):
         """
@@ -243,7 +255,7 @@ class USBDevice(Device):
         except (usb.core.USBError, FtdiError), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
         else:
             if got_line:
                 ret = self._buffer
@@ -280,8 +292,8 @@ class SerialDevice(Device):
                 devices = serial.tools.list_ports.grep(pattern)
             else:
                 devices = serial.tools.list_ports.comports()
-        except Exception, err:
-            raise util.CommError('Error enumerating AD2SERIAL devices: {0}'.format(str(err)))
+        except SerialException, err:
+            raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)))
 
         return devices
 
@@ -304,7 +316,7 @@ class SerialDevice(Device):
             baudrate = SerialDevice.BAUDRATE
 
         if self._interface is None and interface is None:
-            raise util.NoDeviceError('No AD2SERIAL device interface specified.')
+            raise util.NoDeviceError('No device interface specified.')
 
         if interface is not None:
             self._interface = interface
@@ -322,9 +334,7 @@ class SerialDevice(Device):
                                                         #       all issues with it.
 
         except (serial.SerialException, ValueError), err:
-            self.on_close()
-
-            raise util.NoDeviceError('Error opening AD2SERIAL device on port {0}.'.format(interface))
+            raise util.NoDeviceError('Error opening device on port {0}.'.format(interface))
         else:
             self._running = True
             self.on_open(('N/A', "AD2SERIAL"))
@@ -355,7 +365,7 @@ class SerialDevice(Device):
         except serial.SerialTimeoutException, err:
             pass
         except serial.SerialException, err:
-            raise util.CommError('Error writing to serial device.')
+            raise util.CommError('Error writing to device.')
         else:
             self.on_write(data)
 
@@ -363,7 +373,15 @@ class SerialDevice(Device):
         """
         Reads a single character from the device.
         """
-        return self._device.read(1)
+        ret = None
+
+        try:
+            ret = self._device.read(1)
+
+        except serial.SerialException, err:
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
+        return ret
 
     def read_line(self, timeout=0.0):
         """
@@ -406,7 +424,7 @@ class SerialDevice(Device):
         except (OSError, serial.SerialException), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
         else:
             if got_line:
                 ret = self._buffer
@@ -452,9 +470,7 @@ class SocketDevice(Device):
             self._id = '{0}:{1}'.format(self._host, self._port)
 
         except socket.error, err:
-            self.on_close()
-
-            raise util.NoDeviceError('Error opening AD2SOCKET device at {0}:{1}'.format(self._host, self._port))
+            raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port))
         else:
             self._running = True
 
@@ -482,12 +498,18 @@ class SocketDevice(Device):
         """
         Writes data to the device.
         """
-        data_sent = self._device.send(data)
+        data_sent = None
 
-        if data_sent == 0:
-            raise util.CommError('Error while sending data.')
-        else:
+        try:
+            data_sent = self._device.send(data)
+
+            if data_sent == 0:
+                raise util.CommError('Error writing to device.')
+
             self.on_write(data)
+
+        except socket.error, err:
+            raise util.CommError('Error writing to device: {0}'.format(str(err)))
 
         return data_sent
 
@@ -495,6 +517,8 @@ class SocketDevice(Device):
         """
         Reads a single character from the device.
         """
+        data = None
+
         try:
             data = self._device.recv(1)
         except socket.error, err:
@@ -543,7 +567,7 @@ class SocketDevice(Device):
         except socket.error, err:
             timer.cancel()
 
-            raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
         else:
             if got_line:
                 ret = self._buffer
