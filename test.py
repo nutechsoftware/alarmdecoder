@@ -84,6 +84,12 @@ def handle_boot(sender, args):
 def handle_config(sender, args):
     print 'config', args
 
+def handle_fault(sender, args):
+    print 'zone fault', args
+
+def handle_restore(sender, args):
+    print 'zone restored', args
+
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -228,11 +234,31 @@ def test_socket():
     a2u.on_config_received += handle_config
     a2u.on_arm += handle_arm
     a2u.on_disarm += handle_disarm
+    a2u.on_fault += handle_fault
+    a2u.on_restore += handle_restore
 
     a2u.open()
     #a2u.save_config()
     #a2u.reboot()
     a2u.get_config()
+
+    #a2u.address = 18
+    #a2u.configbits = 0xff00
+    #a2u.address_mask = 0xFFFFFFFF
+    #a2u.emulate_zone[0] = False
+    #a2u.emulate_relay[0] = False
+    #a2u.emulate_lrr = False
+    #a2u.deduplicate = False
+
+    #time.sleep(3)
+    #a2u.emulate_zone[1] = True
+    #a2u.save_config()
+
+    #time.sleep(1)
+    #a2u.fault_zone(17, True)
+
+    #time.sleep(15)
+    #a2u.clear_zone(17)
 
     while running:
         time.sleep(0.1)

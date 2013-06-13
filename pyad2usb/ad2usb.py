@@ -6,6 +6,7 @@ import time
 import threading
 import re
 import logging
+from collections import OrderedDict
 from .event import event
 from . import devices
 from . import util
@@ -158,6 +159,8 @@ class AD2USB(object):
     on_bypass = event.Event('Called when a zone is bypassed.')
     on_boot = event.Event('Called when the device finishes bootings.')
     on_config_received = event.Event('Called when the device receives its configuration.')
+    on_fault = event.Event('Called when the device detects a zone fault.')
+    on_restore = event.Event('Called when the device detects that a fault is restored.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -174,6 +177,8 @@ class AD2USB(object):
     F3 = unichr(3) + unichr(3) + unichr(3)
     F4 = unichr(4) + unichr(4) + unichr(4)
 
+    ZONE_EXPIRE = 30
+
     def __init__(self, device):
         """
         Constructor
@@ -184,6 +189,7 @@ class AD2USB(object):
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = None
+        self._zone_status = OrderedDict()
 
         self.address = 18
         self.configbits = 0xFF00
@@ -373,6 +379,37 @@ class AD2USB(object):
 
             if old_status is not None:
                 self.on_fire(self._fire_status)
+
+        if message.check_zone or (not message.ready and "FAULT" in message.text):
+            self._update_zone_status(message)
+
+        self._clear_expired_zones(message)
+
+    def _update_zone_status(self, message):
+        zone = -1
+
+        try:
+            zone = int(message.numeric_code)
+        except ValueError:
+            zone = int(message.numeric_code, 16)
+
+        if zone not in self._zone_status:
+            self.on_fault(zone)
+
+        self._last_zone_fault = zone
+        self._zone_status[zone] = (True, time.time())
+
+    def _clear_expired_zones(self, message):
+        clear_time = time.time()
+        cleared_zones = []
+
+        for z, status in self._zone_status.iteritems():
+            if message.ready or (status[0] and clear_time - status[1] >= self.ZONE_EXPIRE):
+                cleared_zones.append(z)
+
+        for z in cleared_zones:
+            del self._zone_status[z]
+            self.on_restore(z)
 
     def _on_open(self, sender, args):
         """
