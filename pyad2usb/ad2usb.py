@@ -262,13 +262,13 @@ class AD2USB(object):
         """
         status = 2 if simulate_wire_problem else 1
 
-        self._device.write("L{0:02}{1}".format(zone, status))
+        self._device.write("L{0:02}{1}\r".format(zone, status))
 
     def clear_zone(self, zone):
         """
         Clears a zone if we are emulating a zone expander.
         """
-        self._device.write("L{0:02}0".format(zone))
+        self._device.write("L{0:02}0\r".format(zone))
 
     def _wire_events(self):
         """
@@ -422,7 +422,11 @@ class Message(object):
         self.chime_on = False
         self.alarm_event_occurred = False
         self.alarm_sounding = False
+        self.battery_low = False
+        self.entry_delay_off = False
         self.fire_alarm = False
+        self.check_zone = False
+        self.perimeter_only = False
         self.numeric_code = ""
         self.text = ""
         self.cursor_location = -1
@@ -460,7 +464,12 @@ class Message(object):
         self.chime_on = not self.bitfield[9:10] == "0"
         self.alarm_event_occurred = not self.bitfield[10:11] == "0"
         self.alarm_sounding = not self.bitfield[11:12] == "0"
-        self.fire_alarm = not self.bitfield[13:14] == "0"
+        self.battery_low = not self.bitfield[12:13] == "0"
+        self.entry_delay_off = not self.bitfield[13:14] == "0"
+        self.fire_alarm = not self.bitfield[14:15] == "0"
+        self.check_zone = not self.bitfield[15:16] == "0"
+        self.perimeter_only = not self.bitfield[16:17] == "0"
+        # bits 17-20 unused.
         self.text = alpha.strip('"')
 
         if int(self.panel_data[19:21], 16) & 0x01 > 0:
