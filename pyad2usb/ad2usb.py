@@ -189,7 +189,9 @@ class AD2USB(object):
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = None
-        self._zone_status = OrderedDict()
+        self._zones_faulted = []
+        self._last_zone_fault = 0
+        self._last_wait = False
 
         self.address = 18
         self.configbits = 0xFF00
@@ -380,36 +382,201 @@ class AD2USB(object):
             if old_status is not None:
                 self.on_fire(self._fire_status)
 
-        if message.check_zone or (not message.ready and "FAULT" in message.text):
-            self._update_zone_status(message)
+        self._update_zone_status(message)
 
-        self._clear_expired_zones(message)
+        #self._clear_expired_zones(message)
 
     def _update_zone_status(self, message):
-        zone = -1
+        #if message.check_zone or (not message.ready and "FAULT" in message.text):
 
-        try:
-            zone = int(message.numeric_code)
-        except ValueError:
-            zone = int(message.numeric_code, 16)
+        if "Hit * for faults" in message.text:
+            self._device.send('*')
+            return
 
-        if zone not in self._zone_status:
-            self.on_fault(zone)
+        if message.ready:
+            cleared_zones = []
 
-        self._last_zone_fault = zone
-        self._zone_status[zone] = (True, time.time())
-
-    def _clear_expired_zones(self, message):
-        clear_time = time.time()
-        cleared_zones = []
-
-        for z, status in self._zone_status.iteritems():
-            if message.ready or (status[0] and clear_time - status[1] >= self.ZONE_EXPIRE):
+            for z in self._zones_faulted:
                 cleared_zones.append(z)
 
-        for z in cleared_zones:
-            del self._zone_status[z]
+            for idx, status in enumerate(cleared_zones):
+                del self._zones_faulted[idx]
+                self.on_restore(z)
+
+        elif "FAULT" in message.text:
+            zone = -1
+
+            try:
+                zone = int(message.numeric_code)
+            except ValueError:
+                zone = int(message.numeric_code, 16)
+
+            if zone not in self._zones_faulted:
+                # if self._last_zone_fault == 0:
+                #     idx = 0
+                # else:
+                #     idx = self._zones_faulted.index(self._last_zone_fault) + 1
+
+                self._last_zone_fault = zone
+                self._last_wait = True
+                self._zones_faulted.append(zone)
+                self._zones_faulted.sort()
+                self.on_fault(zone)
+
+            self._clear_expired_zones(zone)
+            self._last_zone_fault = zone
+
+    def _clear_expired_zones(self, zone):
+        cleared_zones = []
+
+        found_last = False
+        found_end = False
+
+        print '_clear_expired_zones: ', repr(self._zones_faulted)
+
+        # ----------
+        #for idx in range(len(self._zones_faulted)):
+        # idx = 0
+        # while idx < len(self._zones_faulted):
+        #     z = self._zones_faulted[idx]
+
+        #     if not found_last:
+        #         if z == self._last_zone_fault:
+        #             print '  found start point', z
+        #             found_last = True
+
+        #     if found_last:
+        #         if z == zone and self._last_zone_fault != zone and not break_loop:
+        #             print '  found end point', z
+        #             found_end = True
+        #             break
+        #         elif z != self._last_zone_fault and len(self._zones_faulted) > 1:
+        #             print '  clearing', z
+        #             cleared_zones.append(z)
+
+        #     if idx == len(self._zones_faulted) - 1 and not found_end:
+        #         print '  rolling back to front of the list.'
+        #         idx = 0
+        #         break_loop = True
+        #     else:
+        #         idx += 1
+
+        # ----------
+        # idx = 0
+        # while not found_end and idx < len(self._zones_faulted):
+        #     z = self._zones_faulted[idx]
+
+        #     if z == zone and found_last:
+        #         print '  found end point, exiting', z
+        #         found_end = True
+        #         break
+
+        #     if not found_last and z == self._last_zone_fault:
+        #         print '  found start point', z
+        #         found_last = True
+
+        #     if found_last:
+        #         print 'removing', z
+        #         self._zones_faulted.remove(z)
+
+        #     #print '    idx', idx
+        #     #print '    end', found_end
+        #     #print '    start', found_last
+        #     if idx >= len(self._zones_faulted) - 1 and not found_end and found_last:
+        #         print '  roll'
+        #         idx = 0
+        #     else:
+        #         idx += 1
+
+        # -----
+        # idx = 0
+        # start_pos = -1
+        # end_pos = -1
+
+        # while idx < len(self._zones_faulted):
+        #     z = self._zones_faulted[idx]
+
+        #     if z == self._last_zone_fault or self._last_zone_fault == 0:
+        #         print 'start', idx
+        #         start_pos = idx
+
+        #     if z == zone:
+        #         print 'end', idx
+        #         end_pos = idx
+
+        #     if idx >= len(self._zones_faulted) - 1 and end_pos == -1 and start_pos != -1:
+        #         print 'roll'
+        #         idx = 0
+        #     else:
+        #         idx += 1
+
+        # if start_pos < end_pos:
+        #     diff = end_pos - start_pos
+
+        #     if diff > 1 and not self._last_wait:
+        #         print 'deleting', start_pos + 1, end_pos
+        #         del self._zones_faulted[start_pos + 1:end_pos]
+        # elif end_pos < start_pos:
+        #     diff = len(self._zones_faulted) - start_pos + end_pos
+        #     if diff > 1 and not self._last_wait:
+        #         print 'deleting', start_pos + 1, ' -> end'
+        #         del self._zones_faulted[start_pos + 1:]
+
+        #         print 'deleting', 'start -> ', end_pos
+        #         del self._zones_faulted[:end_pos]
+
+        # if self._last_wait == True:
+        #     self._last_wait = False
+
+        # for idx, z in enumerate(cleared_zones):
+        #     print '  !remove it', z
+        #     #del self._zones_faulted[idx]
+        #     self._zones_faulted.remove(z)
+        #     self.on_restore(z)
+
+        # -----
+        idx = 0
+        start_pos = -1
+        end_pos = -1
+
+        while idx < len(self._zones_faulted):
+            z = self._zones_faulted[idx]
+
+            if z == self._last_zone_fault or self._last_zone_fault == 0:
+                print 'start', idx
+                start_pos = idx
+
+            if z == zone:
+                print 'end', idx
+                end_pos = idx
+
+            if idx >= len(self._zones_faulted) - 1 and end_pos == -1 and start_pos != -1:
+                print 'roll'
+                idx = 0
+            else:
+                idx += 1
+
+        if start_pos < end_pos:
+            diff = end_pos - start_pos
+
+            if diff > 1:
+                print 'deleting', start_pos + 1, end_pos
+                del self._zones_faulted[start_pos + 1:end_pos]
+        elif end_pos <= start_pos:
+            diff = len(self._zones_faulted) - start_pos + end_pos
+            if diff > 1:
+                print 'deleting', start_pos + 1, ' -> end'
+                del self._zones_faulted[start_pos + 1:]
+
+                print 'deleting', 'start -> ', end_pos
+                del self._zones_faulted[:end_pos]
+
+        for idx, z in enumerate(cleared_zones):
+            print '  !remove it', z
+            #del self._zones_faulted[idx]
+            self._zones_faulted.remove(z)
             self.on_restore(z)
+
 
     def _on_open(self, sender, args):
         """
