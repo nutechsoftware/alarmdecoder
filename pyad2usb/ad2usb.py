@@ -384,10 +384,16 @@ class AD2USB(object):
         self._update_zone_status(message)
 
     def _update_zone_status(self, message):
+        """
+        Update zone statuses based on the current message.
+        """
+        # Retrieve a list of faults.
+        # NOTE: This only happens on first boot or after exiting programming mode.
         if "Hit * for faults" in message.text:
             self._device.write('*')
             return
 
+        # Panel is ready, restore all zones.
         if message.ready:
             for idx, z in enumerate(self._zones_faulted):
                 self.on_restore(z)
@@ -395,14 +401,19 @@ class AD2USB(object):
             del self._zones_faulted[:]
             self._last_zone_fault = 0
 
+        # Process fault
         elif "FAULT" in message.text:
             zone = -1
 
+            # Apparently this representation can be both base 10
+            # or base 16, depending on where the message came
+            # from.
             try:
                 zone = int(message.numeric_code)
             except ValueError:
                 zone = int(message.numeric_code, 16)
 
+            # Add new zones and clear expired ones.
             if zone in self._zones_faulted:
                 self._clear_expired_zones(zone)
             else:
@@ -410,12 +421,17 @@ class AD2USB(object):
                 self._zones_faulted.sort()
                 self.on_fault(zone)
 
+            # Save our spot for the next message.
             self._last_zone_fault = zone
 
     def _clear_expired_zones(self, zone):
+        """
+        Clear all expired zones from our status list.
+        """
         cleared_zones = []
         found_last, found_new, at_end = False, False, False
 
+        # First pass: Find our start spot.
         it = iter(self._zones_faulted)
         try:
             while not found_last:
@@ -428,6 +444,8 @@ class AD2USB(object):
         except StopIteration:
             at_end = True
 
+        # Continue until we find our end point and add zones in
+        # between to our clear list.
         try:
             while not at_end and not found_new:
                 z = it.next()
@@ -441,6 +459,8 @@ class AD2USB(object):
         except StopIteration:
             pass
 
+        # Second pass: roll through the list again if we didn't find
+        # our end point and remove everything until we do.
         if not found_new:
             it = iter(self._zones_faulted)
 
@@ -457,6 +477,7 @@ class AD2USB(object):
             except StopIteration:
                 pass
 
+        # Actually remove the zones and trigger the restores.
         for idx, z in enumerate(cleared_zones):
             self._zones_faulted.remove(z)
             self.on_restore(z)
