@@ -234,8 +234,8 @@ def test_socket():
     a2u.on_config_received += handle_config
     a2u.on_arm += handle_arm
     a2u.on_disarm += handle_disarm
-    a2u.on_fault += handle_fault
-    a2u.on_restore += handle_restore
+    a2u.on_zone_fault += handle_fault
+    a2u.on_zone_restore += handle_restore
 
     a2u.open()
     #a2u.save_config()

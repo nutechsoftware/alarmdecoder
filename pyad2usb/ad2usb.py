@@ -10,6 +10,7 @@ from collections import OrderedDict
 from .event import event
 from . import devices
 from . import util
+from . import zonetracking
 
 class Overseer(object):
     """
@@ -159,8 +160,8 @@ class AD2USB(object):
     on_bypass = event.Event('Called when a zone is bypassed.')
     on_boot = event.Event('Called when the device finishes bootings.')
     on_config_received = event.Event('Called when the device receives its configuration.')
-    on_fault = event.Event('Called when the device detects a zone fault.')
-    on_restore = event.Event('Called when the device detects that a fault is restored.')
+    on_zone_fault = event.Event('Called when the device detects a zone fault.')
+    on_zone_restore = event.Event('Called when the device detects that a fault is restored.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -177,20 +178,18 @@ class AD2USB(object):
     F3 = unichr(3) + unichr(3) + unichr(3)
     F4 = unichr(4) + unichr(4) + unichr(4)
 
-    ZONE_EXPIRE = 30
-
     def __init__(self, device):
         """
         Constructor
         """
         self._device = device
+        self._zonetracker = zonetracking.Zonetracker()
+
         self._power_status = None
         self._alarm_status = None
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = None
-        self._zones_faulted = []
-        self._last_zone_fault = 0
 
         self.address = 18
         self.configbits = 0xFF00
@@ -285,6 +284,8 @@ class AD2USB(object):
         self._device.on_close += self._on_close
         self._device.on_read += self._on_read
         self._device.on_write += self._on_write
+        self._zonetracker.on_fault += self._on_zone_fault
+        self._zonetracker.on_restore += self._on_zone_restore
 
     def _handle_message(self, data):
         """
@@ -381,106 +382,16 @@ class AD2USB(object):
             if old_status is not None:
                 self.on_fire(self._fire_status)
 
-        self._update_zone_status(message)
+        self._update_zone_tracker(message)
 
-    def _update_zone_status(self, message):
-        """
-        Update zone statuses based on the current message.
-        """
+    def _update_zone_tracker(self, message):
         # Retrieve a list of faults.
         # NOTE: This only happens on first boot or after exiting programming mode.
-        if "Hit * for faults" in message.text:
+        if not message.ready and "Hit * for faults" in message.text:
             self._device.write('*')
             return
 
-        # Panel is ready, restore all zones.
-        if message.ready:
-            for idx, z in enumerate(self._zones_faulted):
-                self.on_restore(z)
-
-            del self._zones_faulted[:]
-            self._last_zone_fault = 0
-
-        # Process fault
-        elif "FAULT" in message.text:
-            zone = -1
-
-            # Apparently this representation can be both base 10
-            # or base 16, depending on where the message came
-            # from.
-            try:
-                zone = int(message.numeric_code)
-            except ValueError:
-                zone = int(message.numeric_code, 16)
-
-            # Add new zones and clear expired ones.
-            if zone in self._zones_faulted:
-                self._clear_expired_zones(zone)
-            else:
-                self._zones_faulted.append(zone)
-                self._zones_faulted.sort()
-                self.on_fault(zone)
-
-            # Save our spot for the next message.
-            self._last_zone_fault = zone
-
-    def _clear_expired_zones(self, zone):
-        """
-        Clear all expired zones from our status list.
-        """
-        cleared_zones = []
-        found_last, found_new, at_end = False, False, False
-
-        # First pass: Find our start spot.
-        it = iter(self._zones_faulted)
-        try:
-            while not found_last:
-                z = it.next()
-
-                if z == self._last_zone_fault:
-                    found_last = True
-                    break
-
-        except StopIteration:
-            at_end = True
-
-        # Continue until we find our end point and add zones in
-        # between to our clear list.
-        try:
-            while not at_end and not found_new:
-                z = it.next()
-
-                if z == zone:
-                    found_new = True
-                    break
-                else:
-                    cleared_zones += [z]
-
-        except StopIteration:
-            pass
-
-        # Second pass: roll through the list again if we didn't find
-        # our end point and remove everything until we do.
-        if not found_new:
-            it = iter(self._zones_faulted)
-
-            try:
-                while not found_new:
-                    z = it.next()
-
-                    if z == zone:
-                        found_new = True
-                        break
-                    else:
-                        cleared_zones += [z]
-
-            except StopIteration:
-                pass
-
-        # Actually remove the zones and trigger the restores.
-        for idx, z in enumerate(cleared_zones):
-            self._zones_faulted.remove(z)
-            self.on_restore(z)
+        self._zonetracker.update(message)
 
     def _on_open(self, sender, args):
         """
@@ -509,6 +420,18 @@ class AD2USB(object):
         Internal handler for writing to the device.
         """
         self.on_write(args)
+
+    def _on_zone_fault(self, sender, args):
+        """
+        Internal handler for zone faults.
+        """
+        self.on_zone_fault(args)
+
+    def _on_zone_restore(self, sender, args):
+        """
+        Internal handler for zone restoration.
+        """
+        self.on_zone_restore(args)
 
 class Message(object):
     """
