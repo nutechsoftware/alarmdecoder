@@ -5,9 +5,13 @@ Provides the full AD2USB class and factory.
 import time
 import threading
 import re
+import logging
+from collections import OrderedDict
 from .event import event
 from . import devices
 from . import util
+from . import messages
+from . import zonetracking
 
 class Overseer(object):
     """
@@ -70,12 +74,6 @@ class Overseer(object):
 
         self.start()
 
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
-
     def close(self):
         """
         Clean up and shut down.
@@ -100,7 +98,6 @@ class Overseer(object):
         Factory method that returns the requested AD2USB device, or the first device.
         """
         return Overseer.create(device)
-
 
     class DetectThread(threading.Thread):
         """
@@ -143,6 +140,7 @@ class Overseer(object):
 
                     for d in removed_devices:
                         self._overseer.on_detached(d)
+
                 except util.CommError, err:
                     pass
 
@@ -155,38 +153,59 @@ class AD2USB(object):
     """
 
     # High-level Events
-    on_open = event.Event('Called when the device has been opened.')
-    on_close = event.Event('Called when the device has been closed.')
-
-    on_status_changed = event.Event('Called when the panel status changes.')
+    on_arm = event.Event('Called when the panel is armed.')
+    on_disarm = event.Event('Called when the panel is disarmed.')
     on_power_changed = event.Event('Called when panel power switches between AC and DC.')
     on_alarm = event.Event('Called when the alarm is triggered.')
+    on_fire = event.Event('Called when a fire is detected.')
     on_bypass = event.Event('Called when a zone is bypassed.')
+    on_boot = event.Event('Called when the device finishes bootings.')
+    on_config_received = event.Event('Called when the device receives its configuration.')
+    on_zone_fault = event.Event('Called when the device detects a zone fault.')
+    on_zone_restore = event.Event('Called when the device detects that a fault is restored.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
 
     # Low-level Events
+    on_open = event.Event('Called when the device has been opened.')
+    on_close = event.Event('Called when the device has been closed.')
     on_read = event.Event('Called when a line has been read from the device.')
     on_write = event.Event('Called when data has been written to the device.')
+
+    # Constants
+    F1 = unichr(1) + unichr(1) + unichr(1)
+    F2 = unichr(2) + unichr(2) + unichr(2)
+    F3 = unichr(3) + unichr(3) + unichr(3)
+    F4 = unichr(4) + unichr(4) + unichr(4)
 
     def __init__(self, device):
         """
         Constructor
         """
+        self._device = device
+        self._zonetracker = zonetracking.Zonetracker()
+
         self._power_status = None
         self._alarm_status = None
         self._bypass_status = None
-        self._device = device
+        self._armed_status = None
+        self._fire_status = None
 
+        self.address = 18
+        self.configbits = 0xFF00
+        self.address_mask = 0x00000000
+        self.emulate_zone = [False for x in range(5)]
+        self.emulate_relay = [False for x in range(4)]
+        self.emulate_lrr = False
+        self.deduplicate = False
 
-        self._address_mask = 0xFF80     # TEMP
-
-    def __del__(self):
+    @property
+    def id(self):
         """
-        Destructor
+        The ID of the AD2USB device.
         """
-        pass
+        return self._device.id
 
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
         """
@@ -200,11 +219,70 @@ class AD2USB(object):
         Closes the device.
         """
         self._device.close()
+        del self._device
         self._device = None
 
-    @property
-    def id(self):
-        return self._device.id
+    def get_config(self):
+        """
+        Retrieves the configuration from the device.
+        """
+        self._device.write("C\r")
+
+    def save_config(self):
+        """
+        Sets configuration entries on the device.
+        """
+        config_string = ''
+
+        # HACK: Both of these methods are ugly.. but I can't think of an elegant way of doing it.
+
+        #config_string += 'ADDRESS={0}&'.format(self.address)
+        #config_string += 'CONFIGBITS={0:x}&'.format(self.configbits)
+        #config_string += 'MASK={0:x}&'.format(self.address_mask)
+        #config_string += 'EXP={0}&'.format(''.join(['Y' if z else 'N' for z in self.emulate_zone]))
+        #config_string += 'REL={0}&'.format(''.join(['Y' if r else 'N' for r in self.emulate_relay]))
+        #config_string += 'LRR={0}&'.format('Y' if self.emulate_lrr else 'N')
+        #config_string += 'DEDUPLICATE={0}'.format('Y' if self.deduplicate else 'N')
+
+        config_entries = []
+        config_entries.append(('ADDRESS', '{0}'.format(self.address)))
+        config_entries.append(('CONFIGBITS', '{0:x}'.format(self.configbits)))
+        config_entries.append(('MASK', '{0:x}'.format(self.address_mask)))
+        config_entries.append(('EXP', ''.join(['Y' if z else 'N' for z in self.emulate_zone])))
+        config_entries.append(('REL', ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
+        config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
+        config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
+
+        config_string = '&'.join(['='.join(t) for t in config_entries])
+
+        self._device.write("C{0}\r".format(config_string))
+
+    def reboot(self):
+        """
+        Reboots the device.
+        """
+        self._device.write('=')
+
+    def fault_zone(self, zone, simulate_wire_problem=False):
+        """
+        Faults a zone if we are emulating a zone expander.
+        """
+        # Allow ourselves to also be passed an address/channel combination
+        # for zone expanders.
+        #
+        # Format (expander index, channel)
+        if isinstance(zone, tuple):
+            zone = self._zonetracker._expander_to_zone(*zone)
+
+        status = 2 if simulate_wire_problem else 1
+
+        self._device.write("L{0:02}{1}\r".format(zone, status))
+
+    def clear_zone(self, zone):
+        """
+        Clears a zone if we are emulating a zone expander.
+        """
+        self._device.write("L{0:02}0\r".format(zone))
 
     def _wire_events(self):
         """
@@ -214,47 +292,117 @@ class AD2USB(object):
         self._device.on_close += self._on_close
         self._device.on_read += self._on_read
         self._device.on_write += self._on_write
+        self._zonetracker.on_fault += self._on_zone_fault
+        self._zonetracker.on_restore += self._on_zone_restore
 
     def _handle_message(self, data):
         """
         Parses messages from the panel.
         """
+        if data is None:
+            return None
+
         msg = None
 
         if data[0] != '!':
-            msg = Message(data)
+            msg = messages.Message(data)
 
-            if self._address_mask & msg.mask > 0:
+            if self.address_mask & msg.mask > 0:
                 self._update_internal_states(msg)
 
         else:   # specialty messages
             header = data[0:4]
 
             if header == '!EXP' or header == '!REL':
-                msg = ExpanderMessage(data)
+                msg = messages.ExpanderMessage(data)
+                self._update_internal_states(msg)
             elif header == '!RFX':
-                msg = RFMessage(data)
+                msg = messages.RFMessage(data)
+            elif header == '!LRR':
+                msg = messages.LRRMessage(data)
+            elif data.startswith('!Ready'):
+                self.on_boot()
+            elif data.startswith('!CONFIG'):
+                self._handle_config(data)
 
         return msg
 
+    def _handle_config(self, data):
+        """
+        Handles received configuration data.
+        """
+        _, config_string = data.split('>')
+        for setting in config_string.split('&'):
+            k, v = setting.split('=')
+
+            if k == 'ADDRESS':
+                self.address = int(v)
+            elif k == 'CONFIGBITS':
+                self.configbits = int(v, 16)
+            elif k == 'MASK':
+                self.address_mask = int(v, 16)
+            elif k == 'EXP':
+                for z in range(5):
+                    self.emulate_zone[z] = True if v[z] == 'Y' else False
+            elif k == 'REL':
+                for r in range(4):
+                    self.emulate_relay[r] = True if v[r] == 'Y' else False
+            elif k == 'LRR':
+                self.emulate_lrr = True if v == 'Y' else False
+            elif k == 'DEDUPLICATE':
+                self.deduplicate = True if v == 'Y' else False
+
+        self.on_config_received()
+
     def _update_internal_states(self, message):
-        if message.ac_power != self._power_status:
-            self._power_status, old_status = message.ac_power, self._power_status
+        """
+        Updates internal device states.
+        """
+        if isinstance(message, messages.Message):
+            if message.ac_power != self._power_status:
+                self._power_status, old_status = message.ac_power, self._power_status
 
-            if old_status is not None:
-                self.on_power_changed(self._power_status)
+                if old_status is not None:
+                    self.on_power_changed(self._power_status)
 
-        if message.alarm_sounding != self._alarm_status:
-            self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
+            if message.alarm_sounding != self._alarm_status:
+                self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
 
-            if old_status is not None:
-                self.on_alarm(self._alarm_status)
+                if old_status is not None:
+                    self.on_alarm(self._alarm_status)
 
-        if message.zone_bypassed != self._bypass_status:
-            self._bypass_status, old_status = message.zone_bypassed, self._bypass_status
+            if message.zone_bypassed != self._bypass_status:
+                self._bypass_status, old_status = message.zone_bypassed, self._bypass_status
 
-            if old_status is not None:
-                self.on_bypass(self._bypass_status)
+                if old_status is not None:
+                    self.on_bypass(self._bypass_status)
+
+            if (message.armed_away | message.armed_home) != self._armed_status:
+                self._armed_status, old_status = message.armed_away | message.armed_home, self._armed_status
+
+                if old_status is not None:
+                    if self._armed_status:
+                        self.on_arm()
+                    else:
+                        self.on_disarm()
+
+            if message.fire_alarm != self._fire_status:
+                self._fire_status, old_status = message.fire_alarm, self._fire_status
+
+                if old_status is not None:
+                    self.on_fire(self._fire_status)
+
+        self._update_zone_tracker(message)
+
+    def _update_zone_tracker(self, message):
+        # Retrieve a list of faults.
+        # NOTE: This only happens on first boot or after exiting programming mode.
+        if isinstance(message, messages.Message):
+            if not message.ready and "Hit * for faults" in message.text:
+                self._device.write('*')
+                return
+
+        self._zonetracker.update(message)
 
     def _on_open(self, sender, args):
         """
@@ -284,510 +432,14 @@ class AD2USB(object):
         """
         self.on_write(args)
 
-class Message(object):
-    """
-    Represents a message from the alarm panel.
-    """
-
-    def __init__(self, data=None):
-        """
-        Constructor
-        """
-        self._ready = False
-        self._armed_away = False
-        self._armed_home = False
-        self._backlight_on = False
-        self._programming_mode = False
-        self._beeps = -1
-        self._zone_bypassed = False
-        self._ac_power = False
-        self._chime_on = False
-        self._alarm_event_occurred = False
-        self._alarm_sounding = False
-        self._numeric_code = ""
-        self._text = ""
-        self._cursor_location = -1
-        self._data = ""
-        self._mask = ""
-        self._bitfield = ""
-        self._panel_data = ""
-
-        self._regex = re.compile('("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)')
-
-        if data is not None:
-            self._parse_message(data)
-
-    def _parse_message(self, data):
-        """
-        Parse the message from the device.
-        """
-        m = self._regex.match(data)
-
-        if m is None:
-            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
-
-        self._bitfield, self._numeric_code, self._panel_data, alpha = m.group(1, 2, 3, 4)
-        self._mask = int(self._panel_data[3:3+8], 16)
-
-        self._data = data
-        self._ready = not self._bitfield[1:2] == "0"
-        self._armed_away = not self._bitfield[2:3] == "0"
-        self._armed_home = not self._bitfield[3:4] == "0"
-        self._backlight_on = not self._bitfield[4:5] == "0"
-        self._programming_mode = not self._bitfield[5:6] == "0"
-        self._beeps = int(self._bitfield[6:7], 16)
-        self._zone_bypassed = not self._bitfield[7:8] == "0"
-        self._ac_power = not self._bitfield[8:9] == "0"
-        self._chime_on = not self._bitfield[9:10] == "0"
-        self._alarm_event_occurred = not self._bitfield[10:11] == "0"
-        self._alarm_sounding = not self._bitfield[11:12] == "0"
-        self._text = alpha.strip('"')
-
-        if int(self._panel_data[19:21], 16) & 0x01 > 0:
-            self._cursor_location = int(self._bitfield[21:23], 16)    # Alpha character index that the cursor is on.
-
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return 'msg > {0:0<9} [{1}{2}{3}] -- ({4}) {5}'.format(hex(self.mask), 1 if self.ready else 0, 1 if self.armed_away else 0, 1 if self.armed_home else 0, self.numeric_code, self.text)
-
-    @property
-    def ready(self):
-        """
-        Indicates whether or not the panel is ready.
-        """
-        return self._ready
-
-    @ready.setter
-    def ready(self, value):
-        """
-        Sets the value indicating whether or not the panel is ready.
-        """
-        self._ready = value
-
-    @property
-    def armed_away(self):
-        """
-        Indicates whether or not the panel is armed in away mode.
-        """
-        return self._armed_away
-
-    @armed_away.setter
-    def armed_away(self, value):
-        """
-        Sets the value indicating whether or not the panel is armed in away mode.
-        """
-        self._armed_away = value
-
-    @property
-    def armed_home(self):
-        """
-        Indicates whether or not the panel is armed in home/stay mode.
-        """
-        return self._armed_home
-
-    @armed_home.setter
-    def armed_home(self, value):
-        """
-        Sets the value indicating whether or not the panel is armed in home/stay mode.
-        """
-        self._armed_home = value
-
-    @property
-    def backlight_on(self):
-        """
-        Indicates whether or not the panel backlight is on.
-        """
-        return self._backlight_on
-
-    @backlight_on.setter
-    def backlight_on(self, value):
-        """
-        Sets the value indicating whether or not the panel backlight is on.
-        """
-        self._backlight_on = value
-
-    @property
-    def programming_mode(self):
-        """
-        Indicates whether or not the panel is in programming mode.
-        """
-        return self._programming_mode
-
-    @programming_mode.setter
-    def programming_mode(self, value):
-        """
-        Sets the value indicating whether or not the panel is in programming mode.
-        """
-        self._programming_mode = value
-
-    @property
-    def beeps(self):
-        """
-        Returns the number of beeps associated with this message.
-        """
-        return self._beeps
-
-    @beeps.setter
-    def beeps(self, value):
-        """
-        Sets the number of beeps associated with this message.
-        """
-        self._beeps = value
-
-    @property
-    def zone_bypassed(self):
-        """
-        Indicates whether or not zones have been bypassed.
-        """
-        return self._zone_bypassed
-
-    @zone_bypassed.setter
-    def zone_bypassed(self, value):
-        """
-        Sets the value indicating whether or not zones have been bypassed.
-        """
-        self._zone_bypassed = value
-
-    @property
-    def ac_power(self):
-        """
-        Indicates whether or not the system is on AC power.
-        """
-        return self._ac_power
-
-    @ac_power.setter
-    def ac_power(self, value):
-        """
-        Sets the value indicating whether or not the system is on AC power.
-        """
-        self._ac_power = value
-
-    @property
-    def chime_on(self):
-        """
-        Indicates whether or not panel chimes are enabled.
-        """
-        return self._chime_on
-
-    @chime_on.setter
-    def chime_on(self, value):
-        """
-        Sets the value indicating whether or not the panel chimes are enabled.
-        """
-        self._chime_on = value
-
-    @property
-    def alarm_event_occurred(self):
-        """
-        Indicates whether or not an alarm event has occurred.
-        """
-        return self._alarm_event_occurred
-
-    @alarm_event_occurred.setter
-    def alarm_event_occurred(self, value):
-        """
-        Sets the value indicating whether or not an alarm event has occurred.
-        """
-        self._alarm_event_occurred = value
-
-    @property
-    def alarm_sounding(self):
-        """
-        Indicates whether or not an alarm is currently sounding.
-        """
-        return self._alarm_sounding
-
-    @alarm_sounding.setter
-    def alarm_sounding(self, value):
-        """
-        Sets the value indicating whether or not an alarm is currently sounding.
-        """
-        self._alarm_sounding = value
-
-    @property
-    def numeric_code(self):
-        """
-        Numeric indicator of associated with message.  For example: If zone #3 is faulted, this value is 003.
-        """
-        return self._numeric_code
-
-    @numeric_code.setter
-    def numeric_code(self, value):
-        """
-        Sets the numeric indicator associated with this message.
-        """
-        self._numeric_code = value
-
-    @property
-    def text(self):
-        """
-        Alphanumeric text associated with this message.
-        """
-        return self._text
-
-    @text.setter
-    def text(self, value):
-        """
-        Sets the alphanumeric text associated with this message.
-        """
-        self._text = value
-
-    @property
-    def cursor_location(self):
-        """
-        Indicates which text position has the cursor underneath it.
-        """
-        return self._cursor_location
-
-    @cursor_location.setter
-    def cursor_location(self, value):
-        """
-        Sets the value indicating which text position has the cursor underneath it.
-        """
-        self._cursor_location = value
-
-    @property
-    def data(self):
-        """
-        Raw representation of the message from the panel.
-        """
-        return self._data
-
-    @data.setter
-    def data(self, value):
-        """
-        Sets the raw representation of the message from the panel.
-        """
-        self._data = value
-
-    @property
-    def mask(self):
-        """
-        The panel mask for which this message is intended.
-        """
-        return self._mask
-
-    @mask.setter
-    def mask(self, value):
-        """
-        Sets the panel mask for which this message is intended.
-        """
-        self._mask = value
-
-    @property
-    def bitfield(self):
-        """
-        The bit field associated with this message.
-        """
-        return self._bitfield
-
-    @bitfield.setter
-    def bitfield(self, value):
-        """
-        Sets the bit field associated with this message.
-        """
-        self._bitfield = value
-
-    @property
-    def panel_data(self):
-        """
-        The binary field associated with this message.
-        """
-        return self._panel_data
-
-    @panel_data.setter
-    def panel_data(self, value):
-        """
-        Sets the binary field associated with this message.
-        """
-        self._panel_data = value
-
-class ExpanderMessage(object):
-    """
-    Represents a message from a zone or relay expansion module.
-    """
-    ZONE = 0
-    RELAY = 1
-
-    def __init__(self, data=None):
-        """
-        Constructor
-        """
-        self._type = None
-        self._address = None
-        self._channel = None
-        self._value = None
-        self._raw = None
-
-        if data is not None:
-            self._parse_message(data)
-
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        expander_type = 'UNKWN'
-        if self.type == ExpanderMessage.ZONE:
-            expander_type = 'ZONE'
-        elif self.type  == ExpanderMessage.RELAY:
-            expander_type = 'RELAY'
-
-        return 'exp > [{0: <5}] {1}/{2} -- {3}'.format(expander_type, self.address, self.channel, self.value)
-
-    def _parse_message(self, data):
-        """
-        Parse the raw message from the device.
-        """
-        header, values = data.split(':')
-        address, channel, value = values.split(',')
-
-        self.raw = data
-        self.address = address
-        self.channel = channel
-        self.value = value
-
-        if header == '!EXP':
-            self.type = ExpanderMessage.ZONE
-        elif header == '!REL':
-            self.type = ExpanderMessage.RELAY
-
-    @property
-    def address(self):
-        """
-        The relay address from which the message originated.
-        """
-        return self._address
-
-    @address.setter
-    def address(self, value):
-        """
-        Sets the relay address from which the message originated.
-        """
-        self._address = value
-
-    @property
-    def channel(self):
-        """
-        The zone expander channel from which the message originated.
-        """
-        return self._channel
-
-    @channel.setter
-    def channel(self, value):
-        """
-        Sets the zone expander channel from which the message originated.
-        """
-        self._channel = value
-
-    @property
-    def value(self):
-        """
-        The value associated with the message.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """
-        Sets the value associated with the message.
-        """
-        self._value = value
-
-    @property
-    def raw(self):
-        """
-        The raw message from the expander device.
-        """
-        return self._raw
-
-    @raw.setter
-    def raw(self, value):
-        """
-        Sets the raw message from the expander device.
-        """
-        self._value = value
-
-    @property
-    def type(self):
-        """
-        The type of expander associated with this message.
-        """
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        """
-        Sets the type of expander associated with this message.
-        """
-        self._type = value
-
-class RFMessage(object):
-    """
-    Represents a message from an RF receiver.
-    """
-    def __init__(self, data=None):
-        """
-        Constructor
-        """
-        self._raw = None
-        self._serial_number = None
-        self._value = None
-
-        if data is not None:
-            self._parse_message(data)
-
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return 'rf > {0}: {1}'.format(self.serial_number, self.value)
-
-    def _parse_message(self, data):
-        """
-        Parses the raw message from the device.
-        """
-        self.raw = data
-
-        _, values = data.split(':')
-        self.serial_number, self.value = values.split(',')
-
-    @property
-    def serial_number(self):
-        """
-        The serial number for the RF receiver.
-        """
-        return self._serial_number
-
-    @serial_number.setter
-    def serial_number(self, value):
-        self._serial_number = value
-
-    @property
-    def value(self):
-        """
-        The value of the RF message.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        """
-        Sets the value of the RF message.
-        """
-        self._value = value
-
-    @property
-    def raw(self):
+    def _on_zone_fault(self, sender, args):
         """
-        The raw message from the RF receiver.
+        Internal handler for zone faults.
         """
-        return self._raw
+        self.on_zone_fault(args)
 
-    @raw.setter
-    def raw(self, value):
+    def _on_zone_restore(self, sender, args):
         """
-        Sets the raw message from the RF receiver.
+        Internal handler for zone restoration.
         """
-        self._raw = value
+        self.on_zone_restore(args)

@@ -9,7 +9,6 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
-import traceback
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from . import util
@@ -27,15 +26,48 @@ class Device(object):
     on_write = event.Event('Called when data has been written to the device')
 
     def __init__(self):
-        pass
+        """
+        Constructor
+        """
+        self._id = ''
+        self._buffer = ''
+        self._interface = None
+        self._device = None
+        self._running = False
+        self._read_thread = Device.ReadThread(self)
 
-    def __del__(self):
-        pass
+    @property
+    def id(self):
+        """
+        Retrieve the device ID.
+        """
+        return self._id
+
+    @id.setter
+    def id(self, value):
+        """
+        Sets the device ID.
+        """
+        self._id = value
+
+    def is_reader_alive(self):
+        """
+        Indicates whether or not the reader thread is alive.
+        """
+        return self._read_thread.is_alive()
+
+    def stop_reader(self):
+        """
+        Stops the reader thread.
+        """
+        self._read_thread.stop()
 
     class ReadThread(threading.Thread):
         """
         Reader thread which processes messages from the device.
         """
+
+        READ_TIMEOUT = 10
 
         def __init__(self, device):
             """
@@ -59,9 +91,8 @@ class Device(object):
 
             while self._running:
                 try:
-                    self._device.read_line(timeout=10)
-                except util.CommError, err:
-                    traceback.print_exc(err)    # TEMP
+                    self._device.read_line(timeout=self.READ_TIMEOUT)
+
                 except util.TimeoutError, err:
                     pass
 
@@ -82,11 +113,11 @@ class USBDevice(Device):
         """
         Returns all FTDI devices matching our vendor and product IDs.
         """
-
         devices = []
 
         try:
             devices = Ftdi.find_all([(USBDevice.FTDI_VENDOR_ID, USBDevice.FTDI_PRODUCT_ID)], nocache=True)
+
         except (usb.core.USBError, FtdiError), err:
             raise util.CommError('Error enumerating AD2USB devices: {0}'.format(str(err)))
 
@@ -96,20 +127,14 @@ class USBDevice(Device):
         """
         Constructor
         """
-
         Device.__init__(self)
 
+        self._device = Ftdi()
+        self._interface = interface
         self._vendor_id = vid
         self._product_id = pid
         self._serial_number = serial
         self._description = description
-        self._buffer = ''
-        self._device = Ftdi()
-        self._running = False
-        self._interface = interface
-        self._id = ''
-
-        self._read_thread = Device.ReadThread(self)
 
     def open(self, baudrate=BAUDRATE, interface=None, index=0, no_reader_thread=False):
         """
@@ -140,10 +165,10 @@ class USBDevice(Device):
             self._device.set_baudrate(baudrate)
 
             self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
-        except (usb.core.USBError, FtdiError), err:
-            self.on_close()
 
-            raise util.CommError('Error opening AD2USB device: {0}'.format(str(err)))
+        except (usb.core.USBError, FtdiError), err:
+            raise util.NoDeviceError('Error opening device: {0}'.format(str(err)))
+
         else:
             self._running = True
             if not no_reader_thread:
@@ -163,26 +188,11 @@ class USBDevice(Device):
 
             # HACK: Probably should fork pyftdi and make this call in .close().
             self._device.usb_dev.attach_kernel_driver(self._interface)
-        except (FtdiError, usb.core.USBError):
+
+        except:
             pass
 
         self.on_close()
-
-    @property
-    def id(self):
-        return self._id
-
-    def is_reader_alive(self):
-        """
-        Indicates whether or not the reader thread is alive.
-        """
-        return self._read_thread.is_alive()
-
-    def stop_reader(self):
-        """
-        Stops the reader thread.
-        """
-        self._read_thread.stop()
 
     def write(self, data):
         """
@@ -193,13 +203,21 @@ class USBDevice(Device):
 
             self.on_write(data)
         except FtdiError, err:
-            raise util.CommError('Error writing to AD2USB device.')
+            raise util.CommError('Error writing to device: {0}'.format(str(err)))
 
     def read(self):
         """
         Reads a single character from the device.
         """
-        return self._device.read_data(1)
+        ret = None
+
+        try:
+            ret = self._device.read_data(1)
+
+        except (usb.core.USBError, FtdiError), err:
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
+        return ret
 
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
@@ -244,7 +262,8 @@ class USBDevice(Device):
         except (usb.core.USBError, FtdiError), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from AD2USB device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
         else:
             if got_line:
                 ret = self._buffer
@@ -281,8 +300,9 @@ class SerialDevice(Device):
                 devices = serial.tools.list_ports.grep(pattern)
             else:
                 devices = serial.tools.list_ports.comports()
-        except Exception, err:
-            raise util.CommError('Error enumerating AD2SERIAL devices: {0}'.format(str(err)))
+
+        except SerialException, err:
+            raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)))
 
         return devices
 
@@ -292,18 +312,9 @@ class SerialDevice(Device):
         """
         Device.__init__(self)
 
-        self._device = serial.Serial(timeout=0, writeTimeout=0)     # Timeout = non-blocking to match pyftdi.
-        self._read_thread = Device.ReadThread(self)
-        self._buffer = ''
-        self._running = False
         self._interface = interface
         self._id = interface
-
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
+        self._device = serial.Serial(timeout=0, writeTimeout=0)     # Timeout = non-blocking to match pyftdi.
 
     def open(self, baudrate=BAUDRATE, interface=None, index=None, no_reader_thread=False):
         """
@@ -314,7 +325,7 @@ class SerialDevice(Device):
             baudrate = SerialDevice.BAUDRATE
 
         if self._interface is None and interface is None:
-            raise util.NoDeviceError('No AD2SERIAL device interface specified.')
+            raise util.NoDeviceError('No device interface specified.')
 
         if interface is not None:
             self._interface = interface
@@ -330,15 +341,13 @@ class SerialDevice(Device):
                                                         #
                                                         #       Moving it to this point seems to resolve
                                                         #       all issues with it.
-            self._id = '{0}'.format(self._interface)
 
         except (serial.SerialException, ValueError), err:
-            self.on_close()
+            raise util.NoDeviceError('Error opening device on port {0}.'.format(interface))
 
-            raise util.NoDeviceError('Error opening AD2SERIAL device on port {0}.'.format(interface))
         else:
             self._running = True
-            self.on_open((None, "AD2SERIAL"))   # TODO: Fixme.
+            self.on_open(('N/A', "AD2SERIAL"))
 
             if not no_reader_thread:
                 self._read_thread.start()
@@ -352,26 +361,11 @@ class SerialDevice(Device):
             self._read_thread.stop()
 
             self._device.close()
-        except Exception, err:
+
+        except:
             pass
 
         self.on_close()
-
-    @property
-    def id(self):
-        return self._id
-
-    def is_reader_alive(self):
-        """
-        Indicates whether or not the reader thread is alive.
-        """
-        return self._read_thread.is_alive()
-
-    def stop_reader(self):
-        """
-        Stops the reader thread.
-        """
-        self._read_thread.stop()
 
     def write(self, data):
         """
@@ -379,10 +373,13 @@ class SerialDevice(Device):
         """
         try:
             self._device.write(data)
+
         except serial.SerialTimeoutException, err:
             pass
+
         except serial.SerialException, err:
-            raise util.CommError('Error writing to serial device.')
+            raise util.CommError('Error writing to device.')
+
         else:
             self.on_write(data)
 
@@ -390,15 +387,20 @@ class SerialDevice(Device):
         """
         Reads a single character from the device.
         """
-        return self._device.read(1)
+        ret = None
+
+        try:
+            ret = self._device.read(1)
+
+        except serial.SerialException, err:
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
+        return ret
 
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
         """
-        if purge_buffer:
-            self._buffer = ''
-
         def timeout_event():
             timeout_event.reading = False
 
@@ -434,7 +436,7 @@ class SerialDevice(Device):
         except (OSError, serial.SerialException), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from AD2SERIAL device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
 
         else:
             if got_line:
@@ -457,45 +459,36 @@ class SocketDevice(Device):
     Serial to IP interface.
     """
 
-    def __init__(self, interface=None):
+    def __init__(self, interface=("localhost", 10000)):
         """
         Constructor
         """
-        self._host = "localhost"
-        self._port = 10000
-        self._device = None
-        self._buffer = ''
-        self._running = False
-        self._id = ''
+        Device.__init__(self)
 
-        self._read_thread = Device.ReadThread(self)
-
-    def __del__(self):
-        """
-        Destructor
-        """
-        pass
+        self._interface = interface
+        self._host, self._port = interface
 
     def open(self, baudrate=None, interface=None, index=0, no_reader_thread=False):
         """
         Opens the device.
         """
         if interface is not None:
+            self._interface = interface
             self._host, self._port = interface
 
         try:
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._device.connect((self._host, self._port))
+
             self._id = '{0}:{1}'.format(self._host, self._port)
 
         except socket.error, err:
-            self.on_close()
+            raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port))
 
-            traceback.print_exc(err)            # TEMP
         else:
             self._running = True
 
-            self.on_open((None, "AD2SOCKET"))   # TEMP: Change me.
+            self.on_open(('N/A', "AD2SOCKET"))
 
             if not no_reader_thread:
                 self._read_thread.start()
@@ -510,37 +503,28 @@ class SocketDevice(Device):
             self._read_thread.stop()
             self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
             self._device.close()
+
         except:
             pass
 
         self.on_close()
 
-    @property
-    def id(self):
-        return self._id
-
-    def is_reader_alive(self):
-        """
-        Indicates whether or not the reader thread is alive.
-        """
-        return self._read_thread.is_alive()
-
-    def stop_reader(self):
-        """
-        Stops the reader thread.
-        """
-        self._read_thread.stop()
-
     def write(self, data):
         """
         Writes data to the device.
         """
-        data_sent = self._device.send(data)
+        data_sent = None
 
-        if data_sent == 0:
-            raise util.CommError('Error while sending data.')
-        else:
+        try:
+            data_sent = self._device.send(data)
+
+            if data_sent == 0:
+                raise util.CommError('Error writing to device.')
+
             self.on_write(data)
+
+        except socket.error, err:
+            raise util.CommError('Error writing to device: {0}'.format(str(err)))
 
         return data_sent
 
@@ -548,12 +532,13 @@ class SocketDevice(Device):
         """
         Reads a single character from the device.
         """
+        data = None
+
         try:
             data = self._device.recv(1)
+
         except socket.error, err:
             raise util.CommError('Error while reading from device: {0}'.format(str(err)))
-
-        # ??? - Should we trigger an on_read here as well?
 
         return data
 
@@ -600,7 +585,8 @@ class SocketDevice(Device):
         except socket.error, err:
             timer.cancel()
 
-            raise util.CommError('Error reading from Socket device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+
         else:
             if got_line:
                 ret = self._buffer

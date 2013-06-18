@@ -5,6 +5,7 @@ import time
 import signal
 import traceback
 import sys
+import logging
 
 running = True
 
@@ -43,6 +44,12 @@ def handle_bypass(sender, args):
 def handle_message(sender, args):
     print args
 
+def handle_arm(sender, args):
+    print 'armed', args
+
+def handle_disarm(sender, args):
+    print 'disarmed', args
+
 def handle_firmware(stage):
     if stage == pyad2usb.ad2usb.util.Firmware.STAGE_START:
         handle_firmware.wait_tick = 0
@@ -70,6 +77,18 @@ def handle_firmware(stage):
             sys.stdout.flush()
     elif stage == pyad2usb.ad2usb.util.Firmware.STAGE_DONE:
         print "\r\nDone!"
+
+def handle_boot(sender, args):
+    print 'boot', args
+
+def handle_config(sender, args):
+    print 'config', args
+
+def handle_fault(sender, args):
+    print 'zone fault', args
+
+def handle_restore(sender, args):
+    print 'zone restored', args
 
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
@@ -200,7 +219,7 @@ def test_factory_watcher():
     overseer.close()
 
 def test_socket():
-    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("localhost", 10000))
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("singularity.corp.nutech.com", 10000))
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -212,10 +231,39 @@ def test_socket():
     a2u.on_power_changed += handle_power_changed
     a2u.on_alarm += handle_alarm_bell
     a2u.on_bypass += handle_bypass
+    a2u.on_boot += handle_boot
+    a2u.on_config_received += handle_config
+    a2u.on_arm += handle_arm
+    a2u.on_disarm += handle_disarm
+    a2u.on_zone_fault += handle_fault
+    a2u.on_zone_restore += handle_restore
 
     a2u.open()
+    #a2u.save_config()
+    #a2u.reboot()
+    a2u.get_config()
 
-    print dev._id
+    #a2u.address = 18
+    #a2u.configbits = 0xff00
+    #a2u.address_mask = 0xFFFFFFFF
+    #a2u.emulate_zone[0] = False
+    #a2u.emulate_relay[0] = False
+    #a2u.emulate_lrr = False
+    #a2u.deduplicate = False
+
+    #time.sleep(3)
+    #a2u.emulate_zone[1] = True
+    #a2u.save_config()
+
+    time.sleep(1)
+    a2u.fault_zone(17, True)
+
+    time.sleep(15)
+    a2u.clear_zone(17)
+
+    #time.sleep(1)
+    #a2u.fault_zone((2, 2), True)
+
 
     while running:
         time.sleep(0.1)
@@ -279,10 +327,11 @@ def test_double_panel_write():
     dev2.close()
 
 try:
+    logging.basicConfig(level=logging.DEBUG)
     signal.signal(signal.SIGINT, signal_handler)
 
     #test_serial()
-    upload_serial()
+    #upload_serial()
 
     #test_usb()
     #test_usb_serial()
@@ -291,7 +340,7 @@ try:
     #upload_usb()
     #upload_usb_serial()
 
-    #test_socket()
+    test_socket()
     #upload_socket()
 
     #test_no_read_thread()
