@@ -12,7 +12,9 @@ class Zone(object):
 
     CLEAR = 0
     FAULT = 1
-    WIRE_FAULT = 2
+    CHECK = 2   # Wire fault
+
+    STATUS = { CLEAR: 'CLEAR', FAULT: 'FAULT', CHECK: 'CHECK' }
 
     def __init__(self, zone=0, name='', status=CLEAR):
         self.zone = zone
@@ -21,7 +23,10 @@ class Zone(object):
         self.timestamp = time.time()
 
     def __str__(self):
-        return '[{0}] {1} - ts {2}'.format(self.zone, self.status, self.timestamp)
+        return 'Zone {0} {1}'.format(self.zone, self.name)
+
+    def __repr__(self):
+        return 'Zone({0}, {1}, ts {2})'.format(self.zone, Zone.STATUS[self.status], self.timestamp)
 
 class Zonetracker(object):
     """
@@ -66,10 +71,14 @@ class Zonetracker(object):
 
             # Add new zones and clear expired ones.
             if zone in self._zones_faulted:
-                self._update_zone(zone, Zone.FAULT)
+                self._update_zone(zone)
                 self._clear_zones(zone)
             else:
-                self._add_zone(zone, status=Zone.FAULT)
+                status = Zone.FAULT
+                if message.check_zone:
+                    status = Zone.CHECK
+
+                self._add_zone(zone, status=status)
 
             # Save our spot for the next message.
             self._last_zone_fault = zone
@@ -82,6 +91,8 @@ class Zonetracker(object):
         """
         cleared_zones = []
         found_last = found_new = at_end = False
+
+        #print 'zones', self._zones
 
         # First pass: Find our start spot.
         it = iter(self._zones_faulted)
@@ -155,14 +166,16 @@ class Zonetracker(object):
             self._zones_faulted.sort()
             self.on_fault(zone)
 
-    def _update_zone(self, zone, status):
+    def _update_zone(self, zone, status=None):
         """
         Updates a zones status.
         """
         if not zone in self._zones:
             raise IndexError('Zone does not exist and cannot be updated: %d', zone)
 
-        self._zones[zone].status = status
+        if status is not None:
+            self._zones[zone].status = status
+
         self._zones[zone].timestamp = time.time()
 
         if status == Zone.CLEAR:
