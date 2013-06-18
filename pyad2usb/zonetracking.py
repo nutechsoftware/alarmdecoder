@@ -4,6 +4,7 @@ Provides zone tracking functionality for the AD2USB device family.
 
 import time
 from .event import event
+from . import messages
 
 class Zone(object):
     """
@@ -50,40 +51,56 @@ class Zonetracker(object):
         """
         Update zone statuses based on the current message.
         """
-        # Panel is ready, restore all zones.
-        if message.ready:
-            for idx, z in enumerate(self._zones_faulted):
-                self._update_zone(z, Zone.CLEAR)
+        zone = -1
 
-            self._last_zone_fault = 0
+        if isinstance(message, messages.ExpanderMessage):
+            zone = self._expander_to_zone(int(message.address), int(message.channel))
 
-        # Process fault
-        elif "FAULT" in message.text or message.check_zone:
-            zone = -1
-
-            # Apparently this representation can be both base 10
-            # or base 16, depending on where the message came
-            # from.
-            try:
-                zone = int(message.numeric_code)
-            except ValueError:
-                zone = int(message.numeric_code, 16)
-
-            # Add new zones and clear expired ones.
-            if zone in self._zones_faulted:
-                self._update_zone(zone)
-                self._clear_zones(zone)
-            else:
+            status = Zone.CLEAR
+            if int(message.value) == 1:
                 status = Zone.FAULT
-                if message.check_zone:
-                    status = Zone.CHECK
+            elif int(message.value) == 2:
+                status = Zone.CHECK
 
+            try:
+                self._update_zone(zone, status=status)
+            except IndexError:
                 self._add_zone(zone, status=status)
+
+        else:
+            # Panel is ready, restore all zones.
+            if message.ready:
+                for idx, z in enumerate(self._zones_faulted):
+                    self._update_zone(z, Zone.CLEAR)
+
+                self._last_zone_fault = 0
+
+            # Process fault
+            elif "FAULT" in message.text or message.check_zone:
+                # Apparently this representation can be both base 10
+                # or base 16, depending on where the message came
+                # from.
+                try:
+                    zone = int(message.numeric_code)
+                except ValueError:
+                    zone = int(message.numeric_code, 16)
+
+                # Add new zones and clear expired ones.
+                if zone in self._zones_faulted:
+                    self._update_zone(zone)
+                    self._clear_zones(zone)
+                else:
+                    status = Zone.FAULT
+                    if message.check_zone:
+                        status = Zone.CHECK
+
+                    self._add_zone(zone, status=status)
+                    self._zones_faulted.append(zone)
+                    self._zones_faulted.sort()
 
             # Save our spot for the next message.
             self._last_zone_fault = zone
-
-        self._clear_expired_zones()
+            self._clear_expired_zones()
 
     def _clear_zones(self, zone):
         """
@@ -91,8 +108,6 @@ class Zonetracker(object):
         """
         cleared_zones = []
         found_last = found_new = at_end = False
-
-        #print 'zones', self._zones
 
         # First pass: Find our start spot.
         it = iter(self._zones_faulted)
@@ -145,13 +160,13 @@ class Zonetracker(object):
             self._update_zone(z, Zone.CLEAR)
 
     def _clear_expired_zones(self):
-        cleared_zones = []
+        zones = []
 
-        for z in self._zones_faulted:
-            cleared_zones += [z]
+        for z in self._zones.keys():
+            zones += [z]
 
-        for z in cleared_zones:
-            if self._zone_expired(z):
+        for z in zones:
+            if self._zones[z].status != Zone.CLEAR and self._zone_expired(z):
                 self._update_zone(z, Zone.CLEAR)
 
     def _add_zone(self, zone, name='', status=Zone.CLEAR):
@@ -162,8 +177,6 @@ class Zonetracker(object):
             self._zones[zone] = Zone(zone=zone, name=name, status=status)
 
         if status != Zone.CLEAR:
-            self._zones_faulted.append(zone)
-            self._zones_faulted.sort()
             self.on_fault(zone)
 
     def _update_zone(self, zone, status=None):
@@ -179,7 +192,9 @@ class Zonetracker(object):
         self._zones[zone].timestamp = time.time()
 
         if status == Zone.CLEAR:
-            self._zones_faulted.remove(zone)
+            if zone in self._zones_faulted:
+                self._zones_faulted.remove(zone)
+
             self.on_restore(zone)
 
     def _zone_expired(self, zone):
@@ -187,3 +202,8 @@ class Zonetracker(object):
             return True
 
         return False
+
+    def _expander_to_zone(self, address, channel):
+        idx = address - 7   # Expanders start at address 7.
+
+        return address + channel + (idx * 7) + 1

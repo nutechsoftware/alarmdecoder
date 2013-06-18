@@ -254,11 +254,15 @@ def test_socket():
     #a2u.emulate_zone[1] = True
     #a2u.save_config()
 
-    #time.sleep(1)
-    #a2u.fault_zone(17, True)
+    time.sleep(1)
+    a2u.fault_zone(17, True)
 
-    #time.sleep(15)
-    #a2u.clear_zone(17)
+    time.sleep(15)
+    a2u.clear_zone(17)
+
+    #time.sleep(1)
+    #a2u.fault_zone((2, 2), True)
+
 
     while running:
         time.sleep(0.1)
