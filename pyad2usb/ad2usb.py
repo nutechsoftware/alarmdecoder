@@ -163,6 +163,7 @@ class AD2USB(object):
     on_config_received = event.Event('Called when the device receives its configuration.')
     on_zone_fault = event.Event('Called when the device detects a zone fault.')
     on_zone_restore = event.Event('Called when the device detects that a fault is restored.')
+    on_low_battery = event.Event('Called when the device detects a low battery.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -191,6 +192,7 @@ class AD2USB(object):
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = None
+        self._battery_status = None
 
         self.address = 18
         self.configbits = 0xFF00
@@ -386,6 +388,15 @@ class AD2USB(object):
                     else:
                         self.on_disarm()
 
+            # TODO: This needs a timeout or something.. only set on the LO BAT messages
+            #       instead of all messages after.
+            if message.battery_low != self._battery_status:
+                self._battery_status, old_status = message.battery_low, self._battery_status
+
+                if old_status is not None and self._battery_status == True:
+                        self.on_low_battery(self._battery_status)
+
+            # TODO: Also needs a timeout.
             if message.fire_alarm != self._fire_status:
                 self._fire_status, old_status = message.fire_alarm, self._fire_status
 
@@ -393,6 +404,7 @@ class AD2USB(object):
                     self.on_fire(self._fire_status)
 
         self._update_zone_tracker(message)
+
 
     def _update_zone_tracker(self, message):
         # Retrieve a list of faults.

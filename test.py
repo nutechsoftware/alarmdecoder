@@ -90,6 +90,12 @@ def handle_fault(sender, args):
 def handle_restore(sender, args):
     print 'zone restored', args
 
+def handle_battery(sender, args):
+    print 'low battery', args
+
+def handle_fire(sender, args):
+    print 'FIRE!', args
+
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -227,7 +233,7 @@ def test_socket():
     #a2u.on_read += handle_read
     #a2u.on_write += handle_write
 
-    a2u.on_message += handle_message
+    #a2u.on_message += handle_message
     a2u.on_power_changed += handle_power_changed
     a2u.on_alarm += handle_alarm_bell
     a2u.on_bypass += handle_bypass
@@ -237,6 +243,10 @@ def test_socket():
     a2u.on_disarm += handle_disarm
     a2u.on_zone_fault += handle_fault
     a2u.on_zone_restore += handle_restore
+    #
+    a2u.on_fire += handle_fire
+    a2u.on_low_battery += handle_battery
+
 
     a2u.open()
     #a2u.save_config()
@@ -251,15 +261,15 @@ def test_socket():
     #a2u.emulate_lrr = False
     #a2u.deduplicate = False
 
-    #time.sleep(3)
-    #a2u.emulate_zone[1] = True
+    time.sleep(3)
+    #a2u.emulate_zone[1] = False
     #a2u.save_config()
 
-    time.sleep(1)
-    a2u.fault_zone(17, True)
+    #time.sleep(1)
+    #a2u.fault_zone(17, True)
 
-    time.sleep(15)
-    a2u.clear_zone(17)
+    #time.sleep(15)
+    #a2u.clear_zone(17)
 
     #time.sleep(1)
     #a2u.fault_zone((2, 2), True)
