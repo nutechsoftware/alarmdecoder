@@ -164,9 +164,11 @@ class AD2USB(object):
     on_zone_fault = event.Event('Called when the device detects a zone fault.')
     on_zone_restore = event.Event('Called when the device detects that a fault is restored.')
     on_low_battery = event.Event('Called when the device detects a low battery.')
+    on_panic = event.Event('Called when the device detects a panic.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
+    on_lrr_message = event.Event('Called when an LRR message is received.')
 
     # Low-level Events
     on_open = event.Event('Called when the device has been opened.')
@@ -193,6 +195,7 @@ class AD2USB(object):
         self._armed_status = None
         self._fire_status = None
         self._battery_status = None
+        self._panic_status = None
 
         self.address = 18
         self.configbits = 0xFF00
@@ -321,11 +324,30 @@ class AD2USB(object):
             elif header == '!RFX':
                 msg = messages.RFMessage(data)
             elif header == '!LRR':
-                msg = messages.LRRMessage(data)
+                msg = self._handle_lrr(data)
             elif data.startswith('!Ready'):
                 self.on_boot()
             elif data.startswith('!CONFIG'):
                 self._handle_config(data)
+
+        return msg
+
+    def _handle_lrr(self, data):
+        """
+        """
+        msg = messages.LRRMessage(data)
+
+        args = (msg._partition, msg._event_type, msg._event_data)
+        if msg._event_type == 'ALARM_PANIC':
+            self._panic_status = True
+            self.on_panic(args + (True,))
+
+        elif msg._event_type == 'CANCEL':
+            if self._panic_status == True:
+                self._panic_status = False
+                self.on_panic(args + (False,))
+
+        self.on_lrr_message(args)
 
         return msg
 
@@ -404,7 +426,6 @@ class AD2USB(object):
                     self.on_fire(self._fire_status)
 
         self._update_zone_tracker(message)
-
 
     def _update_zone_tracker(self, message):
         # Retrieve a list of faults.

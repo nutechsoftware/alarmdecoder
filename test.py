@@ -96,6 +96,12 @@ def handle_battery(sender, args):
 def handle_fire(sender, args):
     print 'FIRE!', args
 
+def handle_lrr(sender, args):
+    print 'LRR', args
+
+def handle_panic(sender, args):
+    print 'PANIC!', args
+
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -246,6 +252,8 @@ def test_socket():
     #
     a2u.on_fire += handle_fire
     a2u.on_low_battery += handle_battery
+    a2u.on_lrr_message += handle_lrr
+    a2u.on_panic += handle_panic
 
 
     a2u.open()
