@@ -54,18 +54,19 @@ class Zonetracker(object):
         zone = -1
 
         if isinstance(message, messages.ExpanderMessage):
-            zone = self._expander_to_zone(int(message.address), int(message.channel))
+            if message.type == messages.ExpanderMessage.EXPANDER:
+                zone = self._expander_to_zone(int(message.address), int(message.channel))
 
-            status = Zone.CLEAR
-            if int(message.value) == 1:
-                status = Zone.FAULT
-            elif int(message.value) == 2:
-                status = Zone.CHECK
+                status = Zone.CLEAR
+                if int(message.value) == 1:
+                    status = Zone.FAULT
+                elif int(message.value) == 2:
+                    status = Zone.CHECK
 
-            try:
-                self._update_zone(zone, status=status)
-            except IndexError:
-                self._add_zone(zone, status=status)
+                try:
+                    self._update_zone(zone, status=status)
+                except IndexError:
+                    self._add_zone(zone, status=status)
 
         else:
             # Panel is ready, restore all zones.
