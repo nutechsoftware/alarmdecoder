@@ -54,7 +54,7 @@ class Zonetracker(object):
         zone = -1
 
         if isinstance(message, messages.ExpanderMessage):
-            if message.type == messages.ExpanderMessage.EXPANDER:
+            if message.type == messages.ExpanderMessage.ZONE:
                 zone = self._expander_to_zone(int(message.address), int(message.channel))
 
                 status = Zone.CLEAR
@@ -99,8 +99,9 @@ class Zonetracker(object):
                     self._zones_faulted.append(zone)
                     self._zones_faulted.sort()
 
-            # Save our spot for the next message.
-            self._last_zone_fault = zone
+                # Save our spot for the next message.
+                self._last_zone_fault = zone
+
             self._clear_expired_zones()
 
     def _clear_zones(self, zone):
