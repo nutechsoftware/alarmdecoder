@@ -182,6 +182,8 @@ class AD2USB(object):
     F3 = unichr(3) + unichr(3) + unichr(3)
     F4 = unichr(4) + unichr(4) + unichr(4)
 
+    BATTERY_TIMEOUT = 30
+
     def __init__(self, device):
         """
         Constructor
@@ -194,7 +196,8 @@ class AD2USB(object):
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = None
-        self._battery_status = None
+        self._battery_status = (False, 0)
+        self._previous_battery_status = (None, 0)
         self._panic_status = None
 
         self.address = 18
@@ -410,13 +413,19 @@ class AD2USB(object):
                     else:
                         self.on_disarm()
 
-            # TODO: This needs a timeout or something.. only set on the LO BAT messages
-            #       instead of all messages after.
-            if message.battery_low != self._battery_status:
-                self._battery_status, old_status = message.battery_low, self._battery_status
+            # Battery status toggle.  This is kinda ugly.. may be a better way to do it.
+            if message.battery_low != self._battery_status[0]:
+                if time.time() > self._battery_status[1] + AD2USB.BATTERY_TIMEOUT:
+                    self._battery_status, self._previous_battery_status = (message.battery_low, time.time()), self._battery_status
 
-                if old_status is not None and self._battery_status == True:
-                        self.on_low_battery(self._battery_status)
+                    self.on_low_battery(self._battery_status)
+
+                else:
+                    self._previous_battery_status = self._battery_status
+
+            else:
+                if self._battery_status[0] == self._previous_battery_status[0]:
+                    self._battery_status = (self._battery_status[0], time.time())
 
             # TODO: Also needs a timeout.
             if message.fire_alarm != self._fire_status:
