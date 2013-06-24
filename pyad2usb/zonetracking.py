@@ -162,6 +162,9 @@ class Zonetracker(object):
             self._update_zone(z, Zone.CLEAR)
 
     def _clear_expired_zones(self):
+        """
+        Update zone status for all expired zones.
+        """
         zones = []
 
         for z in self._zones.keys():
@@ -200,12 +203,22 @@ class Zonetracker(object):
             self.on_restore(zone)
 
     def _zone_expired(self, zone):
+        """
+        Determine if a zone is expired or not.
+        """
         if time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE:
             return True
 
         return False
 
     def _expander_to_zone(self, address, channel):
+        """
+        Convert an address and channel into a zone number.
+        """
+
+        # TODO: This is going to need to be reworked to support the larger
+        #       panels without fixed addressing on the expanders.
+
         idx = address - 7   # Expanders start at address 7.
 
         return address + channel + (idx * 7) + 1

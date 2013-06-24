@@ -337,6 +337,7 @@ class AD2USB(object):
 
     def _handle_lrr(self, data):
         """
+        Handle Long Range Radio messages.
         """
         msg = messages.LRRMessage(data)
 
@@ -444,6 +445,10 @@ class AD2USB(object):
         self._update_zone_tracker(message)
 
     def _update_zone_tracker(self, message):
+        """
+        Trigger an update of the zonetracker.
+        """
+
         # Retrieve a list of faults.
         # NOTE: This only happens on first boot or after exiting programming mode.
         if isinstance(message, messages.Message):
