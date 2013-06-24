@@ -195,7 +195,8 @@ class AD2USB(object):
         self._alarm_status = None
         self._bypass_status = None
         self._armed_status = None
-        self._fire_status = None
+        self._fire_status = (False, 0)
+        self._previous_fire_status = (None, 0)
         self._battery_status = (False, 0)
         self._previous_battery_status = (None, 0)
         self._panic_status = None
@@ -427,12 +428,19 @@ class AD2USB(object):
                 if self._battery_status[0] == self._previous_battery_status[0]:
                     self._battery_status = (self._battery_status[0], time.time())
 
-            # TODO: Also needs a timeout.
-            if message.fire_alarm != self._fire_status:
-                self._fire_status, old_status = message.fire_alarm, self._fire_status
+            # Fire alarm status toggle.  This is kinda ugly.. may be a better way to do it.
+            if message.fire_alarm != self._fire_status[0]:
+                if time.time() > self._fire_status[1] + AD2USB.BATTERY_TIMEOUT:
+                    self._fire_status, self._previous_fire_status = (message.fire_alarm, time.time()), self._fire_status
 
-                if old_status is not None:
                     self.on_fire(self._fire_status)
+
+                else:
+                    self._previous_fire_status = self._fire_status
+
+            else:
+                if self._fire_status[0] == self._previous_fire_status[0]:
+                    self._fire_status = (self._fire_status[0], time.time())
 
         self._update_zone_tracker(message)
 
