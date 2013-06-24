@@ -183,6 +183,7 @@ class AD2USB(object):
     F4 = unichr(4) + unichr(4) + unichr(4)
 
     BATTERY_TIMEOUT = 30
+    FIRE_TIMEOUT = 30
 
     def __init__(self, device):
         """
@@ -196,9 +197,7 @@ class AD2USB(object):
         self._bypass_status = None
         self._armed_status = None
         self._fire_status = (False, 0)
-        self._previous_fire_status = (None, 0)
         self._battery_status = (False, 0)
-        self._previous_battery_status = (None, 0)
         self._panic_status = None
 
         self.address = 18
@@ -428,19 +427,19 @@ class AD2USB(object):
                 if self._battery_status[0] == self._previous_battery_status[0]:
                     self._battery_status = (self._battery_status[0], time.time())
 
-            # Fire alarm status toggle.  This is kinda ugly.. may be a better way to do it.
-            if message.fire_alarm != self._fire_status[0]:
-                if time.time() > self._fire_status[1] + AD2USB.BATTERY_TIMEOUT:
-                    self._fire_status, self._previous_fire_status = (message.fire_alarm, time.time()), self._fire_status
-
-                    self.on_fire(self._fire_status)
-
-                else:
-                    self._previous_fire_status = self._fire_status
-
+            if message.battery_low == self._battery_status[0]:
+                self._battery_status = (self._battery_status[0], time.time())
             else:
-                if self._fire_status[0] == self._previous_fire_status[0]:
-                    self._fire_status = (self._fire_status[0], time.time())
+                if message.battery_low == True or time.time() > self._battery_status[1] + AD2USB.BATTERY_TIMEOUT:
+                    self._battery_status = (message.battery_low, time.time())
+                    self.on_fire(self._battery_status)
+
+            if message.fire_alarm == self._fire_status[0]:
+                self._fire_status = (self._fire_status[0], time.time())
+            else:
+                if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2USB.FIRE_TIMEOUT:
+                    self._fire_status = (message.fire_alarm, time.time())
+                    self.on_fire(self._fire_status)
 
         self._update_zone_tracker(message)
 
