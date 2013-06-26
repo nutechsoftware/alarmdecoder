@@ -12,6 +12,9 @@ class Message(object):
     def __init__(self, data=None):
         """
         Constructor
+
+        :param data: Message data to parse.
+        :type data: str
         """
         self.ready = False
         self.armed_away = False
@@ -45,6 +48,11 @@ class Message(object):
     def _parse_message(self, data):
         """
         Parse the message from the device.
+
+        :param data: The message data.
+        :type data: str
+
+        :raises: util.InvalidMessageError
         """
         m = self._regex.match(data)
 
@@ -94,6 +102,9 @@ class ExpanderMessage(object):
     def __init__(self, data=None):
         """
         Constructor
+
+        :param data: The message data to parse.
+        :type data: str
         """
         self.type = None
         self.address = None
@@ -119,6 +130,9 @@ class ExpanderMessage(object):
     def _parse_message(self, data):
         """
         Parse the raw message from the device.
+
+        :param data: The message data
+        :type data: str
         """
         header, values = data.split(':')
         address, channel, value = values.split(',')
@@ -141,6 +155,9 @@ class RFMessage(object):
     def __init__(self, data=None):
         """
         Constructor
+
+        :param data: The message data to parse
+        :type data: str
         """
         self.raw = None
         self.serial_number = None
@@ -158,6 +175,9 @@ class RFMessage(object):
     def _parse_message(self, data):
         """
         Parses the raw message from the device.
+
+        :param data: The message data.
+        :type data: str
         """
         self.raw = data
 
@@ -172,6 +192,9 @@ class LRRMessage(object):
     def __init__(self, data=None):
         """
         Constructor
+
+        :param data: The message data to parse.
+        :type data: str
         """
         self.raw = None
         self._event_data = None
@@ -190,6 +213,9 @@ class LRRMessage(object):
     def _parse_message(self, data):
         """
         Parses the raw message from the device.
+
+        :param data: The message data.
+        :type data: str
         """
         self.raw = data
 

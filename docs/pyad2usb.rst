@@ -1,14 +1,6 @@
 pyad2usb Package
 ================
 
-:mod:`pyad2usb` Package
------------------------
-
-.. automodule:: pyad2usb.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`ad2usb` Module
 --------------------
 
@@ -29,6 +21,30 @@ pyad2usb Package
 ------------------
 
 .. automodule:: pyad2usb.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`zonetracking` Module
+--------------------------
+
+.. automodule:: pyad2usb.zonetracking
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`panels` Module
+--------------------
+
+.. automodule:: pyad2usb.panels
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`messages` Module
+----------------------
+
+.. automodule:: pyad2usb.messages
     :members:
     :undoc-members:
     :show-inheritance:

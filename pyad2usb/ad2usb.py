@@ -1,5 +1,9 @@
 """
+
 Provides the full AD2USB class and factory.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
+
 """
 
 import time
@@ -28,6 +32,9 @@ class Overseer(object):
     def find_all(cls):
         """
         Returns all AD2USB devices located on the system.
+
+        :returns: list of devices found
+        :raises: util.CommError
         """
         cls.__devices = devices.USBDevice.find_all()
 
@@ -37,6 +44,8 @@ class Overseer(object):
     def devices(cls):
         """
         Returns a cached list of AD2USB devices located on the system.
+
+        :returns: cached list of devices found.
         """
         return cls.__devices
 
@@ -44,6 +53,12 @@ class Overseer(object):
     def create(cls, device=None):
         """
         Factory method that returns the requested AD2USB device, or the first device.
+
+        :param device: Tuple describing the USB device to open, as returned by find_all().
+        :type device: tuple
+
+        :returns: AD2USB object utilizing the specified device.
+        :raises: util.NoDeviceError
         """
         cls.find_all()
 
@@ -61,6 +76,11 @@ class Overseer(object):
     def __init__(self, attached_event=None, detached_event=None):
         """
         Constructor
+
+        :param attached_event: Event to trigger when a device is attached.
+        :type attached_event: function
+        :param detached_event: Event to trigger when a device is detached.
+        :type detached_event: function
         """
         self._detect_thread = Overseer.DetectThread(self)
 
@@ -96,6 +116,9 @@ class Overseer(object):
     def get_device(self, device=None):
         """
         Factory method that returns the requested AD2USB device, or the first device.
+
+        :param device: Tuple describing the USB device to open, as returned by find_all().
+        :type device: tuple
         """
         return Overseer.create(device)
 
@@ -106,6 +129,9 @@ class Overseer(object):
         def __init__(self, overseer):
             """
             Constructor
+
+            :param overseer: Overseer object to use with the thread.
+            :type overseer: Overseer
             """
             threading.Thread.__init__(self)
 
@@ -178,16 +204,25 @@ class AD2USB(object):
 
     # Constants
     F1 = unichr(1) + unichr(1) + unichr(1)
+    """Represents panel function key #1"""
     F2 = unichr(2) + unichr(2) + unichr(2)
+    """Represents panel function key #2"""
     F3 = unichr(3) + unichr(3) + unichr(3)
+    """Represents panel function key #3"""
     F4 = unichr(4) + unichr(4) + unichr(4)
+    """Represents panel function key #4"""
 
     BATTERY_TIMEOUT = 30
+    """Timeout before the battery status reverts."""
     FIRE_TIMEOUT = 30
+    """Timeout before the fire status reverts."""
 
     def __init__(self, device):
         """
         Constructor
+
+        :param device: The low-level device used for this AD2USB interface.
+        :type device: devices.Device
         """
         self._device = device
         self._zonetracker = zonetracking.Zonetracker()
@@ -212,12 +247,23 @@ class AD2USB(object):
     def id(self):
         """
         The ID of the AD2USB device.
+
+        :returns: The identification string for the device.
         """
         return self._device.id
 
     def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
         """
         Opens the device.
+
+        :param baudrate: The baudrate used for the device.
+        :type baudrate: int
+        :param interface: The interface used for the device.
+        :type interface: varies depends on device type.. FIXME
+        :param index: Interface index.. can probably remove.  FIXME
+        :type index: int
+        :param no_reader_thread: Specifies whether or not the automatic reader thread should be started or not
+        :type no_reader_thread: bool
         """
         self._wire_events()
         self._device.open(baudrate=baudrate, interface=interface, index=index, no_reader_thread=no_reader_thread)
@@ -274,6 +320,11 @@ class AD2USB(object):
     def fault_zone(self, zone, simulate_wire_problem=False):
         """
         Faults a zone if we are emulating a zone expander.
+
+        :param zone: The zone to fault.
+        :type zone: int
+        :param simulate_wire_problem: Whether or not to simulate a wire fault.
+        :type simulate_wire_problem: bool
         """
         # Allow ourselves to also be passed an address/channel combination
         # for zone expanders.
@@ -289,6 +340,9 @@ class AD2USB(object):
     def clear_zone(self, zone):
         """
         Clears a zone if we are emulating a zone expander.
+
+        :param zone: The zone to clear.
+        :type zone: int
         """
         self._device.write("L{0:02}0\r".format(zone))
 
@@ -306,6 +360,11 @@ class AD2USB(object):
     def _handle_message(self, data):
         """
         Parses messages from the panel.
+
+        :param data: Panel data to parse.
+        :type data: str
+
+        :returns: An object representing the message.
         """
         if data is None:
             return None
@@ -338,6 +397,11 @@ class AD2USB(object):
     def _handle_lrr(self, data):
         """
         Handle Long Range Radio messages.
+
+        :param data: LRR message to parse.
+        :type data: str
+
+        :returns: An object representing the LRR message.
         """
         msg = messages.LRRMessage(data)
 
@@ -358,6 +422,9 @@ class AD2USB(object):
     def _handle_config(self, data):
         """
         Handles received configuration data.
+
+        :param data: Configuration string to parse.
+        :type data: str
         """
         _, config_string = data.split('>')
         for setting in config_string.split('&'):
@@ -385,6 +452,9 @@ class AD2USB(object):
     def _update_internal_states(self, message):
         """
         Updates internal device states.
+
+        :param message: Message to update internal states with.
+        :type message: Message, ExpanderMessage, LRRMessage, or RFMessage
         """
         if isinstance(message, messages.Message):
             if message.ac_power != self._power_status:
@@ -447,6 +517,9 @@ class AD2USB(object):
     def _update_zone_tracker(self, message):
         """
         Trigger an update of the zonetracker.
+
+        :param message: The message to update the zonetracker with.
+        :type message: Message, ExpanderMessage, LRRMessage, or RFMessage
         """
 
         # Retrieve a list of faults.

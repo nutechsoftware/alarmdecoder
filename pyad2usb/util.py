@@ -48,6 +48,13 @@ class Firmware(object):
     def upload(dev, filename, progress_callback=None):
         """
         Uploads firmware to an AD2USB/AD2SERIAL device.
+
+        :param filename: The firmware filename
+        :type filename: str
+        :param progress_callback: Callback function used to report progress.
+        :type progress_callback: function
+
+        :raises: util.NoDeviceError, util.TimeoutError
         """
 
         def do_upload():

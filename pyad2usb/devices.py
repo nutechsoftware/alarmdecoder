@@ -1,5 +1,7 @@
 """
 Contains different types of devices belonging to the AD2USB family.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
 import usb.core
@@ -40,6 +42,8 @@ class Device(object):
     def id(self):
         """
         Retrieve the device ID.
+
+        :returns: The identification string for the device.
         """
         return self._id
 
@@ -47,12 +51,17 @@ class Device(object):
     def id(self, value):
         """
         Sets the device ID.
+
+        :param value: The device identification.
+        :type value: str
         """
         self._id = value
 
     def is_reader_alive(self):
         """
         Indicates whether or not the reader thread is alive.
+
+        :returns: Whether or not the reader thread is alive.
         """
         return self._read_thread.is_alive()
 
@@ -68,10 +77,14 @@ class Device(object):
         """
 
         READ_TIMEOUT = 10
+        """Timeout for the reader thread."""
 
         def __init__(self, device):
             """
             Constructor
+
+            :param device: The device used by the reader thread.
+            :type device: devices.Device
             """
             threading.Thread.__init__(self)
             self._device = device
@@ -105,13 +118,19 @@ class USBDevice(Device):
 
     # Constants
     FTDI_VENDOR_ID = 0x0403
+    """Vendor ID used to recognize AD2USB devices."""
     FTDI_PRODUCT_ID = 0x6001
+    """Product ID used to recognize AD2USB devices."""
     BAUDRATE = 115200
+    """Default baudrate for AD2USB devices."""
 
     @staticmethod
     def find_all():
         """
         Returns all FTDI devices matching our vendor and product IDs.
+
+        :returns: list of devices
+        :raises: util.CommError
         """
         devices = []
 
@@ -126,6 +145,17 @@ class USBDevice(Device):
     def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None, interface=0):
         """
         Constructor
+
+        :param vid: Vendor ID
+        :type vid: int
+        :param pid: Product ID
+        :type pid: int
+        :param serial: The serial number
+        :type serial: str
+        :param description: Description of the device.
+        :type description: str
+        :param interface: The interface to use
+        :type interface: int
         """
         Device.__init__(self)
 
@@ -139,6 +169,15 @@ class USBDevice(Device):
     def open(self, baudrate=BAUDRATE, interface=None, index=0, no_reader_thread=False):
         """
         Opens the device.
+
+        :param baudrate: The baudrate to use.
+        :type baudrate: int
+        :param interface: The interface to use.
+        :type interface: int
+        :param no_reader_thread: Whether or not to automatically start the reader thread.
+        :type no_reader_thread: bool
+
+        :raises: util.NoDeviceError
         """
         # Set up defaults
         if baudrate is None:
@@ -197,6 +236,11 @@ class USBDevice(Device):
     def write(self, data):
         """
         Writes data to the device.
+
+        :param data: Data to write
+        :type data: str
+
+        :raises: util.CommError
         """
         try:
             self._device.write_data(data)
@@ -208,6 +252,9 @@ class USBDevice(Device):
     def read(self):
         """
         Reads a single character from the device.
+
+        :returns: The character read from the device.
+        :raises: util.CommError
         """
         ret = None
 
@@ -222,6 +269,14 @@ class USBDevice(Device):
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
+
+        :param timeout: Read timeout
+        :type timeout: float
+        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :type purge_buffer: bool
+
+        :returns: The line that was read.
+        :raises: util.CommError, util.TimeoutError
         """
 
         if purge_buffer:
@@ -287,11 +342,18 @@ class SerialDevice(Device):
 
     # Constants
     BAUDRATE = 19200
+    """Default baudrate for Serial devices."""
 
     @staticmethod
     def find_all(pattern=None):
         """
         Returns all serial ports present.
+
+        :param pattern: Pattern to search for when retrieving serial ports.
+        :type pattern: str
+
+        :returns: list of devices
+        :raises: util.CommError
         """
         devices = []
 
@@ -309,6 +371,9 @@ class SerialDevice(Device):
     def __init__(self, interface=None):
         """
         Constructor
+
+        :param interface: The device to open.
+        :type interface: str
         """
         Device.__init__(self)
 
@@ -319,6 +384,17 @@ class SerialDevice(Device):
     def open(self, baudrate=BAUDRATE, interface=None, index=None, no_reader_thread=False):
         """
         Opens the device.
+
+        :param baudrate: The baudrate to use with the device.
+        :type baudrate: int
+        :param interface: The device to open.
+        :type interface: str
+        :param index: Unused.
+        :type index: int
+        :param no_reader_thread: Whether or not to automatically start the reader thread.
+        :type no_reader_thread: bool
+
+        :raises: util.NoDeviceError
         """
         # Set up the defaults
         if baudrate is None:
@@ -370,6 +446,11 @@ class SerialDevice(Device):
     def write(self, data):
         """
         Writes data to the device.
+
+        :param data: The data to write.
+        :type data: str
+
+        :raises: util.CommError
         """
         try:
             self._device.write(data)
@@ -386,6 +467,9 @@ class SerialDevice(Device):
     def read(self):
         """
         Reads a single character from the device.
+
+        :returns: The character read from the device.
+        :raises: util.CommError
         """
         ret = None
 
@@ -400,6 +484,14 @@ class SerialDevice(Device):
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
+
+        :param timeout: The read timeout.
+        :type timeout: float
+        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :type purge_buffer: bool
+
+        :returns: The line read.
+        :raises: util.CommError, util.TimeoutError
         """
         def timeout_event():
             timeout_event.reading = False
@@ -471,6 +563,17 @@ class SocketDevice(Device):
     def open(self, baudrate=None, interface=None, index=0, no_reader_thread=False):
         """
         Opens the device.
+
+        :param baudrate: The baudrate to use
+        :type baudrate: int
+        :param interface: The hostname and port to connect to.
+        :type interface: tuple
+        :param index: Unused
+        :type index: int
+        :param no_reader_thread: Whether or not to automatically open the reader thread.
+        :type no_reader_thread: bool
+
+        :raises: util.NoDeviceError
         """
         if interface is not None:
             self._interface = interface
@@ -512,6 +615,12 @@ class SocketDevice(Device):
     def write(self, data):
         """
         Writes data to the device.
+
+        :param data: The data to write.
+        :type data: str
+
+        :returns: The number of bytes sent.
+        :raises: util.CommError
         """
         data_sent = None
 
@@ -531,6 +640,9 @@ class SocketDevice(Device):
     def read(self):
         """
         Reads a single character from the device.
+
+        :returns: The character read from the device.
+        :raises: util.CommError
         """
         data = None
 
@@ -545,6 +657,14 @@ class SocketDevice(Device):
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
         Reads a line from the device.
+
+        :param timeout: The read timeout.
+        :type timeout: float
+        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :type purge_buffer: bool
+
+        :returns: The line read from the device.
+        :raises: util.CommError, util.TimeoutError
         """
 
         if purge_buffer:

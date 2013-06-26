@@ -12,21 +12,40 @@ class Zone(object):
     """
 
     CLEAR = 0
+    """Status indicating that the zone is cleared."""
     FAULT = 1
+    """Status indicating that the zone is faulted."""
     CHECK = 2   # Wire fault
+    """Status indicating that there is a wiring issue with the zone."""
 
     STATUS = { CLEAR: 'CLEAR', FAULT: 'FAULT', CHECK: 'CHECK' }
 
     def __init__(self, zone=0, name='', status=CLEAR):
+        """
+        Constructor
+
+        :param zone: The zone number.
+        :type zone: int
+        :param name: Human readable zone name.
+        :type name: str
+        :param status: Initial zone state.
+        :type status: int
+        """
         self.zone = zone
         self.name = name
         self.status = status
         self.timestamp = time.time()
 
     def __str__(self):
+        """
+        String conversion operator.
+        """
         return 'Zone {0} {1}'.format(self.zone, self.name)
 
     def __repr__(self):
+        """
+        Human readable representation operator.
+        """
         return 'Zone({0}, {1}, ts {2})'.format(self.zone, Zone.STATUS[self.status], self.timestamp)
 
 class Zonetracker(object):
@@ -38,6 +57,7 @@ class Zonetracker(object):
     on_restore = event.Event('Called when the device detects that a fault is restored.')
 
     EXPIRE = 30
+    """Zone expiration timeout."""
 
     def __init__(self):
         """
@@ -50,6 +70,9 @@ class Zonetracker(object):
     def update(self, message):
         """
         Update zone statuses based on the current message.
+
+        :param message: Message to use to update the zone tracking.
+        :type message: Message or ExpanderMessage
         """
         zone = -1
 
@@ -107,6 +130,9 @@ class Zonetracker(object):
     def _clear_zones(self, zone):
         """
         Clear all expired zones from our status list.
+
+        :param zone: current zone being processed.
+        :type zone: int
         """
         cleared_zones = []
         found_last = found_new = at_end = False
@@ -177,6 +203,13 @@ class Zonetracker(object):
     def _add_zone(self, zone, name='', status=Zone.CLEAR):
         """
         Adds a zone to the internal zone list.
+
+        :param zone: The zone number.
+        :type zone: int
+        :param name: Human readable zone name.
+        :type name: str
+        :param status: The zone status.
+        :type status: int
         """
         if not zone in self._zones:
             self._zones[zone] = Zone(zone=zone, name=name, status=status)
@@ -187,6 +220,13 @@ class Zonetracker(object):
     def _update_zone(self, zone, status=None):
         """
         Updates a zones status.
+
+        :param zone: The zone number.
+        :type zone: int
+        :param status: The zone status.
+        :type status: int
+
+        :raises: IndexError
         """
         if not zone in self._zones:
             raise IndexError('Zone does not exist and cannot be updated: %d', zone)
@@ -205,6 +245,11 @@ class Zonetracker(object):
     def _zone_expired(self, zone):
         """
         Determine if a zone is expired or not.
+
+        :param zone: The zone number.
+        :type zone: int
+
+        :returns: Whether or not the zone is expired.
         """
         if time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE:
             return True
@@ -214,6 +259,13 @@ class Zonetracker(object):
     def _expander_to_zone(self, address, channel):
         """
         Convert an address and channel into a zone number.
+
+        :param address: The expander address
+        :type address: int
+        :param channel: The channel
+        :type channel: int
+
+        :returns: The zone number associated with an address and channel.
         """
 
         # TODO: This is going to need to be reworked to support the larger
