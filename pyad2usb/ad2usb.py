@@ -484,26 +484,12 @@ class AD2USB(object):
                     else:
                         self.on_disarm()
 
-            # Battery status toggle.  This is kinda ugly.. may be a better way to do it.
-            if message.battery_low != self._battery_status[0]:
-                if time.time() > self._battery_status[1] + AD2USB.BATTERY_TIMEOUT:
-                    self._battery_status, self._previous_battery_status = (message.battery_low, time.time()), self._battery_status
-
-                    self.on_low_battery(self._battery_status)
-
-                else:
-                    self._previous_battery_status = self._battery_status
-
-            else:
-                if self._battery_status[0] == self._previous_battery_status[0]:
-                    self._battery_status = (self._battery_status[0], time.time())
-
             if message.battery_low == self._battery_status[0]:
                 self._battery_status = (self._battery_status[0], time.time())
             else:
                 if message.battery_low == True or time.time() > self._battery_status[1] + AD2USB.BATTERY_TIMEOUT:
                     self._battery_status = (message.battery_low, time.time())
-                    self.on_fire(self._battery_status)
+                    self.on_low_battery(self._battery_status)
 
             if message.fire_alarm == self._fire_status[0]:
                 self._fire_status = (self._fire_status[0], time.time())

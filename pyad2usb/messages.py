@@ -62,7 +62,7 @@ class Message(object):
         self.bitfield, self.numeric_code, self.panel_data, alpha = m.group(1, 2, 3, 4)
         self.mask = int(self.panel_data[3:3+8], 16)
 
-        self.data = data
+        self.raw = data
         self.ready = not self.bitfield[1:2] == "0"
         self.armed_away = not self.bitfield[2:3] == "0"
         self.armed_home = not self.bitfield[3:4] == "0"
