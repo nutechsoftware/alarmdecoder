@@ -276,6 +276,10 @@ class AD2USB(object):
         del self._device
         self._device = None
 
+    def send(self, data):
+        if self._device:
+            self._device.write(data)
+
     def get_config(self):
         """
         Retrieves the configuration from the device.
