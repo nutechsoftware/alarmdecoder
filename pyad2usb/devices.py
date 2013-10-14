@@ -553,27 +553,60 @@ class SocketDevice(Device):
     """
 
     @property
-    def ssl_certificiate(self):
+    def ssl_certificate(self):
+        """
+        Retrieves the SSL client certificate path used for authentication.
+
+        :returns: The certificate path
+        """
         return self._ssl_certificate
 
-    @ssl_certificiate.setter
+    @ssl_certificate.setter
     def ssl_certificate(self, value):
+        """
+        Sets the SSL client certificate to use for authentication.
+
+        :param value: The path to the SSL certificate.
+        :type value: str
+        """
         self._ssl_certificate = value
 
     @property
     def ssl_key(self):
+        """
+        Retrieves the SSL client certificate key used for authentication.
+
+        :returns: The key path
+        """
         return self._ssl_key
 
     @ssl_key.setter
     def ssl_key(self, value):
+        """
+        Sets the SSL client certificate key to use for authentication.
+
+        :param value: The path to the SSL key.
+        :type value: str
+        """
         self._ssl_key = value
 
     @property
     def ssl_ca(self):
+        """
+        Retrieves the SSL Certificate Authority certificate used for authentication.
+
+        :returns: The CA path
+        """
         return self._ssl_ca
 
     @ssl_ca.setter
     def ssl_ca(self, value):
+        """
+        Sets the SSL Certificate Authority certificate used for authentication.
+
+        :param value: The path to the SSL CA certificate.
+        :type value: str
+        """
         self._ssl_ca = value
 
     def __init__(self, interface=("localhost", 10000), use_ssl=False, ssl_certificate=None, ssl_key=None, ssl_ca=None):
@@ -635,7 +668,7 @@ class SocketDevice(Device):
                 self._read_thread.start()
 
     def close(self):
-        """verify_ssl
+        """
         Closes the device.
         """
         self._running = False
