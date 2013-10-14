@@ -231,12 +231,12 @@ def test_factory_watcher():
     overseer.close()
 
 def test_socket():
-    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("singularity.corp.nutech.com", 10000))
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("10.10.0.1", 10000), use_ssl=True, ssl_certificate='tmp/certs/client1.pem', ssl_key='tmp/certs/client1.key', ssl_ca='tmp/certs/ca.pem')
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
     a2u.on_close += handle_close
-    #a2u.on_read += handle_read
+    a2u.on_read += handle_read
     #a2u.on_write += handle_write
 
     #a2u.on_message += handle_message
@@ -259,7 +259,7 @@ def test_socket():
     a2u.open()
     #a2u.save_config()
     #a2u.reboot()
-    a2u.get_config()
+    #a2u.get_config()
 
     #a2u.address = 18
     #a2u.configbits = 0xff00
@@ -270,6 +270,8 @@ def test_socket():
     #a2u.deduplicate = False
 
     time.sleep(3)
+
+    a2u.get_config()
     #a2u.emulate_zone[1] = False
     #a2u.save_config()
 

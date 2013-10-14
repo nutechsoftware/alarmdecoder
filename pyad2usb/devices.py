@@ -11,6 +11,7 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
+from OpenSSL import SSL
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from . import util
@@ -551,7 +552,31 @@ class SocketDevice(Device):
     Serial to IP interface.
     """
 
-    def __init__(self, interface=("localhost", 10000)):
+    @property
+    def ssl_certificiate(self):
+        return self._ssl_certificate
+
+    @ssl_certificiate.setter
+    def ssl_certificate(self, value):
+        self._ssl_certificate = value
+
+    @property
+    def ssl_key(self):
+        return self._ssl_key
+
+    @ssl_key.setter
+    def ssl_key(self, value):
+        self._ssl_key = value
+
+    @property
+    def ssl_ca(self):
+        return self._ssl_ca
+
+    @ssl_ca.setter
+    def ssl_ca(self, value):
+        self._ssl_ca = value
+
+    def __init__(self, interface=("localhost", 10000), use_ssl=False, ssl_certificate=None, ssl_key=None, ssl_ca=None):
         """
         Constructor
         """
@@ -559,6 +584,10 @@ class SocketDevice(Device):
 
         self._interface = interface
         self._host, self._port = interface
+        self._use_ssl = use_ssl
+        self._ssl_certificate = ssl_certificate
+        self._ssl_key = ssl_key
+        self._ssl_ca = ssl_ca
 
     def open(self, baudrate=None, interface=None, index=0, no_reader_thread=False):
         """
@@ -581,6 +610,15 @@ class SocketDevice(Device):
 
         try:
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+            if self._use_ssl:
+                ctx = SSL.Context(SSL.TLSv1_METHOD)
+                ctx.use_privatekey_file(self.ssl_key)
+                ctx.use_certificate_file(self.ssl_certificate)
+                ctx.load_verify_locations(self.ssl_ca, None)
+                ctx.set_verify(SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT | SSL.VERIFY_CLIENT_ONCE, self._verify_ssl_callback)
+                self._device = SSL.Connection(ctx, self._device)
+
             self._device.connect((self._host, self._port))
 
             self._id = '{0}:{1}'.format(self._host, self._port)
@@ -597,7 +635,7 @@ class SocketDevice(Device):
                 self._read_thread.start()
 
     def close(self):
-        """
+        """verify_ssl
         Closes the device.
         """
         self._running = False
@@ -687,7 +725,7 @@ class SocketDevice(Device):
             while timeout_event.reading:
                 buf = self._device.recv(1)
 
-                if buf != '':
+                if buf != '':verify_ssl
                     self._buffer += buf
 
                     if buf == "\n":
@@ -721,3 +759,7 @@ class SocketDevice(Device):
                 raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
+
+    def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):
+        #print ok
+        return ok
