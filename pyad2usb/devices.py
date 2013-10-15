@@ -110,6 +110,11 @@ class Device(object):
                 except util.TimeoutError, err:
                     pass
 
+                except Exception, err:
+                    self._running = False
+
+                    raise err
+
                 time.sleep(0.01)
 
 class USBDevice(Device):
@@ -139,7 +144,7 @@ class USBDevice(Device):
             devices = Ftdi.find_all([(USBDevice.FTDI_VENDOR_ID, USBDevice.FTDI_PRODUCT_ID)], nocache=True)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.CommError('Error enumerating AD2USB devices: {0}'.format(str(err)))
+            raise util.CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
 
         return devices
 
@@ -207,7 +212,7 @@ class USBDevice(Device):
             self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.NoDeviceError('Error opening device: {0}'.format(str(err)))
+            raise util.NoDeviceError('Error opening device: {0}'.format(str(err)), err)
 
         else:
             self._running = True
@@ -248,7 +253,7 @@ class USBDevice(Device):
 
             self.on_write(data)
         except FtdiError, err:
-            raise util.CommError('Error writing to device: {0}'.format(str(err)))
+            raise util.CommError('Error writing to device: {0}'.format(str(err)), err)
 
     def read(self):
         """
@@ -263,7 +268,7 @@ class USBDevice(Device):
             ret = self._device.read_data(1)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
 
@@ -318,7 +323,7 @@ class USBDevice(Device):
         except (usb.core.USBError, FtdiError), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
@@ -365,7 +370,7 @@ class SerialDevice(Device):
                 devices = serial.tools.list_ports.comports()
 
         except SerialException, err:
-            raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)))
+            raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
 
         return devices
 
@@ -420,7 +425,7 @@ class SerialDevice(Device):
                                                         #       all issues with it.
 
         except (serial.SerialException, ValueError), err:
-            raise util.NoDeviceError('Error opening device on port {0}.'.format(interface))
+            raise util.NoDeviceError('Error opening device on port {0}.'.format(interface), err)
 
         else:
             self._running = True
@@ -460,7 +465,7 @@ class SerialDevice(Device):
             pass
 
         except serial.SerialException, err:
-            raise util.CommError('Error writing to device.')
+            raise util.CommError('Error writing to device.', err)
 
         else:
             self.on_write(data)
@@ -478,7 +483,7 @@ class SerialDevice(Device):
             ret = self._device.read(1)
 
         except serial.SerialException, err:
-            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
 
@@ -529,7 +534,7 @@ class SerialDevice(Device):
         except (OSError, serial.SerialException), err:
             timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
@@ -635,7 +640,7 @@ class SocketDevice(Device):
         :param no_reader_thread: Whether or not to automatically open the reader thread.
         :type no_reader_thread: bool
 
-        :raises: util.NoDeviceError
+        :raises: util.NoDeviceError, util.CommError
         """
         if interface is not None:
             self._interface = interface
@@ -645,19 +650,24 @@ class SocketDevice(Device):
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             if self._use_ssl:
-                ctx = SSL.Context(SSL.TLSv1_METHOD)
-                ctx.use_privatekey_file(self.ssl_key)
-                ctx.use_certificate_file(self.ssl_certificate)
-                ctx.load_verify_locations(self.ssl_ca, None)
-                ctx.set_verify(SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT | SSL.VERIFY_CLIENT_ONCE, self._verify_ssl_callback)
-                self._device = SSL.Connection(ctx, self._device)
+                try:
+                    ctx = SSL.Context(SSL.TLSv1_METHOD)
+                    ctx.use_privatekey_file(self.ssl_key)
+                    ctx.use_certificate_file(self.ssl_certificate)
+                    ctx.load_verify_locations(self.ssl_ca, None)
+                    ctx.set_verify(SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT | SSL.VERIFY_CLIENT_ONCE, self._verify_ssl_callback)
+
+                    self._device = SSL.Connection(ctx, self._device)
+
+                except SSL.Error, err:
+                    raise util.CommError('Error setting up SSL connection.', err)
 
             self._device.connect((self._host, self._port))
 
             self._id = '{0}:{1}'.format(self._host, self._port)
 
         except socket.error, err:
-            raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port))
+            raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port), err)
 
         else:
             self._running = True
@@ -703,8 +713,8 @@ class SocketDevice(Device):
 
             self.on_write(data)
 
-        except socket.error, err:
-            raise util.CommError('Error writing to device: {0}'.format(str(err)))
+        except (SSL.Error, socket.error), err:
+            raise util.CommError('Error writing to device.', err)
 
         return data_sent
 
@@ -721,7 +731,7 @@ class SocketDevice(Device):
             data = self._device.recv(1)
 
         except socket.error, err:
-            raise util.CommError('Error while reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error while reading from device: {0}'.format(str(err)), err)
 
         return data
 
@@ -758,7 +768,7 @@ class SocketDevice(Device):
             while timeout_event.reading:
                 buf = self._device.recv(1)
 
-                if buf != '':verify_ssl
+                if buf != '':
                     self._buffer += buf
 
                     if buf == "\n":
@@ -776,7 +786,7 @@ class SocketDevice(Device):
         except socket.error, err:
             timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)))
+            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
