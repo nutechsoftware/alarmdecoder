@@ -6,6 +6,7 @@ import signal
 import traceback
 import sys
 import logging
+from OpenSSL import SSL
 
 running = True
 
@@ -238,22 +239,22 @@ def test_socket():
     a2u.on_close += handle_close
     a2u.on_read += handle_read
     #a2u.on_write += handle_write
-
-    #a2u.on_message += handle_message
-    a2u.on_power_changed += handle_power_changed
-    a2u.on_alarm += handle_alarm_bell
-    a2u.on_bypass += handle_bypass
-    a2u.on_boot += handle_boot
-    a2u.on_config_received += handle_config
-    a2u.on_arm += handle_arm
-    a2u.on_disarm += handle_disarm
-    a2u.on_zone_fault += handle_fault
-    a2u.on_zone_restore += handle_restore
     #
-    a2u.on_fire += handle_fire
-    a2u.on_low_battery += handle_battery
-    a2u.on_lrr_message += handle_lrr
-    a2u.on_panic += handle_panic
+    #a2u.on_message += handle_message
+    #a2u.on_power_changed += handle_power_changed
+    #a2u.on_alarm += handle_alarm_bell
+    #a2u.on_bypass += handle_bypass
+    #a2u.on_boot += handle_boot
+    #a2u.on_config_received += handle_config
+    #a2u.on_arm += handle_arm
+    #a2u.on_disarm += handle_disarm
+    #a2u.on_zone_fault += handle_fault
+    #a2u.on_zone_restore += handle_restore
+    #
+    #a2u.on_fire += handle_fire
+    #a2u.on_low_battery += handle_battery
+    #a2u.on_lrr_message += handle_lrr
+    #a2u.on_panic += handle_panic
 
 
     a2u.open()
