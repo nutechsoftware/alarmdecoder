@@ -655,7 +655,7 @@ class SocketDevice(Device):
                     ctx.use_privatekey_file(self.ssl_key)
                     ctx.use_certificate_file(self.ssl_certificate)
                     ctx.load_verify_locations(self.ssl_ca, None)
-                    ctx.set_verify(SSL.VERIFY_PEER | SSL.VERIFY_FAIL_IF_NO_PEER_CERT | SSL.VERIFY_CLIENT_ONCE, self._verify_ssl_callback)
+                    ctx.set_verify(SSL.VERIFY_PEER, self._verify_ssl_callback)
 
                     self._device = SSL.Connection(ctx, self._device)
 
