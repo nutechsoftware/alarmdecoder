@@ -106,6 +106,9 @@ def handle_panic(sender, args):
 def handle_rfx(sender, args):
     print 'RFX', args
 
+def handle_relay(sender, args):
+    print 'RELAY', args
+
 def upload_usb():
     dev = pyad2usb.ad2usb.devices.USBDevice()
 
@@ -254,6 +257,7 @@ def test_socket():
     a2u.on_zone_fault += handle_fault
     a2u.on_zone_restore += handle_restore
     a2u.on_rfx_message += handle_rfx
+    a2u.on_relay_changed += handle_relay
     #
     #a2u.on_fire += handle_fire
     #a2u.on_low_battery += handle_battery

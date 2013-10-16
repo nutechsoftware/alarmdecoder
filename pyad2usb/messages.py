@@ -138,9 +138,9 @@ class ExpanderMessage(object):
         address, channel, value = values.split(',')
 
         self.raw = data
-        self.address = address
-        self.channel = channel
-        self.value = value
+        self.address = int(address)
+        self.channel = int(channel)
+        self.value = int(value)
 
         if header == '!EXP':
             self.type = ExpanderMessage.ZONE
@@ -173,7 +173,7 @@ class RFMessage(object):
         """
         String conversion operator.
         """
-        return 'rf > {0}: {1}'.format(self.serial_number, self.value)
+        return 'rf > {0}: {1:x}'.format(self.serial_number, self.value)
 
     def _parse_message(self, data):
         """

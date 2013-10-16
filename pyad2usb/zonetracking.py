@@ -82,13 +82,14 @@ class Zonetracker(object):
                 zone = self._expander_to_zone(int(message.address), int(message.channel))
 
                 status = Zone.CLEAR
-                if int(message.value) == 1:
+                if message.value == 1:
                     status = Zone.FAULT
-                elif int(message.value) == 2:
+                elif message.value == 2:
                     status = Zone.CHECK
 
                 try:
                     self._update_zone(zone, status=status)
+
                 except IndexError:
                     self._add_zone(zone, status=status)
 
@@ -114,7 +115,6 @@ class Zonetracker(object):
                 # of whether or not the 3-digit mode is enabled... so we have to pull it out of the
                 # alpha message.
                 if zone == 191:
-                    # TODO: parse message text.
                     zone_regex = re.compile('^CHECK (\d+).*$')
 
                     m = zone_regex.match(message.text)
@@ -127,6 +127,7 @@ class Zonetracker(object):
                 if zone in self._zones_faulted:
                     self._update_zone(zone)
                     self._clear_zones(zone)
+
                 else:
                     status = Zone.FAULT
                     if message.check_zone:

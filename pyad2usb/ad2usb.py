@@ -191,6 +191,7 @@ class AD2USB(object):
     on_zone_restore = event.Event('Called when the device detects that a fault is restored.')
     on_low_battery = event.Event('Called when the device detects a low battery.')
     on_panic = event.Event('Called when the device detects a panic.')
+    on_relay_changed = event.Event('Called when a relay is opened or closed on an expander board.')
 
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
@@ -235,6 +236,7 @@ class AD2USB(object):
         self._fire_status = (False, 0)
         self._battery_status = (False, 0)
         self._panic_status = None
+        self._relay_status = dict()
 
         self.address = 18
         self.configbits = 0xFF00
@@ -387,13 +389,18 @@ class AD2USB(object):
 
             if header == '!EXP' or header == '!REL':
                 msg = messages.ExpanderMessage(data)
+
                 self._update_internal_states(msg)
+
             elif header == '!RFX':
                 msg = self._handle_rfx(data)
+
             elif header == '!LRR':
                 msg = self._handle_lrr(data)
+
             elif data.startswith('!Ready'):
                 self.on_boot()
+
             elif data.startswith('!CONFIG'):
                 self._handle_config(data)
 
@@ -509,6 +516,12 @@ class AD2USB(object):
                 if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2USB.FIRE_TIMEOUT:
                     self._fire_status = (message.fire_alarm, time.time())
                     self.on_fire(self._fire_status)
+
+        elif isinstance(message, messages.ExpanderMessage):
+            if message.type == messages.ExpanderMessage.RELAY:
+                self._relay_status[(message.address, message.channel)] = message.value
+
+                self.on_relay_changed(message)
 
         self._update_zone_tracker(message)
 
