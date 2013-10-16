@@ -30,8 +30,8 @@ def main():
 
         while running:
             ifh, ofh, efh = select.select([sys.stdin, dev._device], [], [], 0)
-            for h in ifh:
 
+            for h in ifh:
                 if h == sys.stdin:
                     data = h.read(1)
 
