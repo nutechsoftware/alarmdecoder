@@ -6,15 +6,6 @@ import termios, tty
 import time
 
 def main():
-    def handle_open(sender, args):
-        print "Connection open.\r"
-
-    def handle_close(sender, args):
-        print "Connection closed.\r"
-
-    def handle_read(sender, args):
-        print '<', args, "\r"
-
     if len(sys.argv) != 5:
         print "Syntax: sslterm.py [host:port] [ca cert] [client cert] [client key]\r"
         return 1
@@ -30,52 +21,37 @@ def main():
     tty.setraw(sys.stdin.fileno())
 
     try:
+        print "Opening connection to {0}:{1}\r".format(host, port)
+
         dev = pyad2usb.ad2usb.devices.SocketDevice(interface=(host, int(port)), use_ssl=True, ssl_certificate=client_cert, ssl_key=client_key, ssl_ca=ca_cert)
-
-        a2u = pyad2usb.ad2usb.AD2USB(dev)
-        a2u.on_open += handle_open
-        a2u.on_close += handle_close
-        a2u.on_read += handle_read
-
-        a2u.open()
-        #dev.open(no_reader_thread=True)
+        dev.open(no_reader_thread=True)
+        dev.write("\r")     # HACK: Prime the pump.  This likely has to do with the SSL handshake
+                            #       not being completed when we get down to the select.
 
         while running:
-            data = None
+            ifh, ofh, efh = select.select([sys.stdin, dev._device], [], [], 0)
+            for h in ifh:
 
-            ifh, ofh, efh = select.select([sys.stdin], [], [], 0)
-            if ifh:
-                data = sys.stdin.read(1)
+                if h == sys.stdin:
+                    data = h.read(1)
 
-                if data:
+                    # Break out if we get a CTRL-C
                     if data == "\x03":
                         print "Exiting..\r"
                         running = False
                         break
 
                     else:
-                        a2u.send(data)
+                        dev.write(data)
 
-        a2u.close()
+                else:
+                    data = h.read(100)
 
-            #ifh, ofh, efh = select.select([sys.stdin, dev._device], [], [], 0)
-            #for h in ifh:
-            #    data = h.read(1)
-            #
-            #    if h == sys.stdin:
-            #        if data == "\x03":
-            #            print "Exiting..\r"
-            #            running = False
-            #            break
-            #
-            #        else:
-            #            dev.write(data)
-            #
-            #    else:
-            #        sys.stdout.write(data)
-            #        sys.stdout.flush()
+                    sys.stdout.write(data)
+                    sys.stdout.flush()
 
-        #dev.close()
+        dev.close()
+        print "Connection closed.\r"
 
     finally:
         termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old_term_settings)
