@@ -162,6 +162,9 @@ class RFMessage(object):
         self.raw = None
         self.serial_number = None
         self.value = None
+        self.battery = None
+        self.supervision = None
+        self.loop = dict()
 
         if data is not None:
             self._parse_message(data)
@@ -183,6 +186,18 @@ class RFMessage(object):
 
         _, values = data.split(':')
         self.serial_number, self.value = values.split(',')
+        self.value = int(self.value, 16)
+
+        test_bit = lambda v, b: v & (1 << b) > 0
+
+        # Bit 1 = unknown
+        self.battery = test_bit(self.value, 2)
+        self.supervision = test_bit(self.value, 3)
+        # Bit 8 = unknown
+        self.loop[0] = test_bit(self.value, 5)
+        self.loop[1] = test_bit(self.value, 6)
+        self.loop[2] = test_bit(self.value, 7)
+        self.loop[3] = test_bit(self.value, 8)
 
 class LRRMessage(object):
     """

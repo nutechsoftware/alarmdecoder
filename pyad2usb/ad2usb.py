@@ -195,6 +195,7 @@ class AD2USB(object):
     # Mid-level Events
     on_message = event.Event('Called when a message has been received from the device.')
     on_lrr_message = event.Event('Called when an LRR message is received.')
+    on_rfx_message = event.Event('Called when an RFX message is received.')
 
     # Low-level Events
     on_open = event.Event('Called when the device has been opened.')
@@ -388,13 +389,20 @@ class AD2USB(object):
                 msg = messages.ExpanderMessage(data)
                 self._update_internal_states(msg)
             elif header == '!RFX':
-                msg = messages.RFMessage(data)
+                msg = self._handle_rfx(data)
             elif header == '!LRR':
                 msg = self._handle_lrr(data)
             elif data.startswith('!Ready'):
                 self.on_boot()
             elif data.startswith('!CONFIG'):
                 self._handle_config(data)
+
+        return msg
+
+    def _handle_rfx(self, data):
+        msg = messages.RFMessage(data)
+
+        self.on_rfx_message(msg)
 
         return msg
 
