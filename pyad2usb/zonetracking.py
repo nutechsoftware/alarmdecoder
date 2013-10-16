@@ -2,6 +2,7 @@
 Provides zone tracking functionality for the AD2USB device family.
 """
 
+import re
 import time
 from .event import event
 from . import messages
@@ -108,6 +109,19 @@ class Zonetracker(object):
                     zone = int(message.numeric_code)
                 except ValueError:
                     zone = int(message.numeric_code, 16)
+
+                # NOTE: Odd case for ECP failures.  Apparently they report as zone 191 (0xBF) regardless
+                # of whether or not the 3-digit mode is enabled... so we have to pull it out of the
+                # alpha message.
+                if zone == 191:
+                    # TODO: parse message text.
+                    zone_regex = re.compile('^CHECK (\d+).*$')
+
+                    m = zone_regex.match(message.text)
+                    if m is None:
+                        return
+
+                    zone = m.group(1)
 
                 # Add new zones and clear expired ones.
                 if zone in self._zones_faulted:
