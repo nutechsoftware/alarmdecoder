@@ -164,7 +164,7 @@ class RFMessage(object):
         self.value = None
         self.battery = None
         self.supervision = None
-        self.loop = dict()
+        self.loop = {}
 
         if data is not None:
             self._parse_message(data)

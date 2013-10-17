@@ -236,7 +236,7 @@ class AD2USB(object):
         self._fire_status = (False, 0)
         self._battery_status = (False, 0)
         self._panic_status = None
-        self._relay_status = dict()
+        self._relay_status = {}
 
         self.address = 18
         self.configbits = 0xFF00
