@@ -79,7 +79,7 @@ class Zonetracker(object):
 
         if isinstance(message, messages.ExpanderMessage):
             if message.type == messages.ExpanderMessage.ZONE:
-                zone = self._expander_to_zone(int(message.address), int(message.channel))
+                zone = self._expander_to_zone(message.address, message.channel)
 
                 status = Zone.CLEAR
                 if message.value == 1:

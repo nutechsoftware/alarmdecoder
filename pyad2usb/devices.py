@@ -72,6 +72,20 @@ class Device(object):
         """
         self._read_thread.stop()
 
+    def close(self):
+        """
+        Closes the device.
+        """
+        try:
+            self._running = False
+            self._read_thread.stop()
+            self._device.close()
+
+        except:
+            pass
+
+        self.on_close()
+
     class ReadThread(threading.Thread):
         """
         Reader thread which processes messages from the device.
@@ -113,7 +127,7 @@ class Device(object):
                 except Exception, err:
                     self._running = False
 
-                    raise err
+                    #raise err
 
                 time.sleep(0.01)
 
@@ -226,18 +240,13 @@ class USBDevice(Device):
         Closes the device.
         """
         try:
-            self._running = False
-            self._read_thread.stop()
-
-            self._device.close()
-
             # HACK: Probably should fork pyftdi and make this call in .close().
             self._device.usb_dev.attach_kernel_driver(self._interface)
 
+            super(USBDevice, self).close()
+
         except:
             pass
-
-        self.on_close()
 
     def write(self, data):
         """
@@ -439,15 +448,10 @@ class SerialDevice(Device):
         Closes the device.
         """
         try:
-            self._running = False
-            self._read_thread.stop()
-
-            self._device.close()
+            super(SerialDevice, self).close()
 
         except:
             pass
-
-        self.on_close()
 
     def write(self, data):
         """
@@ -556,6 +560,15 @@ class SocketDevice(Device):
     Device that supports communication with an AD2USB that is exposed via ser2sock or another
     Serial to IP interface.
     """
+
+    @property
+    def ssl(self):
+        """
+        Retrieves whether or not the device is using SSL.
+
+        :returns: Whether or not the device is using SSL.
+        """
+        return self._use_ssl
 
     @property
     def ssl_certificate(self):
@@ -681,17 +694,16 @@ class SocketDevice(Device):
         """
         Closes the device.
         """
-        self._running = False
-
         try:
-            self._read_thread.stop()
-            self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
-            self._device.close()
+            if self.ssl:
+                self._device.shutdown()
+            else:
+                self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
 
-        except:
+            super(SocketDevice, self).close()
+
+        except Exception, ex:
             pass
-
-        self.on_close()
 
     def write(self, data):
         """
