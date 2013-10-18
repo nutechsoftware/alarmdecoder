@@ -139,29 +139,31 @@ def upload_socket():
     dev.close()
 
 def test_usb():
-    dev = pyad2usb.ad2usb.devices.USBDevice()
+    global running
 
-    a2u = pyad2usb.ad2usb.AD2USB(dev)
-    a2u.on_open += handle_open
-    a2u.on_close += handle_close
-    a2u.on_read += handle_read
-    a2u.on_write += handle_write
+    dev = pyad2usb.ad2usb.devices.USBDevice(interface=(0, 0))
 
-    a2u.on_power_changed += handle_power_changed
-    a2u.on_alarm += handle_alarm_bell
-    a2u.on_bypass += handle_bypass
+    #a2u = pyad2usb.ad2usb.AD2USB(dev)
+    dev.on_open += handle_open
+    dev.on_close += handle_close
+    dev.on_read += handle_read
+    dev.on_write += handle_write
 
-    a2u.open()
+    #a2u.on_power_changed += handle_power_changed
+    #a2u.on_alarm += handle_alarm_bell
+    #a2u.on_bypass += handle_bypass
 
-    print dev._id
+    dev.open()
+
+    print dev.id
 
     while running:
         time.sleep(0.1)
 
-    a2u.close()
+    dev.close()
 
 def test_serial():
-    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB0')
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB1')
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -188,21 +190,21 @@ def test_serial():
     #dev.close()
 
 def test_usb_serial():
-    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB5')
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB1')
 
-    a2u = pyad2usb.ad2usb.AD2USB(dev)
-    a2u.on_open += handle_open
-    a2u.on_close += handle_close
-    a2u.on_read += handle_read
-    a2u.on_write += handle_write
+    #a2u = pyad2usb.ad2usb.AD2USB(dev)
+    dev.on_open += handle_open
+    dev.on_close += handle_close
+    dev.on_read += handle_read
+    dev.on_write += handle_write
 
-    a2u.open(baudrate=115200)
+    dev.open(baudrate=115200)
     print dev._id
 
     while running:
         time.sleep(0.1)
 
-    a2u.close()
+    dev.close()
 
 def test_factory():
     a2u = pyad2usb.ad2usb.Overseer.create()
@@ -238,7 +240,11 @@ def test_factory_watcher():
     overseer.close()
 
 def test_socket():
-    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("10.10.0.1", 10000), use_ssl=True, ssl_certificate='tmp/certs/client1.pem', ssl_key='tmp/certs/client1.key', ssl_ca='tmp/certs/ca.pem')
+    dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("10.10.0.1", 10000))
+    dev.ssl = True
+    dev.ssl_certificate = 'tmp/certs/client1.pem'
+    dev.ssl_key = 'tmp/certs/client1.key'
+    dev.ssl_ca = 'tmp/certs/ca.pem'
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -324,7 +330,13 @@ def test_no_read_thread():
     dev.close()
 
 def test_serial_grep():
-    re =  pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=9710:7840')
+    re = pyad2usb.devices.SerialDevice.find_all(pattern='VID:PID=0403:6001')
+    print 'serial'
+    for x in re:
+        print x
+
+    print 'usb'
+    re = pyad2usb.devices.USBDevice.find_all()
     for x in re:
         print x
 

@@ -255,7 +255,7 @@ class AD2USB(object):
         """
         return self._device.id
 
-    def open(self, baudrate=None, interface=None, index=None, no_reader_thread=False):
+    def open(self, baudrate=None, no_reader_thread=False):
         """
         Opens the device.
 
@@ -269,7 +269,7 @@ class AD2USB(object):
         :type no_reader_thread: bool
         """
         self._wire_events()
-        self._device.open(baudrate=baudrate, interface=interface, index=index, no_reader_thread=no_reader_thread)
+        self._device.open(baudrate=baudrate, no_reader_thread=no_reader_thread)
 
     def close(self):
         """

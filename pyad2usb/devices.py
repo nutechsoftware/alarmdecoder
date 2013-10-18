@@ -34,7 +34,6 @@ class Device(object):
         """
         self._id = ''
         self._buffer = ''
-        self._interface = None
         self._device = None
         self._running = False
         self._read_thread = Device.ReadThread(self)
@@ -162,38 +161,88 @@ class USBDevice(Device):
 
         return devices
 
-    def __init__(self, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID, serial=None, description=None, interface=0):
+    @property
+    def interface(self):
+        """
+        Retrieves the interface used to connect to the device.
+
+        :returns: the interface used to connect to the device.
+        """
+        return (self._device_number, self._endpoint)
+
+    @interface.setter
+    def interface(self, value):
+        """
+        Sets the interface used to connect to the device.
+
+        :param value: Tuple containing the device number and endpoint number to use.
+        :type value: tuple
+        """
+        self._device_number = value[0]
+        self._endpoint = value[1]
+
+    @property
+    def serial_number(self):
+        """
+        Retrieves the serial number of the device.
+
+        :returns: The serial number of the device.
+        """
+
+        return self._serial_number
+
+    @serial_number.setter
+    def serial_number(self, value):
+        """
+        Sets the serial number of the device.
+
+        :param value: The serial number of the device.
+        :type value: string
+        """
+        self._serial_number = value
+
+    @property
+    def description(self):
+        """
+        Retrieves the description of the device.
+
+        :returns: The description of the device.
+        """
+        return self._description
+
+    @description.setter
+    def description(self, value):
+        """
+        Sets the description of the device.
+
+        :param value: The description of the device.
+        :type value: string
+        """
+        self._description = value
+
+    def __init__(self, interface=(0, 0)):
         """
         Constructor
 
-        :param vid: Vendor ID
-        :type vid: int
-        :param pid: Product ID
-        :type pid: int
-        :param serial: The serial number
-        :type serial: str
-        :param description: Description of the device.
-        :type description: str
-        :param interface: The interface to use
-        :type interface: int
+        :param interface: Tuple containing the device number and endpoint number to use.
+        :type interface: tuple
         """
         Device.__init__(self)
 
         self._device = Ftdi()
-        self._interface = interface
-        self._vendor_id = vid
-        self._product_id = pid
-        self._serial_number = serial
-        self._description = description
+        self._device_number = interface[0]
+        self._endpoint = interface[1]
+        self._vendor_id = USBDevice.FTDI_VENDOR_ID
+        self._product_id = USBDevice.FTDI_PRODUCT_ID
+        self._serial_number = None
+        self._description = None
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=0, no_reader_thread=False):
+    def open(self, baudrate=BAUDRATE, no_reader_thread=False):
         """
         Opens the device.
 
         :param baudrate: The baudrate to use.
         :type baudrate: int
-        :param interface: The interface to use.
-        :type interface: int
         :param no_reader_thread: Whether or not to automatically start the reader thread.
         :type no_reader_thread: bool
 
@@ -203,21 +252,12 @@ class USBDevice(Device):
         if baudrate is None:
             baudrate = USBDevice.BAUDRATE
 
-        if self._interface is None and interface is None:
-            self._interface = 0
-
-        if interface is not None:
-            self._interface = interface
-
-        if index is None:
-            index = 0
-
         # Open the device and start up the thread.
         try:
             self._device.open(self._vendor_id,
                              self._product_id,
-                             self._interface,
-                             index,
+                             self._endpoint,
+                             self._device_number,
                              self._serial_number,
                              self._description)
 
@@ -241,9 +281,9 @@ class USBDevice(Device):
         """
         try:
             # HACK: Probably should fork pyftdi and make this call in .close().
-            self._device.usb_dev.attach_kernel_driver(self._interface)
+            self._device.usb_dev.attach_kernel_driver(self._device_number)
 
-            super(USBDevice, self).close()
+            Device.close(self)
 
         except:
             pass
@@ -383,6 +423,25 @@ class SerialDevice(Device):
 
         return devices
 
+    @property
+    def interface(self):
+        """
+        Retrieves the interface used to connect to the device.
+
+        :returns: the interface used to connect to the device.
+        """
+        return self._port
+
+    @interface.setter
+    def interface(self, value):
+        """
+        Sets the interface used to connect to the device.
+
+        :param value: The name of the serial device.
+        :type value: string
+        """
+        self._port = value
+
     def __init__(self, interface=None):
         """
         Constructor
@@ -392,20 +451,16 @@ class SerialDevice(Device):
         """
         Device.__init__(self)
 
-        self._interface = interface
+        self._port = interface
         self._id = interface
         self._device = serial.Serial(timeout=0, writeTimeout=0)     # Timeout = non-blocking to match pyftdi.
 
-    def open(self, baudrate=BAUDRATE, interface=None, index=None, no_reader_thread=False):
+    def open(self, baudrate=BAUDRATE, no_reader_thread=False):
         """
         Opens the device.
 
         :param baudrate: The baudrate to use with the device.
         :type baudrate: int
-        :param interface: The device to open.
-        :type interface: str
-        :param index: Unused.
-        :type index: int
         :param no_reader_thread: Whether or not to automatically start the reader thread.
         :type no_reader_thread: bool
 
@@ -415,13 +470,10 @@ class SerialDevice(Device):
         if baudrate is None:
             baudrate = SerialDevice.BAUDRATE
 
-        if self._interface is None and interface is None:
+        if self._port is None:
             raise util.NoDeviceError('No device interface specified.')
 
-        if interface is not None:
-            self._interface = interface
-
-        self._device.port = self._interface
+        self._device.port = self._port
 
         # Open the device and start up the reader thread.
         try:
@@ -434,7 +486,7 @@ class SerialDevice(Device):
                                                         #       all issues with it.
 
         except (serial.SerialException, ValueError), err:
-            raise util.NoDeviceError('Error opening device on port {0}.'.format(interface), err)
+            raise util.NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
 
         else:
             self._running = True
@@ -448,7 +500,7 @@ class SerialDevice(Device):
         Closes the device.
         """
         try:
-            super(SerialDevice, self).close()
+            Device.close(self)
 
         except:
             pass
@@ -562,6 +614,26 @@ class SocketDevice(Device):
     """
 
     @property
+    def interface(self):
+        """
+        Retrieves the interface used to connect to the device.
+
+        :returns: the interface used to connect to the device.
+        """
+        return (self._host, self._port)
+
+    @interface.setter
+    def interface(self, value):
+        """
+        Sets the interface used to connect to the device.
+
+        :param value: Tuple containing the device number and endpoint number to use.
+        :type value: tuple
+        """
+        self._host = value[0]
+        self._port = value[1]
+
+    @property
     def ssl(self):
         """
         Retrieves whether or not the device is using SSL.
@@ -569,6 +641,16 @@ class SocketDevice(Device):
         :returns: Whether or not the device is using SSL.
         """
         return self._use_ssl
+
+    @ssl.setter
+    def ssl(self, value):
+        """
+        Sets whether or not SSL communication is in use.
+
+        :param value: Whether or not SSL communication is in use.
+        :type value: bool
+        """
+        self._use_ssl = value
 
     @property
     def ssl_certificate(self):
@@ -627,37 +709,32 @@ class SocketDevice(Device):
         """
         self._ssl_ca = value
 
-    def __init__(self, interface=("localhost", 10000), use_ssl=False, ssl_certificate=None, ssl_key=None, ssl_ca=None):
+    def __init__(self, interface=("localhost", 10000)):
         """
         Constructor
+
+        :param interface: Tuple containing the hostname and port of our target.
+        :type interface: tuple
         """
         Device.__init__(self)
 
-        self._interface = interface
         self._host, self._port = interface
-        self._use_ssl = use_ssl
-        self._ssl_certificate = ssl_certificate
-        self._ssl_key = ssl_key
-        self._ssl_ca = ssl_ca
+        self._use_ssl = False
+        self._ssl_certificate = None
+        self._ssl_key = None
+        self._ssl_ca = None
 
-    def open(self, baudrate=None, interface=None, index=0, no_reader_thread=False):
+    def open(self, baudrate=None, no_reader_thread=False):
         """
         Opens the device.
 
         :param baudrate: The baudrate to use
         :type baudrate: int
-        :param interface: The hostname and port to connect to.
-        :type interface: tuple
-        :param index: Unused
-        :type index: int
         :param no_reader_thread: Whether or not to automatically open the reader thread.
         :type no_reader_thread: bool
 
         :raises: util.NoDeviceError, util.CommError
         """
-        if interface is not None:
-            self._interface = interface
-            self._host, self._port = interface
 
         try:
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -700,7 +777,7 @@ class SocketDevice(Device):
             else:
                 self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
 
-            super(SocketDevice, self).close()
+            Device.close(self)
 
         except Exception, ex:
             pass
