@@ -11,7 +11,7 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
-from OpenSSL import SSL
+from OpenSSL import SSL, crypto
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from . import util
@@ -742,9 +742,23 @@ class SocketDevice(Device):
             if self._use_ssl:
                 try:
                     ctx = SSL.Context(SSL.TLSv1_METHOD)
-                    ctx.use_privatekey_file(self.ssl_key)
-                    ctx.use_certificate_file(self.ssl_certificate)
-                    ctx.load_verify_locations(self.ssl_ca, None)
+
+                    if isinstance(self.ssl_key, crypto.PKey):
+                        ctx.use_privatekey(self.ssl_key)
+                    else:
+                        ctx.use_privatekey_file(self.ssl_key)
+
+                    if isinstance(self.ssl_certificate, crypto.X509):
+                        ctx.use_certificate(self.ssl_certificate)
+                    else:
+                        ctx.use_certificate_file(self.ssl_certificate)
+
+                    if isinstance(self.ssl_ca, crypto.X509):
+                        store = ctx.get_cert_store()
+                        store.add_cert(self.ssl_ca)
+                    else:
+                        ctx.load_verify_locations(self.ssl_ca, None)
+
                     ctx.set_verify(SSL.VERIFY_PEER, self._verify_ssl_callback)
 
                     self._device = SSL.Connection(ctx, self._device)
