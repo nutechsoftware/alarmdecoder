@@ -378,31 +378,29 @@ class AD2USB(object):
 
         msg = None
 
-        if data[0] != '!':
+        header = data[0:4]
+        if header[0] != '!' or header == '!KPE':
             msg = messages.Message(data)
 
             if self.address_mask & msg.mask > 0:
                 self._update_internal_states(msg)
 
-        else:   # specialty messages
-            header = data[0:4]
+        elif header == '!EXP' or header == '!REL':
+            msg = messages.ExpanderMessage(data)
 
-            if header == '!EXP' or header == '!REL':
-                msg = messages.ExpanderMessage(data)
+            self._update_internal_states(msg)
 
-                self._update_internal_states(msg)
+        elif header == '!RFX':
+            msg = self._handle_rfx(data)
 
-            elif header == '!RFX':
-                msg = self._handle_rfx(data)
+        elif header == '!LRR':
+            msg = self._handle_lrr(data)
 
-            elif header == '!LRR':
-                msg = self._handle_lrr(data)
+        elif data.startswith('!Ready'):
+            self.on_boot()
 
-            elif data.startswith('!Ready'):
-                self.on_boot()
-
-            elif data.startswith('!CONFIG'):
-                self._handle_config(data)
+        elif data.startswith('!CONFIG'):
+            self._handle_config(data)
 
         return msg
 
