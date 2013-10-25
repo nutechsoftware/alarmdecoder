@@ -23,7 +23,12 @@ def main():
     try:
         print "Opening connection to {0}:{1}\r".format(host, port)
 
-        dev = pyad2usb.ad2usb.devices.SocketDevice(interface=(host, int(port)), use_ssl=True, ssl_certificate=client_cert, ssl_key=client_key, ssl_ca=ca_cert)
+        dev = pyad2usb.ad2usb.devices.SocketDevice(interface=(host, int(port)))
+        dev.ssl = True
+        dev.ssl_certificate = client_cert
+        dev.ssl_key = client_key
+        dev.ssl_ca = ca_cert
+
         dev.open(no_reader_thread=True)
         dev.write("\r")     # HACK: Prime the pump.  This likely has to do with the SSL handshake
                             #       not being completed when we get down to the select.
