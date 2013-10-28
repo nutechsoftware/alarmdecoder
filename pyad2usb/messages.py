@@ -1,5 +1,7 @@
 """
 Message representations received from the panel through the AD2USB.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
 import re
@@ -62,23 +64,25 @@ class Message(object):
         self.bitfield, self.numeric_code, self.panel_data, alpha = m.group(1, 2, 3, 4)
         self.mask = int(self.panel_data[3:3+8], 16)
 
+        is_bit_set = lambda bit: not self.bitfield[bit] == "0"
+
         self.raw = data
-        self.ready = not self.bitfield[1:2] == "0"
-        self.armed_away = not self.bitfield[2:3] == "0"
-        self.armed_home = not self.bitfield[3:4] == "0"
-        self.backlight_on = not self.bitfield[4:5] == "0"
-        self.programming_mode = not self.bitfield[5:6] == "0"
-        self.beeps = int(self.bitfield[6:7], 16)
-        self.zone_bypassed = not self.bitfield[7:8] == "0"
-        self.ac_power = not self.bitfield[8:9] == "0"
-        self.chime_on = not self.bitfield[9:10] == "0"
-        self.alarm_event_occurred = not self.bitfield[10:11] == "0"
-        self.alarm_sounding = not self.bitfield[11:12] == "0"
-        self.battery_low = not self.bitfield[12:13] == "0"
-        self.entry_delay_off = not self.bitfield[13:14] == "0"
-        self.fire_alarm = not self.bitfield[14:15] == "0"
-        self.check_zone = not self.bitfield[15:16] == "0"
-        self.perimeter_only = not self.bitfield[16:17] == "0"
+        self.ready = is_bit_set(1)
+        self.armed_away = is_bit_set(2)
+        self.armed_home = is_bit_set(3)
+        self.backlight_on = is_bit_set(4)
+        self.programming_mode = is_bit_set(5)
+        self.beeps = int(self.bitfield[6], 16)
+        self.zone_bypassed = is_bit_set(7)
+        self.ac_power = is_bit_set(8)
+        self.chime_on = is_bit_set(9)
+        self.alarm_event_occurred = is_bit_set(10)
+        self.alarm_sounding = is_bit_set(11)
+        self.battery_low = is_bit_set(12)
+        self.entry_delay_off = is_bit_set(13)
+        self.fire_alarm = is_bit_set(14)
+        self.check_zone = is_bit_set(15)
+        self.perimeter_only = is_bit_set(16)
         # bits 17-20 unused.
         self.text = alpha.strip('"')
 
@@ -188,16 +192,16 @@ class RFMessage(object):
         self.serial_number, self.value = values.split(',')
         self.value = int(self.value, 16)
 
-        test_bit = lambda v, b: v & (1 << b) > 0
+        is_bit_set = lambda v, b: self.value & (1 << b) > 0
 
         # Bit 1 = unknown
-        self.battery = test_bit(self.value, 2)
-        self.supervision = test_bit(self.value, 3)
+        self.battery = is_bit_set(2)
+        self.supervision = is_bit_set(3)
         # Bit 8 = unknown
-        self.loop[0] = test_bit(self.value, 5)
-        self.loop[1] = test_bit(self.value, 6)
-        self.loop[2] = test_bit(self.value, 7)
-        self.loop[3] = test_bit(self.value, 8)
+        self.loop[0] = is_bit_set(5)
+        self.loop[1] = is_bit_set(6)
+        self.loop[2] = is_bit_set(7)
+        self.loop[3] = is_bit_set(8)
 
 class LRRMessage(object):
     """
