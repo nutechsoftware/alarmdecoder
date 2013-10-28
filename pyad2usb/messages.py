@@ -192,7 +192,7 @@ class RFMessage(object):
         self.serial_number, self.value = values.split(',')
         self.value = int(self.value, 16)
 
-        is_bit_set = lambda v, b: self.value & (1 << b) > 0
+        is_bit_set = lambda b: self.value & (1 << b) > 0
 
         # Bit 1 = unknown
         self.battery = is_bit_set(2)
