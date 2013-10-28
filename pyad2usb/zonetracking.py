@@ -1,5 +1,7 @@
 """
 Provides zone tracking functionality for the AD2USB device family.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
 import re
@@ -96,7 +98,7 @@ class Zonetracker(object):
         else:
             # Panel is ready, restore all zones.
             if message.ready:
-                for idx, z in enumerate(self._zones_faulted):
+                for z in self._zones_faulted:
                     self._update_zone(z, Zone.CLEAR)
 
                 self._last_zone_fault = 0
@@ -150,16 +152,16 @@ class Zonetracker(object):
         :type zone: int
         """
         cleared_zones = []
-        found_last = found_new = at_end = False
+        found_last_faulted = found_current = at_end = False
 
         # First pass: Find our start spot.
         it = iter(self._zones_faulted)
         try:
-            while not found_last:
+            while not found_last_faulted:
                 z = it.next()
 
                 if z == self._last_zone_fault:
-                    found_last = True
+                    found_last_faulted = True
                     break
 
         except StopIteration:
@@ -168,11 +170,11 @@ class Zonetracker(object):
         # Continue until we find our end point and add zones in
         # between to our clear list.
         try:
-            while not at_end and not found_new:
+            while not at_end and not found_current:
                 z = it.next()
 
                 if z == zone:
-                    found_new = True
+                    found_current = True
                     break
                 else:
                     cleared_zones += [z]
@@ -182,15 +184,15 @@ class Zonetracker(object):
 
         # Second pass: roll through the list again if we didn't find
         # our end point and remove everything until we do.
-        if not found_new:
+        if not found_current:
             it = iter(self._zones_faulted)
 
             try:
-                while not found_new:
+                while not found_current:
                     z = it.next()
 
                     if z == zone:
-                        found_new = True
+                        found_current = True
                         break
                     else:
                         cleared_zones += [z]
@@ -199,7 +201,7 @@ class Zonetracker(object):
                 pass
 
         # Actually remove the zones and trigger the restores.
-        for idx, z in enumerate(cleared_zones):
+        for z in cleared_zones:
             self._update_zone(z, Zone.CLEAR)
 
     def _clear_expired_zones(self):
