@@ -1,5 +1,7 @@
 """
 Representations of Panels and their templates.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
 VISTA20 = 0

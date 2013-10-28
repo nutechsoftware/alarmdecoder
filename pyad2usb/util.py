@@ -1,5 +1,7 @@
 """
 Provides utility classes for the AD2USB devices.
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
 import ad2usb

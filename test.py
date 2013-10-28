@@ -143,24 +143,27 @@ def test_usb():
 
     dev = pyad2usb.ad2usb.devices.USBDevice(interface=(0, 0))
 
-    #a2u = pyad2usb.ad2usb.AD2USB(dev)
-    dev.on_open += handle_open
-    dev.on_close += handle_close
-    dev.on_read += handle_read
-    dev.on_write += handle_write
+    a2u = pyad2usb.ad2usb.AD2USB(dev)
+    a2u.on_open += handle_open
+    a2u.on_close += handle_close
+    #a2u.on_read += handle_read
+    #a2u.on_write += handle_write
+    a2u.on_message += handle_message
+    a2u.on_zone_fault += handle_fault
+    a2u.on_zone_restore += handle_restore
 
     #a2u.on_power_changed += handle_power_changed
     #a2u.on_alarm += handle_alarm_bell
     #a2u.on_bypass += handle_bypass
 
-    dev.open()
+    a2u.open()
 
     print dev.id
 
     while running:
         time.sleep(0.1)
 
-    dev.close()
+    a2u.close()
 
 def test_serial():
     dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB1')
@@ -242,9 +245,9 @@ def test_factory_watcher():
 def test_socket():
     dev = pyad2usb.ad2usb.devices.SocketDevice(interface=("10.10.0.1", 10000))
     dev.ssl = True
-    dev.ssl_certificate = 'tmp/certs/client1.pem'
-    dev.ssl_key = 'tmp/certs/client1.key'
-    dev.ssl_ca = 'tmp/certs/ca.pem'
+    dev.ssl_certificate = '../certs-temp/client.pem'
+    dev.ssl_key = '../certs-temp/client.key'
+    dev.ssl_ca = '../certs-temp/ca.pem'
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -252,7 +255,7 @@ def test_socket():
     a2u.on_read += handle_read
     #a2u.on_write += handle_write
     #
-    #a2u.on_message += handle_message
+    a2u.on_message += handle_message
     #a2u.on_power_changed += handle_power_changed
     #a2u.on_alarm += handle_alarm_bell
     #a2u.on_bypass += handle_bypass
@@ -374,14 +377,14 @@ try:
     #test_serial()
     #upload_serial()
 
-    test_usb()
+    #test_usb()
     #test_usb_serial()
     #test_factory()
     #test_factory_watcher()
     #upload_usb()
     #upload_usb_serial()
 
-    #test_socket()
+    test_socket()
     #upload_socket()
 
     #test_no_read_thread()

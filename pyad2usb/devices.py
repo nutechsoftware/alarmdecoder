@@ -4,12 +4,10 @@ Contains different types of devices belonging to the AD2USB family.
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-import usb.core
-import usb.util
+import usb.core, usb.util
 import time
 import threading
-import serial
-import serial.tools.list_ports
+import serial, serial.tools.list_ports
 import socket
 from OpenSSL import SSL, crypto
 from pyftdi.pyftdi.ftdi import *
@@ -301,6 +299,7 @@ class USBDevice(Device):
             self._device.write_data(data)
 
             self.on_write(data)
+
         except FtdiError, err:
             raise util.CommError('Error writing to device: {0}'.format(str(err)), err)
 
@@ -740,31 +739,7 @@ class SocketDevice(Device):
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             if self._use_ssl:
-                try:
-                    ctx = SSL.Context(SSL.TLSv1_METHOD)
-
-                    if isinstance(self.ssl_key, crypto.PKey):
-                        ctx.use_privatekey(self.ssl_key)
-                    else:
-                        ctx.use_privatekey_file(self.ssl_key)
-
-                    if isinstance(self.ssl_certificate, crypto.X509):
-                        ctx.use_certificate(self.ssl_certificate)
-                    else:
-                        ctx.use_certificate_file(self.ssl_certificate)
-
-                    if isinstance(self.ssl_ca, crypto.X509):
-                        store = ctx.get_cert_store()
-                        store.add_cert(self.ssl_ca)
-                    else:
-                        ctx.load_verify_locations(self.ssl_ca, None)
-
-                    ctx.set_verify(SSL.VERIFY_PEER, self._verify_ssl_callback)
-
-                    self._device = SSL.Connection(ctx, self._device)
-
-                except SSL.Error, err:
-                    raise util.CommError('Error setting up SSL connection.', err)
+                self._init_ssl()
 
             self._device.connect((self._host, self._port))
 
@@ -905,6 +880,33 @@ class SocketDevice(Device):
                 raise util.TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
+
+    def _init_ssl(self):
+        try:
+            ctx = SSL.Context(SSL.TLSv1_METHOD)
+
+            if isinstance(self.ssl_key, crypto.PKey):
+                ctx.use_privatekey(self.ssl_key)
+            else:
+                ctx.use_privatekey_file(self.ssl_key)
+
+            if isinstance(self.ssl_certificate, crypto.X509):
+                ctx.use_certificate(self.ssl_certificate)
+            else:
+                ctx.use_certificate_file(self.ssl_certificate)
+
+            if isinstance(self.ssl_ca, crypto.X509):
+                store = ctx.get_cert_store()
+                store.add_cert(self.ssl_ca)
+            else:
+                ctx.load_verify_locations(self.ssl_ca, None)
+
+            ctx.set_verify(SSL.VERIFY_PEER, self._verify_ssl_callback)
+
+            self._device = SSL.Connection(ctx, self._device)
+
+        except SSL.Error, err:
+            raise util.CommError('Error setting up SSL connection.', err)
 
     def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):
         #print ok
