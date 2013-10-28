@@ -1,16 +1,12 @@
 """
-
 Provides the full AD2USB class and factory.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
-
 """
 
 import time
 import threading
 import re
-import logging
-from collections import OrderedDict
 from .event import event
 from . import devices
 from . import util
@@ -19,7 +15,7 @@ from . import zonetracking
 
 class Overseer(object):
     """
-    Factory for creation of AD2USB devices as well as provide4s attach/detach events."
+    Factory for creation of AD2USB devices as well as provides attach/detach events."
     """
 
     # Factory events
@@ -422,7 +418,7 @@ class AD2USB(object):
         """
         msg = messages.LRRMessage(data)
 
-        args = (msg._partition, msg._event_type, msg._event_data)
+        args = (msg.partition, msg.event_type, msg.event_data)
         if msg._event_type == 'ALARM_PANIC':
             self._panic_status = True
             self.on_panic(args + (True,))
@@ -455,14 +451,14 @@ class AD2USB(object):
                 self.address_mask = int(v, 16)
             elif k == 'EXP':
                 for z in range(5):
-                    self.emulate_zone[z] = True if v[z] == 'Y' else False
+                    self.emulate_zone[z] = (v[z] == 'Y')
             elif k == 'REL':
                 for r in range(4):
-                    self.emulate_relay[r] = True if v[r] == 'Y' else False
+                    self.emulate_relay[r] = (v[r] == 'Y')
             elif k == 'LRR':
-                self.emulate_lrr = True if v == 'Y' else False
+                self.emulate_lrr = (v == 'Y')
             elif k == 'DEDUPLICATE':
-                self.deduplicate = True if v == 'Y' else False
+                self.deduplicate = (v == 'Y')
 
         self.on_config_received()
 

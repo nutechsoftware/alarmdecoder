@@ -216,9 +216,9 @@ class LRRMessage(object):
         :type data: str
         """
         self.raw = None
-        self._event_data = None
-        self._partition = None
-        self._event_type = None
+        self.event_data = None
+        self.partition = None
+        self.event_type = None
 
         if data is not None:
             self._parse_message(data)
@@ -239,4 +239,4 @@ class LRRMessage(object):
         self.raw = data
 
         _, values = data.split(':')
-        self._event_data, self._partition, self._event_type = values.split(',')
+        self.event_data, self.partition, self.event_type = values.split(',')
