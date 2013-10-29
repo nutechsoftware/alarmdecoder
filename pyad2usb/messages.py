@@ -227,7 +227,7 @@ class LRRMessage(object):
         """
         String conversion operator.
         """
-        return 'lrr > {0} @ {1} -- {2}'.format()
+        return 'lrr > {0} @ {1} -- {2}'.format(self.event_data, self.partition, self.event_type)
 
     def _parse_message(self, data):
         """
