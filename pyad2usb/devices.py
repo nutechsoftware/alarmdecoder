@@ -271,7 +271,7 @@ class USBDevice(Device):
             if not no_reader_thread:
                 self._read_thread.start()
 
-            self.on_open((self._serial_number, self._description))
+            self.on_open()
 
     def close(self):
         """
@@ -489,7 +489,7 @@ class SerialDevice(Device):
 
         else:
             self._running = True
-            self.on_open(('N/A', "AD2SERIAL"))
+            self.on_open()
 
             if not no_reader_thread:
                 self._read_thread.start()
@@ -751,7 +751,7 @@ class SocketDevice(Device):
         else:
             self._running = True
 
-            self.on_open(('N/A', "AD2SOCKET"))
+            self.on_open()
 
             if not no_reader_thread:
                 self._read_thread.start()

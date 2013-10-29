@@ -421,12 +421,12 @@ class AD2USB(object):
         args = (msg.partition, msg.event_type, msg.event_data)
         if msg._event_type == 'ALARM_PANIC':
             self._panic_status = True
-            self.on_panic(args + (True,))
+            self.on_panic(True)
 
         elif msg._event_type == 'CANCEL':
             if self._panic_status == True:
                 self._panic_status = False
-                self.on_panic(args + (False,))
+                self.on_panic(False)
 
         self.on_lrr_message(args)
 
