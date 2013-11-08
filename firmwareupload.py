@@ -46,7 +46,7 @@ def main():
     print "Flashing device: {0}\r\nFirmware: {1}".format(device, firmware)
 
     dev = pyad2usb.ad2usb.devices.SerialDevice(interface=device)
-    dev.open(interface=device, baudrate=19200)
+    dev.open(baudrate=19200)
 
     time.sleep(3)
     pyad2usb.ad2usb.util.Firmware.upload(dev, firmware, handle_firmware)
