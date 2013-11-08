@@ -166,7 +166,7 @@ def test_usb():
     a2u.close()
 
 def test_serial():
-    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB1')
+    dev = pyad2usb.ad2usb.devices.SerialDevice(interface='/dev/ttyUSB2')
 
     a2u = pyad2usb.ad2usb.AD2USB(dev)
     a2u.on_open += handle_open
@@ -185,6 +185,10 @@ def test_serial():
     #dev.open()
 
     print dev._id
+
+    time.sleep(1)
+
+    a2u.send('V')
 
     while running:
         time.sleep(0.1)
@@ -374,7 +378,7 @@ try:
     logging.basicConfig(level=logging.DEBUG)
     signal.signal(signal.SIGINT, signal_handler)
 
-    #test_serial()
+    test_serial()
     #upload_serial()
 
     #test_usb()
@@ -384,7 +388,7 @@ try:
     #upload_usb()
     #upload_usb_serial()
 
-    test_socket()
+    #test_socket()
     #upload_socket()
 
     #test_no_read_thread()
