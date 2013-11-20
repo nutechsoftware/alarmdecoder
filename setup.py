@@ -24,5 +24,6 @@ setup(name='pyad2',
         'OpenSSL',
         'pyftdi'
     ],
+    scripts=['bin/ad2-sslterm', 'bin/ad2-firmwareupload'],
     include_package_data=True,
     zip_safe=False)
