@@ -6,7 +6,14 @@ Message representations received from the panel through the AD2USB.
 
 import re
 
-class Message(object):
+class BaseMessage(object):
+    """
+    Base class for messages.
+    """
+    def __init__(self):
+        self.raw = None
+
+class Message(BaseMessage):
     """
     Represents a message from the alarm panel.
     """
@@ -95,7 +102,7 @@ class Message(object):
         """
         return 'msg > {0:0<9} [{1}{2}{3}] -- ({4}) {5}'.format(hex(self.mask), 1 if self.ready else 0, 1 if self.armed_away else 0, 1 if self.armed_home else 0, self.numeric_code, self.text)
 
-class ExpanderMessage(object):
+class ExpanderMessage(BaseMessage):
     """
     Represents a message from a zone or relay expansion module.
     """
@@ -151,7 +158,7 @@ class ExpanderMessage(object):
         elif header == '!REL':
             self.type = ExpanderMessage.RELAY
 
-class RFMessage(object):
+class RFMessage(BaseMessage):
     """
     Represents a message from an RF receiver.
     """
@@ -203,7 +210,7 @@ class RFMessage(object):
         self.loop[2] = is_bit_set(7)
         self.loop[3] = is_bit_set(8)
 
-class LRRMessage(object):
+class LRRMessage(BaseMessage):
     """
     Represent a message from a Long Range Radio.
     """
