@@ -21,9 +21,11 @@ setup(name='pyad2',
     license='',
     packages=['pyad2'],
     install_requires=[
-        'OpenSSL',
+        'pyopenssl',
         'pyftdi'
     ],
+    test_suite='nose.collector',
+    tests_require=['nose', 'mock'],
     scripts=['bin/ad2-sslterm', 'bin/ad2-firmwareupload'],
     include_package_data=True,
     zip_safe=False)
