@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
-import pyad2usb.ad2usb
+import pyad2.ad2
 import sys, select
 import termios, tty
 import time
 
 def main():
     if len(sys.argv) != 5:
-        print "Syntax: sslterm.py [host:port] [ca cert] [client cert] [client key]\r"
+        print "Syntax: {0} [host:port] [ca cert] [client cert] [client key]\r".format(sys.argv[0])
         return 1
 
     host, port = sys.argv[1].split(':')
@@ -23,7 +23,7 @@ def main():
     try:
         print "Opening connection to {0}:{1}\r".format(host, port)
 
-        dev = pyad2usb.ad2usb.devices.SocketDevice(interface=(host, int(port)))
+        dev = pyad2.ad2.devices.SocketDevice(interface=(host, int(port)))
         dev.ssl = True
         dev.ssl_certificate = client_cert
         dev.ssl_key = client_key

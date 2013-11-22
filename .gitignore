@@ -1,3 +1,4 @@
 *.pyc
 tmp
 bin/ad2-test
+*.egg-info
