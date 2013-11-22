@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyad2usb's documentation!
+Welcome to pyad2's documentation!
 ====================================
 
 Contents:
@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
-   pyad2usb
+   pyad2
 
 
 Indices and tables

@@ -1,7 +1,7 @@
-pyad2usb
+pyad2
 ========
 
 .. toctree::
    :maxdepth: 4
 
-   pyad2usb
+   pyad2

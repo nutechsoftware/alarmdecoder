@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2usb.zonetracking &mdash; pyad2usb  documentation</title>
+    <title>pyad2.zonetracking &mdash; pyad2  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2usb  documentation" href="../../index.html" />
+    <link rel="top" title="pyad2  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2usb  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,16 +46,19 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2usb.zonetracking</h1><div class="highlight"><pre>
+  <h1>Source code for pyad2.zonetracking</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Provides zone tracking functionality for the AD2USB device family.</span>
+
+<span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">messages</span>
 
-<div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representation of a panel zone.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -97,7 +100,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s">&#39;Zone({0}, {1}, ts {2})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">STATUS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Zonetracker"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.zonetracking.Zonetracker">[docs]</a><span class="k">class</span> <span class="nc">Zonetracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Zonetracker"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zonetracker">[docs]</a><span class="k">class</span> <span class="nc">Zonetracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles tracking of zone and their statuses.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -116,7 +119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="Zonetracker.update"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.zonetracking.Zonetracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<div class="viewcode-block" id="Zonetracker.update"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zonetracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update zone statuses based on the current message.</span>
 
@@ -127,23 +130,24 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
-                <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expander_to_zone</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">))</span>
+                <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expander_to_zone</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
 
                 <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span>
-                <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">FAULT</span>
-                <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CHECK</span>
 
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
+
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_add_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># Panel is ready, restore all zones.</span>
             <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ready</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
@@ -158,10 +162,23 @@
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="n">zone</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">numeric_code</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
 
+                <span class="c"># NOTE: Odd case for ECP failures.  Apparently they report as zone 191 (0xBF) regardless</span>
+                <span class="c"># of whether or not the 3-digit mode is enabled... so we have to pull it out of the</span>
+                <span class="c"># alpha message.</span>
+                <span class="k">if</span> <span class="n">zone</span> <span class="o">==</span> <span class="mi">191</span><span class="p">:</span>
+                    <span class="n">zone_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;^CHECK (\d+).*$&#39;</span><span class="p">)</span>
+
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">zone_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">return</span>
+
+                    <span class="n">zone</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
                 <span class="c"># Add new zones and clear expired ones.</span>
                 <span class="k">if</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_clear_zones</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
+
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">FAULT</span>
                     <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">check_zone</span><span class="p">:</span>
@@ -184,16 +201,16 @@
 <span class="sd">        :type zone: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cleared_zones</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">found_last</span> <span class="o">=</span> <span class="n">found_new</span> <span class="o">=</span> <span class="n">at_end</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">found_last_faulted</span> <span class="o">=</span> <span class="n">found_current</span> <span class="o">=</span> <span class="n">at_end</span> <span class="o">=</span> <span class="bp">False</span>
 
         <span class="c"># First pass: Find our start spot.</span>
         <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="ow">not</span> <span class="n">found_last</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">found_last_faulted</span><span class="p">:</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span><span class="p">:</span>
-                    <span class="n">found_last</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">found_last_faulted</span> <span class="o">=</span> <span class="bp">True</span>
                     <span class="k">break</span>
 
         <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
@@ -202,11 +219,11 @@
         <span class="c"># Continue until we find our end point and add zones in</span>
         <span class="c"># between to our clear list.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">while</span> <span class="ow">not</span> <span class="n">at_end</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">found_new</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">at_end</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">found_current</span><span class="p">:</span>
                 <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 
                 <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="n">zone</span><span class="p">:</span>
-                    <span class="n">found_new</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">found_current</span> <span class="o">=</span> <span class="bp">True</span>
                     <span class="k">break</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cleared_zones</span> <span class="o">+=</span> <span class="p">[</span><span class="n">z</span><span class="p">]</span>
@@ -216,15 +233,15 @@
 
         <span class="c"># Second pass: roll through the list again if we didn&#39;t find</span>
         <span class="c"># our end point and remove everything until we do.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_new</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_current</span><span class="p">:</span>
             <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">)</span>
 
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">while</span> <span class="ow">not</span> <span class="n">found_new</span><span class="p">:</span>
+                <span class="k">while</span> <span class="ow">not</span> <span class="n">found_current</span><span class="p">:</span>
                     <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
 
                     <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="n">zone</span><span class="p">:</span>
-                        <span class="n">found_new</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">found_current</span> <span class="o">=</span> <span class="bp">True</span>
                         <span class="k">break</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">cleared_zones</span> <span class="o">+=</span> <span class="p">[</span><span class="n">z</span><span class="p">]</span>
@@ -233,7 +250,7 @@
                 <span class="k">pass</span>
 
         <span class="c"># Actually remove the zones and trigger the restores.</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cleared_zones</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">cleared_zones</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_clear_expired_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -356,7 +373,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2usb  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

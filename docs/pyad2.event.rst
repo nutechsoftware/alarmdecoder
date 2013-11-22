@@ -4,7 +4,7 @@ event Package
 :mod:`event` Package
 --------------------
 
-.. automodule:: pyad2usb.event
+.. automodule:: pyad2.event
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ event Package
 :mod:`event` Module
 -------------------
 
-.. automodule:: pyad2usb.event.event
+.. automodule:: pyad2.event.event
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,10 +1,10 @@
-pyad2usb Package
+pyad2 Package
 ================
 
-:mod:`ad2usb` Module
+:mod:`ad2` Module
 --------------------
 
-.. automodule:: pyad2usb.ad2usb
+.. automodule:: pyad2.ad2
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ pyad2usb Package
 :mod:`devices` Module
 ---------------------
 
-.. automodule:: pyad2usb.devices
+.. automodule:: pyad2.devices
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ pyad2usb Package
 :mod:`util` Module
 ------------------
 
-.. automodule:: pyad2usb.util
+.. automodule:: pyad2.util
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ pyad2usb Package
 :mod:`zonetracking` Module
 --------------------------
 
-.. automodule:: pyad2usb.zonetracking
+.. automodule:: pyad2.zonetracking
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ pyad2usb Package
 :mod:`panels` Module
 --------------------
 
-.. automodule:: pyad2usb.panels
+.. automodule:: pyad2.panels
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ pyad2usb Package
 :mod:`messages` Module
 ----------------------
 
-.. automodule:: pyad2usb.messages
+.. automodule:: pyad2.messages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -54,5 +54,5 @@ Subpackages
 
 .. toctree::
 
-    pyad2usb.event
+    pyad2.event
 

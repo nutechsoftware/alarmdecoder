@@ -1,4 +1,4 @@
-pyad2usb Package
+pyad2 Package
 ================
 
 :mod:`ad2` Module
@@ -54,5 +54,5 @@ Subpackages
 
 .. toctree::
 
-    pyad2usb.event
+    pyad2.event
 

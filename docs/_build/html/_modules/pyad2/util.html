@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2usb.util &mdash; pyad2usb  documentation</title>
+    <title>pyad2.util &mdash; pyad2  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2usb  documentation" href="../../index.html" />
+    <link rel="top" title="pyad2  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2usb  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,41 +46,43 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2usb.util</h1><div class="highlight"><pre>
+  <h1>Source code for pyad2.util</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Provides utility classes for the AD2USB devices.</span>
+
+<span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">ad2usb</span>
+<span class="kn">import</span> <span class="nn">ad2</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 
-<div class="viewcode-block" id="NoDeviceError"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.NoDeviceError">[docs]</a><span class="k">class</span> <span class="nc">NoDeviceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="NoDeviceError"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.NoDeviceError">[docs]</a><span class="k">class</span> <span class="nc">NoDeviceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    No devices found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="CommError"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.CommError">[docs]</a><span class="k">class</span> <span class="nc">CommError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="CommError"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.CommError">[docs]</a><span class="k">class</span> <span class="nc">CommError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    There was an error communicating with the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="TimeoutError"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.TimeoutError">[docs]</a><span class="k">class</span> <span class="nc">TimeoutError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeoutError"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.TimeoutError">[docs]</a><span class="k">class</span> <span class="nc">TimeoutError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    There was a timeout while trying to communicate with the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="InvalidMessageError"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.InvalidMessageError">[docs]</a><span class="k">class</span> <span class="nc">InvalidMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="InvalidMessageError"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.InvalidMessageError">[docs]</a><span class="k">class</span> <span class="nc">InvalidMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The format of the panel message was invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="Firmware"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.Firmware">[docs]</a><span class="k">class</span> <span class="nc">Firmware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Firmware"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.Firmware">[docs]</a><span class="k">class</span> <span class="nc">Firmware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents firmware for the AD2USB/AD2SERIAL devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -94,9 +96,16 @@
     <span class="n">STAGE_DONE</span> <span class="o">=</span> <span class="mi">5</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Firmware.upload"><a class="viewcode-back" href="../../pyad2usb.html#pyad2usb.util.Firmware.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Firmware.upload"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.Firmware.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uploads firmware to an AD2USB/AD2SERIAL device.</span>
+
+<span class="sd">        :param filename: The firmware filename</span>
+<span class="sd">        :type filename: str</span>
+<span class="sd">        :param progress_callback: Callback function used to report progress.</span>
+<span class="sd">        :type progress_callback: function</span>
+
+<span class="sd">        :raises: util.NoDeviceError, util.TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">do_upload</span><span class="p">():</span>
@@ -114,7 +123,7 @@
                         <span class="k">if</span> <span class="n">progress_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                             <span class="n">progress_callback</span><span class="p">(</span><span class="n">Firmware</span><span class="o">.</span><span class="n">STAGE_UPLOADING</span><span class="p">)</span>
 
-                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">read_until</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
@@ -171,10 +180,12 @@
                 <span class="n">stage_callback</span><span class="p">(</span><span class="n">Firmware</span><span class="o">.</span><span class="n">STAGE_WAITING</span><span class="p">)</span>
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
         <span class="c"># Reboot the device and wait for the boot loader.</span>
         <span class="n">stage_callback</span><span class="p">(</span><span class="n">Firmware</span><span class="o">.</span><span class="n">STAGE_BOOT</span><span class="p">)</span>
         <span class="n">dev</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;=&quot;</span><span class="p">)</span>
-        <span class="n">read_until</span><span class="p">(</span><span class="s">&#39;!boot&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span>
+        <span class="n">read_until</span><span class="p">(</span><span class="s">&#39;......&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">15.0</span><span class="p">)</span>
 
         <span class="c"># Get ourselves into the boot loader and wait for indication</span>
         <span class="c"># that it&#39;s ready for the firmware upload.</span>
@@ -218,7 +229,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2usb  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
