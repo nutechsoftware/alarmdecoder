@@ -1,5 +1,5 @@
 """
-Contains different types of devices belonging to the AD2USB family.
+Contains different types of devices belonging to the AD2 family.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -17,7 +17,7 @@ from .event import event
 
 class Device(object):
     """
-    Generic parent device to all AD2USB products.
+    Generic parent device to all AD2 products.
     """
 
     # Generic device events
@@ -610,7 +610,7 @@ class SerialDevice(Device):
 
 class SocketDevice(Device):
     """
-    Device that supports communication with an AD2USB that is exposed via ser2sock or another
+    Device that supports communication with an AD2 that is exposed via ser2sock or another
     Serial to IP interface.
     """
 

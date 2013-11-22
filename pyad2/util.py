@@ -1,5 +1,5 @@
 """
-Provides utility classes for the AD2USB devices.
+Provides utility classes for the AD2 devices.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -35,7 +35,7 @@ class InvalidMessageError(Exception):
 
 class Firmware(object):
     """
-    Represents firmware for the AD2USB/AD2SERIAL devices.
+    Represents firmware for the AD2 devices.
     """
 
     # Constants
@@ -49,7 +49,7 @@ class Firmware(object):
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
-        Uploads firmware to an AD2USB/AD2SERIAL device.
+        Uploads firmware to an AD2 device.
 
         :param filename: The firmware filename
         :type filename: str

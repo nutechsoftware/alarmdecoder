@@ -1,5 +1,5 @@
 """
-Provides the full AD2USB class and factory.
+Provides the full AD2 class and factory.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -171,7 +171,7 @@ class Overseer(object):
 
 class AD2(object):
     """
-    High-level wrapper around AD2USB/AD2SERIAL devices.
+    High-level wrapper around AD2 devices.
     """
 
     # High-level Events
@@ -219,7 +219,7 @@ class AD2(object):
         """
         Constructor
 
-        :param device: The low-level device used for this AD2USB interface.
+        :param device: The low-level device used for this AD2 interface.
         :type device: devices.Device
         """
         self._device = device
@@ -245,7 +245,7 @@ class AD2(object):
     @property
     def id(self):
         """
-        The ID of the AD2USB device.
+        The ID of the AD2 device.
 
         :returns: The identification string for the device.
         """

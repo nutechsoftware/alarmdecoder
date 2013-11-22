@@ -1,5 +1,5 @@
 """
-Message representations received from the panel through the AD2USB.
+Message representations received from the panel through the AD2 devices.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
