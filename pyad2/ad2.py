@@ -65,9 +65,9 @@ class Overseer(object):
             device = cls.__devices[0]
 
         vendor, product, sernum, ifcount, description = device
-        device = devices.USBDevice(serial=sernum, description=description)
+        device = devices.USBDevice((sernum, ifcount - 1))
 
-        return AD2USB(device)
+        return AD2(device)
 
     def __init__(self, attached_event=None, detached_event=None):
         """
@@ -169,7 +169,7 @@ class Overseer(object):
                 time.sleep(0.25)
 
 
-class AD2USB(object):
+class AD2(object):
     """
     High-level wrapper around AD2USB/AD2SERIAL devices.
     """
@@ -329,6 +329,7 @@ class AD2USB(object):
         :param simulate_wire_problem: Whether or not to simulate a wire fault.
         :type simulate_wire_problem: bool
         """
+
         # Allow ourselves to also be passed an address/channel combination
         # for zone expanders.
         #
@@ -418,7 +419,6 @@ class AD2USB(object):
         """
         msg = messages.LRRMessage(data)
 
-        args = (msg.partition, msg.event_type, msg.event_data)
         if msg.event_type == 'ALARM_PANIC':
             self._panic_status = True
             self.on_panic(True)
@@ -500,14 +500,14 @@ class AD2USB(object):
             if message.battery_low == self._battery_status[0]:
                 self._battery_status = (self._battery_status[0], time.time())
             else:
-                if message.battery_low == True or time.time() > self._battery_status[1] + AD2USB.BATTERY_TIMEOUT:
+                if message.battery_low == True or time.time() > self._battery_status[1] + AD2.BATTERY_TIMEOUT:
                     self._battery_status = (message.battery_low, time.time())
                     self.on_low_battery(self._battery_status)
 
             if message.fire_alarm == self._fire_status[0]:
                 self._fire_status = (self._fire_status[0], time.time())
             else:
-                if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2USB.FIRE_TIMEOUT:
+                if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2.FIRE_TIMEOUT:
                     self._fire_status = (message.fire_alarm, time.time())
                     self.on_fire(self._fire_status)
 

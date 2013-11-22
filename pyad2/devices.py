@@ -166,17 +166,17 @@ class USBDevice(Device):
 
         :returns: the interface used to connect to the device.
         """
-        return (self._device_number, self._endpoint)
+        return (self._serial_number, self._endpoint)
 
     @interface.setter
     def interface(self, value):
         """
         Sets the interface used to connect to the device.
 
-        :param value: Tuple containing the device number and endpoint number to use.
+        :param value: Tuple containing the serial number and endpoint number to use.
         :type value: tuple
         """
-        self._device_number = value[0]
+        self._serial_number = value[0]
         self._endpoint = value[1]
 
     @property
@@ -218,7 +218,7 @@ class USBDevice(Device):
         """
         self._description = value
 
-    def __init__(self, interface=(0, 0)):
+    def __init__(self, interface=(None, 0)):
         """
         Constructor
 
@@ -228,11 +228,11 @@ class USBDevice(Device):
         Device.__init__(self)
 
         self._device = Ftdi()
-        self._device_number = interface[0]
+        self._serial_number = interface[0]
         self._endpoint = interface[1]
         self._vendor_id = USBDevice.FTDI_VENDOR_ID
         self._product_id = USBDevice.FTDI_PRODUCT_ID
-        self._serial_number = None
+        self._device_number = None
         self._description = None
 
     def open(self, baudrate=BAUDRATE, no_reader_thread=False):
@@ -369,7 +369,8 @@ class USBDevice(Device):
                             self._buffer = self._buffer[:-1]
 
         except (usb.core.USBError, FtdiError), err:
-            timer.cancel()
+            if timer:
+                timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
@@ -587,7 +588,8 @@ class SerialDevice(Device):
                             self._buffer = self._buffer[:-1]
 
         except (OSError, serial.SerialException), err:
-            timer.cancel()
+            if timer:
+                timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 
@@ -862,7 +864,8 @@ class SocketDevice(Device):
                             self._buffer = self._buffer[:-1]
 
         except socket.error, err:
-            timer.cancel()
+            if timer:
+                timer.cancel()
 
             raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
 

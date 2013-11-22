@@ -5,6 +5,7 @@ Message representations received from the panel through the AD2USB.
 """
 
 import re
+from . import util
 
 class BaseMessage(object):
     """
@@ -145,13 +146,17 @@ class ExpanderMessage(BaseMessage):
         :param data: The message data
         :type data: str
         """
-        header, values = data.split(':')
-        address, channel, value = values.split(',')
+        try:
+            header, values = data.split(':')
+            address, channel, value = values.split(',')
 
-        self.raw = data
-        self.address = int(address)
-        self.channel = int(channel)
-        self.value = int(value)
+            self.raw = data
+            self.address = int(address)
+            self.channel = int(channel)
+            self.value = int(value)
+
+        except ValueError:
+            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
 
         if header == '!EXP':
             self.type = ExpanderMessage.ZONE
@@ -193,22 +198,27 @@ class RFMessage(BaseMessage):
         :param data: The message data.
         :type data: str
         """
-        self.raw = data
+        try:
+            self.raw = data
 
-        _, values = data.split(':')
-        self.serial_number, self.value = values.split(',')
-        self.value = int(self.value, 16)
+            _, values = data.split(':')
+            self.serial_number, self.value = values.split(',')
+            self.value = int(self.value, 16)
 
-        is_bit_set = lambda b: self.value & (1 << b) > 0
+            is_bit_set = lambda b: self.value & (1 << b) > 0
 
-        # Bit 1 = unknown
-        self.battery = is_bit_set(2)
-        self.supervision = is_bit_set(3)
-        # Bit 8 = unknown
-        self.loop[0] = is_bit_set(5)
-        self.loop[1] = is_bit_set(6)
-        self.loop[2] = is_bit_set(7)
-        self.loop[3] = is_bit_set(8)
+            # Bit 1 = unknown
+            self.battery = is_bit_set(2)
+            self.supervision = is_bit_set(3)
+            # Bit 8 = unknown
+            self.loop[0] = is_bit_set(5)
+            self.loop[1] = is_bit_set(6)
+            self.loop[2] = is_bit_set(7)
+            self.loop[3] = is_bit_set(8)
+
+        except ValueError:
+            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
+
 
 class LRRMessage(BaseMessage):
     """
@@ -243,7 +253,11 @@ class LRRMessage(BaseMessage):
         :param data: The message data.
         :type data: str
         """
-        self.raw = data
+        try:
+            self.raw = data
 
-        _, values = data.split(':')
-        self.event_data, self.partition, self.event_type = values.split(',')
+            _, values = data.split(':')
+            self.event_data, self.partition, self.event_type = values.split(',')
+
+        except ValueError:
+            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
