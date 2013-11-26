@@ -6,7 +6,6 @@ Provides utility classes for the AD2 devices.
 
 import ad2
 import time
-import traceback
 import threading
 
 class NoDeviceError(Exception):
