@@ -912,5 +912,4 @@ class SocketDevice(Device):
             raise util.CommError('Error setting up SSL connection.', err)
 
     def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):
-        #print ok
         return ok
