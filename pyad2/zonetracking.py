@@ -88,6 +88,9 @@ class Zonetracker(object):
                 elif message.value == 2:
                     status = Zone.CHECK
 
+                # NOTE: Expander zone faults are handled differently than regular messages.
+                # We don't include them in self._zones_faulted because they are not reported
+                # by the panel in it's rolling list of faults.
                 try:
                     self._update_zone(zone, status=status)
 
