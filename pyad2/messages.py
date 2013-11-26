@@ -5,14 +5,23 @@ Message representations received from the panel through the AD2 devices.
 """
 
 import re
-from . import util
+from .util import InvalidMessageError
 
 class BaseMessage(object):
     """
     Base class for messages.
     """
     def __init__(self):
+        """
+        Constructor
+        """
         self.raw = None
+
+    def __str__(self):
+        """
+        String conversion operator.
+        """
+        return self.raw
 
 class Message(BaseMessage):
     """
@@ -62,12 +71,12 @@ class Message(BaseMessage):
         :param data: The message data.
         :type data: str
 
-        :raises: util.InvalidMessageError
+        :raises: InvalidMessageError
         """
         m = self._regex.match(data)
 
         if m is None:
-            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
+            raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
         self.bitfield, self.numeric_code, self.panel_data, alpha = m.group(1, 2, 3, 4)
         self.mask = int(self.panel_data[3:3+8], 16)
@@ -101,7 +110,7 @@ class Message(BaseMessage):
         """
         String conversion operator.
         """
-        return 'msg > {0:0<9} [{1}{2}{3}] -- ({4}) {5}'.format(hex(self.mask), 1 if self.ready else 0, 1 if self.armed_away else 0, 1 if self.armed_home else 0, self.numeric_code, self.text)
+        return self.raw
 
 class ExpanderMessage(BaseMessage):
     """
@@ -109,7 +118,9 @@ class ExpanderMessage(BaseMessage):
     """
 
     ZONE = 0
+    """Flag indicating that the expander message relates to a Zone Expander."""
     RELAY = 1
+    """Flag indicating that the expander message relates to a Relay Expander."""
 
     def __init__(self, data=None):
         """
@@ -131,13 +142,7 @@ class ExpanderMessage(BaseMessage):
         """
         String conversion operator.
         """
-        expander_type = 'UNKWN'
-        if self.type == ExpanderMessage.ZONE:
-            expander_type = 'ZONE'
-        elif self.type  == ExpanderMessage.RELAY:
-            expander_type = 'RELAY'
-
-        return 'exp > [{0: <5}] {1}/{2} -- {3}'.format(expander_type, self.address, self.channel, self.value)
+        return self.raw
 
     def _parse_message(self, data):
         """
@@ -156,12 +161,14 @@ class ExpanderMessage(BaseMessage):
             self.value = int(value)
 
         except ValueError:
-            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
+            raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
         if header == '!EXP':
             self.type = ExpanderMessage.ZONE
         elif header == '!REL':
             self.type = ExpanderMessage.RELAY
+        else:
+            raise InvalidMessageError('Unknown expander message header: {0}'.format(data))
 
 class RFMessage(BaseMessage):
     """
@@ -189,7 +196,7 @@ class RFMessage(BaseMessage):
         """
         String conversion operator.
         """
-        return 'rf > {0}: {1:x}'.format(self.serial_number, self.value)
+        return self.raw
 
     def _parse_message(self, data):
         """
@@ -217,7 +224,7 @@ class RFMessage(BaseMessage):
             self.loop[3] = is_bit_set(8)
 
         except ValueError:
-            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
+            raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
 
 class LRRMessage(BaseMessage):
@@ -244,7 +251,7 @@ class LRRMessage(BaseMessage):
         """
         String conversion operator.
         """
-        return 'lrr > {0} @ {1} -- {2}'.format(self.event_data, self.partition, self.event_type)
+        return self.raw
 
     def _parse_message(self, data):
         """
@@ -260,4 +267,4 @@ class LRRMessage(BaseMessage):
             self.event_data, self.partition, self.event_type = values.split(',')
 
         except ValueError:
-            raise util.InvalidMessageError('Received invalid message: {0}'.format(data))
+            raise InvalidMessageError('Received invalid message: {0}'.format(data))
