@@ -6,6 +6,7 @@ Provides zone tracking functionality for the AD2USB device family.
 
 import re
 import time
+
 from .event import event
 from . import messages
 
@@ -77,8 +78,6 @@ class Zonetracker(object):
         :param message: Message to use to update the zone tracking.
         :type message: Message or ExpanderMessage
         """
-        zone = -1
-
         if isinstance(message, messages.ExpanderMessage):
             if message.type == messages.ExpanderMessage.ZONE:
                 zone = self._expander_to_zone(message.address, message.channel)
@@ -268,10 +267,7 @@ class Zonetracker(object):
 
         :returns: Whether or not the zone is expired.
         """
-        if time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE:
-            return True
-
-        return False
+        return time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE
 
     def _expander_to_zone(self, address, channel):
         """
