@@ -6,12 +6,11 @@ Provides the full AD2 class and factory.
 
 import time
 import threading
-import re
 from .event import event
-from . import devices
-from . import util
-from . import messages
-from . import zonetracking
+from .devices import USBDevice
+from .util import CommError, NoDeviceError
+from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
+from .zonetracking import Zonetracker
 
 class Overseer(object):
     """
@@ -30,9 +29,9 @@ class Overseer(object):
         Returns all AD2USB devices located on the system.
 
         :returns: list of devices found
-        :raises: util.CommError
+        :raises: CommError
         """
-        cls.__devices = devices.USBDevice.find_all()
+        cls.__devices = USBDevice.find_all()
 
         return cls.__devices
 
@@ -54,18 +53,18 @@ class Overseer(object):
         :type device: tuple
 
         :returns: AD2USB object utilizing the specified device.
-        :raises: util.NoDeviceError
+        :raises: NoDeviceError
         """
         cls.find_all()
 
         if len(cls.__devices) == 0:
-            raise util.NoDeviceError('No AD2USB devices present.')
+            raise NoDeviceError('No AD2USB devices present.')
 
         if device is None:
             device = cls.__devices[0]
 
         vendor, product, sernum, ifcount, description = device
-        device = devices.USBDevice((sernum, ifcount - 1))
+        device = USBDevice((sernum, ifcount - 1))
 
         return AD2(device)
 
@@ -163,7 +162,7 @@ class Overseer(object):
                     for d in removed_devices:
                         self._overseer.on_detached(d)
 
-                except util.CommError, err:
+                except CommError, err:
                     pass
 
                 time.sleep(0.25)
@@ -220,10 +219,10 @@ class AD2(object):
         Constructor
 
         :param device: The low-level device used for this AD2 interface.
-        :type device: devices.Device
+        :type device: Device
         """
         self._device = device
-        self._zonetracker = zonetracking.Zonetracker()
+        self._zonetracker = Zonetracker()
 
         self._power_status = None
         self._alarm_status = None
@@ -271,7 +270,9 @@ class AD2(object):
         """
         Closes the device.
         """
-        self._device.close()
+        if self._device:
+            self._device.close()
+
         del self._device
         self._device = None
 
@@ -283,7 +284,7 @@ class AD2(object):
         """
         Retrieves the configuration from the device.
         """
-        self._device.write("C\r")
+        self.send("C\r")
 
     def save_config(self):
         """
@@ -312,13 +313,13 @@ class AD2(object):
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
-        self._device.write("C{0}\r".format(config_string))
+        self.send("C{0}\r".format(config_string))
 
     def reboot(self):
         """
         Reboots the device.
         """
-        self._device.write('=')
+        self.send('=')
 
     def fault_zone(self, zone, simulate_wire_problem=False):
         """
@@ -339,7 +340,7 @@ class AD2(object):
 
         status = 2 if simulate_wire_problem else 1
 
-        self._device.write("L{0:02}{1}\r".format(zone, status))
+        self.send("L{0:02}{1}\r".format(zone, status))
 
     def clear_zone(self, zone):
         """
@@ -348,7 +349,7 @@ class AD2(object):
         :param zone: The zone to clear.
         :type zone: int
         """
-        self._device.write("L{0:02}0\r".format(zone))
+        self.send("L{0:02}0\r".format(zone))
 
     def _wire_events(self):
         """
@@ -371,19 +372,19 @@ class AD2(object):
         :returns: An object representing the message.
         """
         if data is None:
-            return None
+            raise InvalidMessageError()
 
         msg = None
 
         header = data[0:4]
         if header[0] != '!' or header == '!KPE':
-            msg = messages.Message(data)
+            msg = Message(data)
 
             if self.address_mask & msg.mask > 0:
                 self._update_internal_states(msg)
 
         elif header == '!EXP' or header == '!REL':
-            msg = messages.ExpanderMessage(data)
+            msg = ExpanderMessage(data)
 
             self._update_internal_states(msg)
 
@@ -402,7 +403,7 @@ class AD2(object):
         return msg
 
     def _handle_rfx(self, data):
-        msg = messages.RFMessage(data)
+        msg = RFMessage(data)
 
         self.on_rfx_message(msg)
 
@@ -417,7 +418,7 @@ class AD2(object):
 
         :returns: An object representing the LRR message.
         """
-        msg = messages.LRRMessage(data)
+        msg = LRRMessage(data)
 
         if msg.event_type == 'ALARM_PANIC':
             self._panic_status = True
@@ -469,7 +470,7 @@ class AD2(object):
         :param message: Message to update internal states with.
         :type message: Message, ExpanderMessage, LRRMessage, or RFMessage
         """
-        if isinstance(message, messages.Message):
+        if isinstance(message, Message):
             if message.ac_power != self._power_status:
                 self._power_status, old_status = message.ac_power, self._power_status
 
@@ -511,8 +512,8 @@ class AD2(object):
                     self._fire_status = (message.fire_alarm, time.time())
                     self.on_fire(self._fire_status)
 
-        elif isinstance(message, messages.ExpanderMessage):
-            if message.type == messages.ExpanderMessage.RELAY:
+        elif isinstance(message, ExpanderMessage):
+            if message.type == ExpanderMessage.RELAY:
                 self._relay_status[(message.address, message.channel)] = message.value
 
                 self.on_relay_changed(message)
@@ -529,9 +530,9 @@ class AD2(object):
 
         # Retrieve a list of faults.
         # NOTE: This only happens on first boot or after exiting programming mode.
-        if isinstance(message, messages.Message):
+        if isinstance(message, Message):
             if not message.ready and "Hit * for faults" in message.text:
-                self._device.write('*')
+                self.send('*')
                 return
 
         self._zonetracker.update(message)
