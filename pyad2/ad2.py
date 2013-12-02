@@ -6,6 +6,7 @@ Provides the full AD2 class and factory.
 
 import time
 import threading
+
 from .event import event
 from .devices import USBDevice
 from .util import CommError, NoDeviceError
