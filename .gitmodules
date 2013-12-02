@@ -1,3 +1,0 @@
-[submodule "libs/pyftdi"]
-	path = libs/pyftdi
-	url = git@git.corp.nutech.com:nutech/pyftdi
