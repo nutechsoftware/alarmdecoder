@@ -1,4 +1,12 @@
 # event.py (improved)
+#
+
+# Based on pyevent originally found at http://www.emptypage.jp/notes/pyevent.en.html
+# 
+# License: https://creativecommons.org/licenses/by/2.1/jp/deed.en
+#
+# Changes:
+#    Added type check in fire()
 
 class Event(object):
 
