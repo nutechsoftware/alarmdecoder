@@ -21,7 +21,7 @@ setup(name='pyad2',
     url='http://github.com/nutechsoftware/pyad2',
     author='Nu Tech Software Solutions, Inc.',
     author_email='general@support.nutech.com',
-    license='',
+    license='MIT',
     packages=['pyad2', 'pyad2.event'],
     install_requires=[
         'pyopenssl',
