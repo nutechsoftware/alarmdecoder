@@ -10,7 +10,7 @@ setup(name='pyad2',
     long_description=readme(),
     classifiers=[
         'Development Status :: 4 - Beta',
-        #'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Communications',
