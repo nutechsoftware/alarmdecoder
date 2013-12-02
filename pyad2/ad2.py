@@ -12,7 +12,7 @@ from .util import CommError, NoDeviceError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
 
-class Overseer(object):
+class AD2Factory(object):
     """
     Factory for creation of AD2USB devices as well as provides attach/detach events."
     """
@@ -77,7 +77,7 @@ class Overseer(object):
         :param detached_event: Event to trigger when a device is detached.
         :type detached_event: function
         """
-        self._detect_thread = Overseer.DetectThread(self)
+        self._detect_thread = AD2Factory.DetectThread(self)
 
         if attached_event:
             self.on_attached += attached_event
@@ -85,7 +85,7 @@ class Overseer(object):
         if detached_event:
             self.on_detached += detached_event
 
-        Overseer.find_all()
+        AD2Factory.find_all()
 
         self.start()
 
@@ -115,22 +115,22 @@ class Overseer(object):
         :param device: Tuple describing the USB device to open, as returned by find_all().
         :type device: tuple
         """
-        return Overseer.create(device)
+        return AD2Factory.create(device)
 
     class DetectThread(threading.Thread):
         """
         Thread that handles detection of added/removed devices.
         """
-        def __init__(self, overseer):
+        def __init__(self, factory):
             """
             Constructor
 
-            :param overseer: Overseer object to use with the thread.
-            :type overseer: Overseer
+            :param factory: AD2Factory object to use with the thread.
+            :type factory: AD2Factory
             """
             threading.Thread.__init__(self)
 
-            self._overseer = overseer
+            self._factory = factory
             self._running = False
 
         def stop(self):
@@ -149,18 +149,18 @@ class Overseer(object):
 
             while self._running:
                 try:
-                    Overseer.find_all()
+                    AD2Factory.find_all()
 
-                    current_devices = set(Overseer.devices())
+                    current_devices = set(AD2Factory.devices())
                     new_devices = [d for d in current_devices if d not in last_devices]
                     removed_devices = [d for d in last_devices if d not in current_devices]
                     last_devices = current_devices
 
                     for d in new_devices:
-                        self._overseer.on_attached(d)
+                        self._factory.on_attached(d)
 
                     for d in removed_devices:
-                        self._overseer.on_detached(d)
+                        self._factory.on_detached(d)
 
                 except CommError, err:
                     pass

@@ -3,22 +3,22 @@ import time
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
 
-from ..ad2 import Overseer, AD2
+from ..ad2 import AD2Factory, AD2
 from ..devices import USBDevice
 from ..messages import Message, RFMessage, LRRMessage, ExpanderMessage
 from ..event.event import Event, EventHandler
 from ..zonetracking import Zonetracker
 
-class TestOverseer(TestCase):
+class TestAD2Factory(TestCase):
     def setUp(self):
         self._attached = False
         self._detached = False
 
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            self._overseer = Overseer()
+            self._factory = AD2Factory()
 
     def tearDown(self):
-        self._overseer.stop()
+        self._factory.stop()
 
     def attached_event(self, sender, args):
         self._attached = True
@@ -28,22 +28,22 @@ class TestOverseer(TestCase):
 
     def test_find_all(self):
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            devices = Overseer.find_all()
+            devices = AD2Factory.find_all()
 
             self.assertEquals(devices[0][2], 'AD2')
 
     def test_create_default_param(self):
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            device = Overseer.create()
+            device = AD2Factory.create()
 
             self.assertEquals(device._device.interface, ('AD2', 0))
 
     def test_create_with_param(self):
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            device = Overseer.create((0, 0, 'AD2-1', 1, 'AD2'))
+            device = AD2Factory.create((0, 0, 'AD2-1', 1, 'AD2'))
             self.assertEquals(device._device.interface, ('AD2-1', 0))
 
-            device = Overseer.create((0, 0, 'AD2-2', 1, 'AD2'))
+            device = AD2Factory.create((0, 0, 'AD2-2', 1, 'AD2'))
             self.assertEquals(device._device.interface, ('AD2-2', 0))
 
     def test_events(self):
@@ -51,18 +51,18 @@ class TestOverseer(TestCase):
         self.assertEquals(self._detached, False)
 
         # this is ugly, but it works.
-        self._overseer.stop()
-        self._overseer._detect_thread = Overseer.DetectThread(self._overseer)
-        self._overseer.on_attached += self.attached_event
-        self._overseer.on_detached += self.detached_event
+        self._factory.stop()
+        self._factory._detect_thread = AD2Factory.DetectThread(self._factory)
+        self._factory.on_attached += self.attached_event
+        self._factory.on_detached += self.detached_event
 
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            self._overseer.start()
+            self._factory.start()
 
             with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-2', 1, 'AD2')]):
-                Overseer.find_all()
+                AD2Factory.find_all()
                 time.sleep(1)
-                self._overseer.stop()
+                self._factory.stop()
 
         self.assertEquals(self._attached, True)
         self.assertEquals(self._detached, True)

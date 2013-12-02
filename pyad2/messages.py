@@ -5,6 +5,7 @@ Message representations received from the panel through the AD2 devices.
 """
 
 import re
+
 from .util import InvalidMessageError
 
 class BaseMessage(object):

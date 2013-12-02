@@ -8,7 +8,7 @@ import re
 import time
 
 from .event import event
-from . import messages
+from .messages import ExpanderMessage
 
 class Zone(object):
     """
@@ -78,8 +78,8 @@ class Zonetracker(object):
         :param message: Message to use to update the zone tracking.
         :type message: Message or ExpanderMessage
         """
-        if isinstance(message, messages.ExpanderMessage):
-            if message.type == messages.ExpanderMessage.ZONE:
+        if isinstance(message, ExpanderMessage):
+            if message.type == ExpanderMessage.ZONE:
                 zone = self._expander_to_zone(message.address, message.channel)
 
                 status = Zone.CLEAR

@@ -9,10 +9,11 @@ import time
 import threading
 import serial, serial.tools.list_ports
 import socket
+
 from OpenSSL import SSL, crypto
 from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
-from . import util
+from .util import CommError, TimeoutError, NoDeviceError
 from .event import event
 
 class Device(object):
@@ -118,7 +119,7 @@ class Device(object):
                 try:
                     self._device.read_line(timeout=self.READ_TIMEOUT)
 
-                except util.TimeoutError, err:
+                except TimeoutError, err:
                     pass
 
                 except Exception, err:
@@ -147,7 +148,7 @@ class USBDevice(Device):
         Returns all FTDI devices matching our vendor and product IDs.
 
         :returns: list of devices
-        :raises: util.CommError
+        :raises: CommError
         """
         devices = []
 
@@ -155,7 +156,7 @@ class USBDevice(Device):
             devices = Ftdi.find_all([(USBDevice.FTDI_VENDOR_ID, USBDevice.FTDI_PRODUCT_ID)], nocache=True)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
+            raise CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
 
         return devices
 
@@ -244,7 +245,7 @@ class USBDevice(Device):
         :param no_reader_thread: Whether or not to automatically start the reader thread.
         :type no_reader_thread: bool
 
-        :raises: util.NoDeviceError
+        :raises: NoDeviceError
         """
         # Set up defaults
         if baudrate is None:
@@ -264,7 +265,7 @@ class USBDevice(Device):
             self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.NoDeviceError('Error opening device: {0}'.format(str(err)), err)
+            raise NoDeviceError('Error opening device: {0}'.format(str(err)), err)
 
         else:
             self._running = True
@@ -293,7 +294,7 @@ class USBDevice(Device):
         :param data: Data to write
         :type data: str
 
-        :raises: util.CommError
+        :raises: CommError
         """
         try:
             self._device.write_data(data)
@@ -301,14 +302,14 @@ class USBDevice(Device):
             self.on_write(data)
 
         except FtdiError, err:
-            raise util.CommError('Error writing to device: {0}'.format(str(err)), err)
+            raise CommError('Error writing to device: {0}'.format(str(err)), err)
 
     def read(self):
         """
         Reads a single character from the device.
 
         :returns: The character read from the device.
-        :raises: util.CommError
+        :raises: CommError
         """
         ret = None
 
@@ -316,7 +317,7 @@ class USBDevice(Device):
             ret = self._device.read_data(1)
 
         except (usb.core.USBError, FtdiError), err:
-            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
 
@@ -330,7 +331,7 @@ class USBDevice(Device):
         :type purge_buffer: bool
 
         :returns: The line that was read.
-        :raises: util.CommError, util.TimeoutError
+        :raises: CommError, TimeoutError
         """
 
         if purge_buffer:
@@ -372,7 +373,7 @@ class USBDevice(Device):
             if timer:
                 timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
@@ -385,7 +386,7 @@ class USBDevice(Device):
             if timer.is_alive():
                 timer.cancel()
             else:
-                raise util.TimeoutError('Timeout while waiting for line terminator.')
+                raise TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
 
@@ -408,7 +409,7 @@ class SerialDevice(Device):
         :type pattern: str
 
         :returns: list of devices
-        :raises: util.CommError
+        :raises: CommError
         """
         devices = []
 
@@ -419,7 +420,7 @@ class SerialDevice(Device):
                 devices = serial.tools.list_ports.comports()
 
         except SerialException, err:
-            raise util.CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
+            raise CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
 
         return devices
 
@@ -464,14 +465,14 @@ class SerialDevice(Device):
         :param no_reader_thread: Whether or not to automatically start the reader thread.
         :type no_reader_thread: bool
 
-        :raises: util.NoDeviceError
+        :raises: NoDeviceError
         """
         # Set up the defaults
         if baudrate is None:
             baudrate = SerialDevice.BAUDRATE
 
         if self._port is None:
-            raise util.NoDeviceError('No device interface specified.')
+            raise NoDeviceError('No device interface specified.')
 
         self._device.port = self._port
 
@@ -486,7 +487,7 @@ class SerialDevice(Device):
                                                         #       all issues with it.
 
         except (serial.SerialException, ValueError), err:
-            raise util.NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
+            raise NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
 
         else:
             self._running = True
@@ -512,7 +513,7 @@ class SerialDevice(Device):
         :param data: The data to write.
         :type data: str
 
-        :raises: util.CommError
+        :raises: CommError
         """
         try:
             self._device.write(data)
@@ -521,7 +522,7 @@ class SerialDevice(Device):
             pass
 
         except serial.SerialException, err:
-            raise util.CommError('Error writing to device.', err)
+            raise CommError('Error writing to device.', err)
 
         else:
             self.on_write(data)
@@ -531,7 +532,7 @@ class SerialDevice(Device):
         Reads a single character from the device.
 
         :returns: The character read from the device.
-        :raises: util.CommError
+        :raises: CommError
         """
         ret = None
 
@@ -539,7 +540,7 @@ class SerialDevice(Device):
             ret = self._device.read(1)
 
         except serial.SerialException, err:
-            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
 
@@ -553,7 +554,7 @@ class SerialDevice(Device):
         :type purge_buffer: bool
 
         :returns: The line read.
-        :raises: util.CommError, util.TimeoutError
+        :raises: CommError, TimeoutError
         """
         def timeout_event():
             timeout_event.reading = False
@@ -591,7 +592,7 @@ class SerialDevice(Device):
             if timer:
                 timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
@@ -604,7 +605,7 @@ class SerialDevice(Device):
             if timer.is_alive():
                 timer.cancel()
             else:
-                raise util.TimeoutError('Timeout while waiting for line terminator.')
+                raise TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
 
@@ -734,7 +735,7 @@ class SocketDevice(Device):
         :param no_reader_thread: Whether or not to automatically open the reader thread.
         :type no_reader_thread: bool
 
-        :raises: util.NoDeviceError, util.CommError
+        :raises: NoDeviceError, CommError
         """
 
         try:
@@ -748,7 +749,7 @@ class SocketDevice(Device):
             self._id = '{0}:{1}'.format(self._host, self._port)
 
         except socket.error, err:
-            raise util.NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port), err)
+            raise NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port), err)
 
         else:
             self._running = True
@@ -781,7 +782,7 @@ class SocketDevice(Device):
         :type data: str
 
         :returns: The number of bytes sent.
-        :raises: util.CommError
+        :raises: CommError
         """
         data_sent = None
 
@@ -789,12 +790,12 @@ class SocketDevice(Device):
             data_sent = self._device.send(data)
 
             if data_sent == 0:
-                raise util.CommError('Error writing to device.')
+                raise CommError('Error writing to device.')
 
             self.on_write(data)
 
         except (SSL.Error, socket.error), err:
-            raise util.CommError('Error writing to device.', err)
+            raise CommError('Error writing to device.', err)
 
         return data_sent
 
@@ -803,7 +804,7 @@ class SocketDevice(Device):
         Reads a single character from the device.
 
         :returns: The character read from the device.
-        :raises: util.CommError
+        :raises: CommError
         """
         data = None
 
@@ -811,7 +812,7 @@ class SocketDevice(Device):
             data = self._device.recv(1)
 
         except socket.error, err:
-            raise util.CommError('Error while reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error while reading from device: {0}'.format(str(err)), err)
 
         return data
 
@@ -825,7 +826,7 @@ class SocketDevice(Device):
         :type purge_buffer: bool
 
         :returns: The line read from the device.
-        :raises: util.CommError, util.TimeoutError
+        :raises: CommError, TimeoutError
         """
 
         if purge_buffer:
@@ -867,7 +868,7 @@ class SocketDevice(Device):
             if timer:
                 timer.cancel()
 
-            raise util.CommError('Error reading from device: {0}'.format(str(err)), err)
+            raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
@@ -880,7 +881,7 @@ class SocketDevice(Device):
             if timer.is_alive():
                 timer.cancel()
             else:
-                raise util.TimeoutError('Timeout while waiting for line terminator.')
+                raise TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
 
@@ -909,7 +910,7 @@ class SocketDevice(Device):
             self._device = SSL.Connection(ctx, self._device)
 
         except SSL.Error, err:
-            raise util.CommError('Error setting up SSL connection.', err)
+            raise CommError('Error setting up SSL connection.', err)
 
     def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):
         return ok
