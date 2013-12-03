@@ -257,10 +257,6 @@ class AD2(object):
 
         :param baudrate: The baudrate used for the device.
         :type baudrate: int
-        :param interface: The interface used for the device.
-        :type interface: varies depends on device type.. FIXME
-        :param index: Interface index.. can probably remove.  FIXME
-        :type index: int
         :param no_reader_thread: Specifies whether or not the automatic reader thread should be started or not
         :type no_reader_thread: bool
         """
@@ -278,6 +274,12 @@ class AD2(object):
         self._device = None
 
     def send(self, data):
+        """
+        Sends data to the AD2 device.
+
+        :param data: The data to send.
+        :type data: str
+        """
         if self._device:
             self._device.write(data)
 
@@ -404,6 +406,14 @@ class AD2(object):
         return msg
 
     def _handle_rfx(self, data):
+        """
+        Handle RF messages.
+
+        :param data: RF message to parse.
+        :type data: str
+
+        :returns: An object representing the RF message.
+        """
         msg = RFMessage(data)
 
         self.on_rfx_message(msg)

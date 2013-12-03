@@ -223,7 +223,7 @@ class USBDevice(Device):
         """
         Constructor
 
-        :param interface: Tuple containing the device number and endpoint number to use.
+        :param interface: Tuple containing the serial number and endpoint number to use.
         :type interface: tuple
         """
         Device.__init__(self)
@@ -629,7 +629,7 @@ class SocketDevice(Device):
         """
         Sets the interface used to connect to the device.
 
-        :param value: Tuple containing the device number and endpoint number to use.
+        :param value: Tuple containing the host and port to use.
         :type value: tuple
         """
         self._host = value[0]
