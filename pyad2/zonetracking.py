@@ -99,6 +99,10 @@ class Zonetracker(object):
 
         else:
             # Panel is ready, restore all zones.
+            #
+            # NOTE: This will need to be updated to support panels with multiple partitions.
+            # In it's current state a ready on partition #1 will end up clearing all zones, even
+            # if they exist elsewhere and it shouldn't.
             if message.ready:
                 for z in self._zones_faulted:
                     self._update_zone(z, Zone.CLEAR)
