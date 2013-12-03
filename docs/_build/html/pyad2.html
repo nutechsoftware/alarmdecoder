@@ -360,8 +360,6 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate used for the device.</li>
-<li><strong>interface</strong> (<em>varies depends on device type.. FIXME</em>) &#8211; The interface used for the device.</li>
-<li><strong>index</strong> (<em>int</em>) &#8211; Interface index.. can probably remove.  FIXME</li>
 <li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Specifies whether or not the automatic reader thread should be started or not</li>
 </ul>
 </td>
@@ -379,7 +377,16 @@
 <dl class="method">
 <dt id="pyad2.ad2.AD2.send">
 <tt class="descname">send</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2.send" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sends data to the AD2 device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; The data to send.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyad2.ad2.AD2.get_config">
@@ -1166,6 +1173,12 @@ Serial to IP interface.</p>
 <em class="property">class </em><tt class="descclassname">pyad2.messages.</tt><tt class="descname">BaseMessage</tt><a class="reference internal" href="_modules/pyad2/messages.html#BaseMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.messages.BaseMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Base class for messages.</p>
+<dl class="attribute">
+<dt id="pyad2.messages.BaseMessage.raw">
+<tt class="descname">raw</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.BaseMessage.raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>The raw message text</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1173,6 +1186,138 @@ Serial to IP interface.</p>
 <em class="property">class </em><tt class="descclassname">pyad2.messages.</tt><tt class="descname">Message</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/messages.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.messages.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyad2.messages.BaseMessage" title="pyad2.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">pyad2.messages.BaseMessage</span></tt></a></p>
 <p>Represents a message from the alarm panel.</p>
+<dl class="attribute">
+<dt id="pyad2.messages.Message.ready">
+<tt class="descname">ready</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is in a ready state</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.armed_away">
+<tt class="descname">armed_away</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.armed_away" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is armed away</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.armed_home">
+<tt class="descname">armed_home</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.armed_home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is armed home</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.backlight_on">
+<tt class="descname">backlight_on</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.backlight_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the keypad backlight is on</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.programming_mode">
+<tt class="descname">programming_mode</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.programming_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not we&#8217;re in programming mode</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.beeps">
+<tt class="descname">beeps</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.Message.beeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of beeps associated with a message</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.zone_bypassed">
+<tt class="descname">zone_bypassed</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.zone_bypassed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not a zone is bypassed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.ac_power">
+<tt class="descname">ac_power</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.ac_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is on AC power</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.chime_on">
+<tt class="descname">chime_on</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.chime_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the chime is enabled</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.alarm_event_occurred">
+<tt class="descname">alarm_event_occurred</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.alarm_event_occurred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not an alarm event has occurred</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.alarm_sounding">
+<tt class="descname">alarm_sounding</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.alarm_sounding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not an alarm is sounding</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.battery_low">
+<tt class="descname">battery_low</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.battery_low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not there is a low battery</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.entry_delay_off">
+<tt class="descname">entry_delay_off</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.entry_delay_off" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the entry delay is enabled</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.fire_alarm">
+<tt class="descname">fire_alarm</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.fire_alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not a fire alarm is sounding</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.check_zone">
+<tt class="descname">check_zone</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.check_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not there are zones that require attention.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.perimeter_only">
+<tt class="descname">perimeter_only</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.Message.perimeter_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the perimeter is armed</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.numeric_code">
+<tt class="descname">numeric_code</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.Message.numeric_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The numeric code associated with the message</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.text">
+<tt class="descname">text</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.Message.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>The human-readable text to be displayed on the panel LCD</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.cursor_location">
+<tt class="descname">cursor_location</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.Message.cursor_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current cursor location on the keypad</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.mask">
+<tt class="descname">mask</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.Message.mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address mask this message is intended for</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.bitfield">
+<tt class="descname">bitfield</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.Message.bitfield" title="Permalink to this definition">¶</a></dt>
+<dd><p>The bitfield associated with this message</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.Message.panel_data">
+<tt class="descname">panel_data</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.Message.panel_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The panel data field associated with this message</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1192,6 +1337,30 @@ Serial to IP interface.</p>
 <dd><p>Flag indicating that the expander message relates to a Relay Expander.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pyad2.messages.ExpanderMessage.type">
+<tt class="descname">type</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expander message type: ExpanderMessage.ZONE or ExpanderMessage.RELAY</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.ExpanderMessage.address">
+<tt class="descname">address</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address of expander</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.ExpanderMessage.channel">
+<tt class="descname">channel</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel on the expander</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.ExpanderMessage.value">
+<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value associated with the message</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1199,6 +1368,41 @@ Serial to IP interface.</p>
 <em class="property">class </em><tt class="descclassname">pyad2.messages.</tt><tt class="descname">RFMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/messages.html#RFMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.messages.RFMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyad2.messages.BaseMessage" title="pyad2.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">pyad2.messages.BaseMessage</span></tt></a></p>
 <p>Represents a message from an RF receiver.</p>
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.x">
+<tt class="descname">x</tt><em class="property"> = 3</em><a class="headerlink" href="#pyad2.messages.RFMessage.x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.serial_number">
+<tt class="descname">serial_number</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.RFMessage.serial_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serial number of the RF device</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.value">
+<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.RFMessage.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value associated with this message</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.battery">
+<tt class="descname">battery</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.RFMessage.battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Battery low indication</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.supervision">
+<tt class="descname">supervision</tt><em class="property"> = False</em><a class="headerlink" href="#pyad2.messages.RFMessage.supervision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supervision required indication</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.RFMessage.loop">
+<tt class="descname">loop</tt><em class="property"> = [False, False, False, False]</em><a class="headerlink" href="#pyad2.messages.RFMessage.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop indicators</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1206,6 +1410,24 @@ Serial to IP interface.</p>
 <em class="property">class </em><tt class="descclassname">pyad2.messages.</tt><tt class="descname">LRRMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/messages.html#LRRMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.messages.LRRMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyad2.messages.BaseMessage" title="pyad2.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">pyad2.messages.BaseMessage</span></tt></a></p>
 <p>Represent a message from a Long Range Radio.</p>
+<dl class="attribute">
+<dt id="pyad2.messages.LRRMessage.event_data">
+<tt class="descname">event_data</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.LRRMessage.event_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data associated with the LRR message.  Usually user ID or zone.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.LRRMessage.partition">
+<tt class="descname">partition</tt><em class="property"> = -1</em><a class="headerlink" href="#pyad2.messages.LRRMessage.partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partition that this message applies to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyad2.messages.LRRMessage.event_type">
+<tt class="descname">event_type</tt><em class="property"> = None</em><a class="headerlink" href="#pyad2.messages.LRRMessage.event_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the event that occurred</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
