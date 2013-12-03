@@ -65,7 +65,7 @@ class AD2Factory(object):
             device = cls.__devices[0]
 
         vendor, product, sernum, ifcount, description = device
-        device = USBDevice((sernum, ifcount - 1))
+        device = USBDevice(interface=sernum)
 
         return AD2(device)
 

@@ -167,18 +167,21 @@ class USBDevice(Device):
 
         :returns: the interface used to connect to the device.
         """
-        return (self._serial_number, self._endpoint)
+        return self._interface
 
     @interface.setter
     def interface(self, value):
         """
         Sets the interface used to connect to the device.
 
-        :param value: Tuple containing the serial number and endpoint number to use.
-        :type value: tuple
+        :param value: May specify either the serial number or the device index.
+        :type value: str or int
         """
-        self._serial_number = value[0]
-        self._endpoint = value[1]
+        self._interface = value
+        if isinstance(value, int):
+            self._device_number = value
+        else:
+            self._serial_number = value
 
     @property
     def serial_number(self):
@@ -219,21 +222,23 @@ class USBDevice(Device):
         """
         self._description = value
 
-    def __init__(self, interface=(None, 0)):
+    def __init__(self, interface=0):
         """
         Constructor
 
-        :param interface: Tuple containing the serial number and endpoint number to use.
-        :type interface: tuple
+        :param interface: May specify either the serial number or the device index.
+        :type interface: str or int
         """
         Device.__init__(self)
 
         self._device = Ftdi()
-        self._serial_number = interface[0]
-        self._endpoint = interface[1]
+
+        self._device_number = 0
+        self._serial_number = None
+        self.interface = interface
         self._vendor_id = USBDevice.FTDI_VENDOR_ID
         self._product_id = USBDevice.FTDI_PRODUCT_ID
-        self._device_number = None
+        self._endpoint = 0
         self._description = None
 
     def open(self, baudrate=BAUDRATE, no_reader_thread=False):

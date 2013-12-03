@@ -36,15 +36,15 @@ class TestAD2Factory(TestCase):
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
             device = AD2Factory.create()
 
-            self.assertEquals(device._device.interface, ('AD2', 0))
+            self.assertEquals(device._device.interface, 'AD2')
 
     def test_create_with_param(self):
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
             device = AD2Factory.create((0, 0, 'AD2-1', 1, 'AD2'))
-            self.assertEquals(device._device.interface, ('AD2-1', 0))
+            self.assertEquals(device._device.interface, 'AD2-1')
 
             device = AD2Factory.create((0, 0, 'AD2-2', 1, 'AD2'))
-            self.assertEquals(device._device.interface, ('AD2-2', 0))
+            self.assertEquals(device._device.interface, 'AD2-2')
 
     def test_events(self):
         self.assertEquals(self._attached, False)

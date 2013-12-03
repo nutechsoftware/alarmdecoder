@@ -34,8 +34,22 @@ class TestUSBDevice(TestCase):
             with self.assertRaises(CommError):
                 devices = USBDevice.find_all()
 
+    def test_interface_serial_number(self):
+        self._device.interface = 'AD2USB'
+
+        self.assertEquals(self._device.interface, 'AD2USB')
+        self.assertEquals(self._device.serial_number, 'AD2USB')
+        self.assertEquals(self._device._device_number, 0)
+
+    def test_interface_index(self):
+        self._device.interface = 1
+
+        self.assertEquals(self._device.interface, 1)
+        self.assertEquals(self._device.serial_number, None)
+        self.assertEquals(self._device._device_number, 1)
+
     def test_open(self):
-        self._device.interface = ('AD2USB', 0)
+        self._device.interface = 'AD2USB'
 
         with patch.object(self._device._device, 'open') as mock:
             self._device.open(no_reader_thread=True)
@@ -43,7 +57,7 @@ class TestUSBDevice(TestCase):
             mock.assert_any_calls()
 
     def test_open_failed(self):
-        self._device.interface = ('AD2USB', 0)
+        self._device.interface = 'AD2USB'
 
         with patch.object(self._device._device, 'open', side_effect=[USBError('testing'), FtdiError]):
             with self.assertRaises(NoDeviceError):
@@ -53,7 +67,7 @@ class TestUSBDevice(TestCase):
                 self._device.open(no_reader_thread=True)
 
     def test_write(self):
-        self._device.interface = ('AD2USB', 0)
+        self._device.interface = 'AD2USB'
         self._device.open(no_reader_thread=True)
 
         with patch.object(self._device._device, 'write_data') as mock:
@@ -67,7 +81,7 @@ class TestUSBDevice(TestCase):
                 self._device.write('test')
 
     def test_read(self):
-        self._device.interface = ('AD2USB', 0)
+        self._device.interface = 'AD2USB'
         self._device.open(no_reader_thread=True)
 
         with patch.object(self._device._device, 'read_data') as mock:
