@@ -48,7 +48,7 @@
             
   <h1>Source code for pyad2.devices</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Contains different types of devices belonging to the AD2USB family.</span>
+<span class="sd">Contains different types of devices belonging to the AD2 family.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -58,15 +58,16 @@
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">serial</span><span class="o">,</span> <span class="nn">serial.tools.list_ports</span>
 <span class="kn">import</span> <span class="nn">socket</span>
+
 <span class="kn">from</span> <span class="nn">OpenSSL</span> <span class="kn">import</span> <span class="n">SSL</span><span class="p">,</span> <span class="n">crypto</span>
 <span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">pyftdi.pyftdi.usbtools</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 
 <div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generic parent device to all AD2USB products.</span>
+<span class="sd">    Generic parent device to all AD2 products.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Generic device events</span>
@@ -167,7 +168,7 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">read_line</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">READ_TIMEOUT</span><span class="p">)</span>
 
-                <span class="k">except</span> <span class="n">util</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
                     <span class="k">pass</span>
 
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
@@ -196,7 +197,7 @@
 <span class="sd">        Returns all FTDI devices matching our vendor and product IDs.</span>
 
 <span class="sd">        :returns: list of devices</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -204,7 +205,7 @@
             <span class="n">devices</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="o">.</span><span class="n">find_all</span><span class="p">([(</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_VENDOR_ID</span><span class="p">,</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_PRODUCT_ID</span><span class="p">)],</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating AD2USB devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating AD2USB devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">devices</span>
 </div>
@@ -293,7 +294,7 @@
 <span class="sd">        :param no_reader_thread: Whether or not to automatically start the reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: util.NoDeviceError</span>
+<span class="sd">        :raises: NoDeviceError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Set up defaults</span>
         <span class="k">if</span> <span class="n">baudrate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -313,7 +314,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s">&#39;USB {0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">bus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
@@ -342,7 +343,7 @@
 <span class="sd">        :param data: Data to write</span>
 <span class="sd">        :type data: str</span>
 
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -350,14 +351,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">FtdiError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="USBDevice.read"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
 <span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -365,7 +366,7 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
@@ -379,7 +380,7 @@
 <span class="sd">        :type purge_buffer: bool</span>
 
 <span class="sd">        :returns: The line that was read.</span>
-<span class="sd">        :raises: util.CommError, util.TimeoutError</span>
+<span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">purge_buffer</span><span class="p">:</span>
@@ -421,7 +422,7 @@
             <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
@@ -434,7 +435,7 @@
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 
@@ -457,7 +458,7 @@
 <span class="sd">        :type pattern: str</span>
 
 <span class="sd">        :returns: list of devices</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -468,7 +469,7 @@
                 <span class="n">devices</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">list_ports</span><span class="o">.</span><span class="n">comports</span><span class="p">()</span>
 
         <span class="k">except</span> <span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating serial devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating serial devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">devices</span>
 </div>
@@ -513,14 +514,14 @@
 <span class="sd">        :param no_reader_thread: Whether or not to automatically start the reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: util.NoDeviceError</span>
+<span class="sd">        :raises: NoDeviceError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Set up the defaults</span>
         <span class="k">if</span> <span class="n">baudrate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">baudrate</span> <span class="o">=</span> <span class="n">SerialDevice</span><span class="o">.</span><span class="n">BAUDRATE</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No device interface specified.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No device interface specified.&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
 
@@ -535,7 +536,7 @@
                                                         <span class="c">#       all issues with it.</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device on port {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device on port {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
@@ -561,7 +562,7 @@
 <span class="sd">        :param data: The data to write.</span>
 <span class="sd">        :type data: str</span>
 
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -570,7 +571,7 @@
             <span class="k">pass</span>
 
         <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -580,7 +581,7 @@
 <span class="sd">        Reads a single character from the device.</span>
 
 <span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -588,7 +589,7 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
@@ -602,7 +603,7 @@
 <span class="sd">        :type purge_buffer: bool</span>
 
 <span class="sd">        :returns: The line read.</span>
-<span class="sd">        :raises: util.CommError, util.TimeoutError</span>
+<span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
             <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
@@ -640,7 +641,7 @@
             <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
@@ -653,13 +654,13 @@
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div></div>
 <div class="viewcode-block" id="SocketDevice"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice">[docs]</a><span class="k">class</span> <span class="nc">SocketDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device that supports communication with an AD2USB that is exposed via ser2sock or another</span>
+<span class="sd">    Device that supports communication with an AD2 that is exposed via ser2sock or another</span>
 <span class="sd">    Serial to IP interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -783,7 +784,7 @@
 <span class="sd">        :param no_reader_thread: Whether or not to automatically open the reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: util.NoDeviceError, util.CommError</span>
+<span class="sd">        :raises: NoDeviceError, CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -797,7 +798,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s">&#39;{0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device at {0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device at {0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
@@ -830,7 +831,7 @@
 <span class="sd">        :type data: str</span>
 
 <span class="sd">        :returns: The number of bytes sent.</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data_sent</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -838,12 +839,12 @@
             <span class="n">data_sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">data_sent</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">SSL</span><span class="o">.</span><span class="n">Error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data_sent</span>
 </div>
@@ -852,7 +853,7 @@
 <span class="sd">        Reads a single character from the device.</span>
 
 <span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -860,7 +861,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error while reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error while reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data</span>
 </div>
@@ -874,7 +875,7 @@
 <span class="sd">        :type purge_buffer: bool</span>
 
 <span class="sd">        :returns: The line read from the device.</span>
-<span class="sd">        :raises: util.CommError, util.TimeoutError</span>
+<span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">purge_buffer</span><span class="p">:</span>
@@ -916,7 +917,7 @@
             <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
@@ -929,7 +930,7 @@
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
@@ -958,10 +959,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">SSL</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">SSL</span><span class="o">.</span><span class="n">Error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error setting up SSL connection.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error setting up SSL connection.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_verify_ssl_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">x509</span><span class="p">,</span> <span class="n">errnum</span><span class="p">,</span> <span class="n">errdepth</span><span class="p">,</span> <span class="n">ok</span><span class="p">):</span>
-        <span class="c">#print ok</span>
         <span class="k">return</span> <span class="n">ok</span></div>
 </pre></div>
 

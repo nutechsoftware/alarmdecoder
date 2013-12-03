@@ -48,14 +48,13 @@
             
   <h1>Source code for pyad2.util</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides utility classes for the AD2USB devices.</span>
+<span class="sd">Provides utility classes for the AD2 devices.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">ad2</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 
 <div class="viewcode-block" id="NoDeviceError"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.NoDeviceError">[docs]</a><span class="k">class</span> <span class="nc">NoDeviceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -84,7 +83,7 @@
 </div>
 <div class="viewcode-block" id="Firmware"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.Firmware">[docs]</a><span class="k">class</span> <span class="nc">Firmware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents firmware for the AD2USB/AD2SERIAL devices.</span>
+<span class="sd">    Represents firmware for the AD2 devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Constants</span>
@@ -98,7 +97,7 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Firmware.upload"><a class="viewcode-back" href="../../pyad2.html#pyad2.util.Firmware.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uploads firmware to an AD2USB/AD2SERIAL device.</span>
+<span class="sd">        Uploads firmware to an AD2 device.</span>
 
 <span class="sd">        :param filename: The firmware filename</span>
 <span class="sd">        :type filename: str</span>

@@ -56,27 +56,27 @@
 <h1>pyad2 Package<a class="headerlink" href="#pyad2-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-pyad2.ad2">
 <span id="ad2-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">ad2</span></tt> Module<a class="headerlink" href="#module-pyad2.ad2" title="Permalink to this headline">¶</a></h2>
-<p>Provides the full AD2USB class and factory.</p>
+<p>Provides the full AD2 class and factory.</p>
 <dl class="class">
-<dt id="pyad2.ad2.Overseer">
-<em class="property">class </em><tt class="descclassname">pyad2.ad2.</tt><tt class="descname">Overseer</tt><big>(</big><em>attached_event=None</em>, <em>detached_event=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory">
+<em class="property">class </em><tt class="descclassname">pyad2.ad2.</tt><tt class="descname">AD2Factory</tt><big>(</big><em>attached_event=None</em>, <em>detached_event=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Factory for creation of AD2USB devices as well as provides attach/detach events.&#8221;</p>
 <dl class="attribute">
-<dt id="pyad2.ad2.Overseer.on_attached">
-<tt class="descname">on_attached</tt><a class="headerlink" href="#pyad2.ad2.Overseer.on_attached" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.on_attached">
+<tt class="descname">on_attached</tt><a class="headerlink" href="#pyad2.ad2.AD2Factory.on_attached" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when an AD2USB device has been detected.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="pyad2.ad2.Overseer.on_detached">
-<tt class="descname">on_detached</tt><a class="headerlink" href="#pyad2.ad2.Overseer.on_detached" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.on_detached">
+<tt class="descname">on_detached</tt><a class="headerlink" href="#pyad2.ad2.AD2Factory.on_detached" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when an AD2USB device has been removed.</p>
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="pyad2.ad2.Overseer.find_all">
-<em class="property">classmethod </em><tt class="descname">find_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.find_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.find_all" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.find_all">
+<em class="property">classmethod </em><tt class="descname">find_all</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.find_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.find_all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns all AD2USB devices located on the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -84,15 +84,15 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of devices found</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="pyad2.ad2.Overseer.devices">
-<em class="property">classmethod </em><tt class="descname">devices</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.devices" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.devices">
+<em class="property">classmethod </em><tt class="descname">devices</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.devices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a cached list of AD2USB devices located on the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -105,8 +105,8 @@
 </dd></dl>
 
 <dl class="classmethod">
-<dt id="pyad2.ad2.Overseer.create">
-<em class="property">classmethod </em><tt class="descname">create</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.create" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.create">
+<em class="property">classmethod </em><tt class="descname">create</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.create" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory method that returns the requested AD2USB device, or the first device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -116,33 +116,33 @@
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">AD2USB object utilizing the specified device.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">util.NoDeviceError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">NoDeviceError</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.close" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean up and shut down.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.start">
-<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.start" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Starts the detection thread, if not already running.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.stop">
-<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.stop" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops the detection thread.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.get_device">
-<tt class="descname">get_device</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.get_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.get_device" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.get_device">
+<tt class="descname">get_device</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.get_device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.get_device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Factory method that returns the requested AD2USB device, or the first device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -155,19 +155,19 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="pyad2.ad2.Overseer.DetectThread">
-<em class="property">class </em><tt class="descname">DetectThread</tt><big>(</big><em>overseer</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.DetectThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.DetectThread" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.DetectThread">
+<em class="property">class </em><tt class="descname">DetectThread</tt><big>(</big><em>factory</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.DetectThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.DetectThread" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></tt></p>
 <p>Thread that handles detection of added/removed devices.</p>
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.DetectThread.stop">
-<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.DetectThread.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.DetectThread.stop" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.DetectThread.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.DetectThread.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.DetectThread.stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stops the thread.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.ad2.Overseer.DetectThread.run">
-<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#Overseer.DetectThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.Overseer.DetectThread.run" title="Permalink to this definition">¶</a></dt>
+<dt id="pyad2.ad2.AD2Factory.DetectThread.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2Factory.DetectThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2Factory.DetectThread.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>The actual detection process.</p>
 </dd></dl>
 
@@ -179,7 +179,7 @@
 <dt id="pyad2.ad2.AD2">
 <em class="property">class </em><tt class="descclassname">pyad2.ad2.</tt><tt class="descname">AD2</tt><big>(</big><em>device</em><big>)</big><a class="reference internal" href="_modules/pyad2/ad2.html#AD2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>High-level wrapper around AD2USB/AD2SERIAL devices.</p>
+<p>High-level wrapper around AD2 devices.</p>
 <dl class="attribute">
 <dt id="pyad2.ad2.AD2.on_arm">
 <tt class="descname">on_arm</tt><a class="headerlink" href="#pyad2.ad2.AD2.on_arm" title="Permalink to this definition">¶</a></dt>
@@ -339,7 +339,7 @@
 <dl class="attribute">
 <dt id="pyad2.ad2.AD2.id">
 <tt class="descname">id</tt><a class="reference internal" href="_modules/pyad2/ad2.html#AD2.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.ad2.AD2.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The ID of the AD2USB device.</p>
+<dd><p>The ID of the AD2 device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -436,12 +436,12 @@
 </div>
 <div class="section" id="module-pyad2.devices">
 <span id="devices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">devices</span></tt> Module<a class="headerlink" href="#module-pyad2.devices" title="Permalink to this headline">¶</a></h2>
-<p>Contains different types of devices belonging to the AD2USB family.</p>
+<p>Contains different types of devices belonging to the AD2 family.</p>
 <dl class="class">
 <dt id="pyad2.devices.Device">
 <em class="property">class </em><tt class="descclassname">pyad2.devices.</tt><tt class="descname">Device</tt><a class="reference internal" href="_modules/pyad2/devices.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.devices.Device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Generic parent device to all AD2USB products.</p>
+<p>Generic parent device to all AD2 products.</p>
 <dl class="attribute">
 <dt id="pyad2.devices.Device.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#pyad2.devices.Device.on_open" title="Permalink to this definition">¶</a></dt>
@@ -566,7 +566,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -628,7 +628,7 @@
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.NoDeviceError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError</p>
 </td>
 </tr>
 </tbody>
@@ -651,7 +651,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; Data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -667,7 +667,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -690,7 +690,7 @@
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.CommError, util.TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
 </td>
 </tr>
 </tbody>
@@ -722,7 +722,7 @@
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -756,7 +756,7 @@
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.NoDeviceError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError</p>
 </td>
 </tr>
 </tbody>
@@ -779,7 +779,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; The data to write.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -795,7 +795,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -818,7 +818,7 @@
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line read.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.CommError, util.TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
 </td>
 </tr>
 </tbody>
@@ -831,7 +831,7 @@
 <dt id="pyad2.devices.SocketDevice">
 <em class="property">class </em><tt class="descclassname">pyad2.devices.</tt><tt class="descname">SocketDevice</tt><big>(</big><em>interface=('localhost'</em>, <em>10000)</em><big>)</big><a class="reference internal" href="_modules/pyad2/devices.html#SocketDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.devices.SocketDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#pyad2.devices.Device" title="pyad2.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">pyad2.devices.Device</span></tt></a></p>
-<p>Device that supports communication with an AD2USB that is exposed via ser2sock or another
+<p>Device that supports communication with an AD2 that is exposed via ser2sock or another
 Serial to IP interface.</p>
 <dl class="attribute">
 <dt id="pyad2.devices.SocketDevice.interface">
@@ -917,7 +917,7 @@ Serial to IP interface.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.NoDeviceError, util.CommError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError, CommError</p>
 </td>
 </tr>
 </tbody>
@@ -942,7 +942,7 @@ Serial to IP interface.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The number of bytes sent.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -958,7 +958,7 @@ Serial to IP interface.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">util.CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
 </tr>
 </tbody>
 </table>
@@ -981,7 +981,7 @@ Serial to IP interface.</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line read from the device.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">util.CommError, util.TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
 </td>
 </tr>
 </tbody>
@@ -993,7 +993,7 @@ Serial to IP interface.</p>
 </div>
 <div class="section" id="module-pyad2.util">
 <span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-pyad2.util" title="Permalink to this headline">¶</a></h2>
-<p>Provides utility classes for the AD2USB devices.</p>
+<p>Provides utility classes for the AD2 devices.</p>
 <dl class="exception">
 <dt id="pyad2.util.NoDeviceError">
 <em class="property">exception </em><tt class="descclassname">pyad2.util.</tt><tt class="descname">NoDeviceError</tt><a class="reference internal" href="_modules/pyad2/util.html#NoDeviceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.util.NoDeviceError" title="Permalink to this definition">¶</a></dt>
@@ -1026,7 +1026,7 @@ Serial to IP interface.</p>
 <dt id="pyad2.util.Firmware">
 <em class="property">class </em><tt class="descclassname">pyad2.util.</tt><tt class="descname">Firmware</tt><a class="reference internal" href="_modules/pyad2/util.html#Firmware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.util.Firmware" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Represents firmware for the AD2USB/AD2SERIAL devices.</p>
+<p>Represents firmware for the AD2 devices.</p>
 <dl class="attribute">
 <dt id="pyad2.util.Firmware.STAGE_START">
 <tt class="descname">STAGE_START</tt><em class="property"> = 0</em><a class="headerlink" href="#pyad2.util.Firmware.STAGE_START" title="Permalink to this definition">¶</a></dt>
@@ -1060,7 +1060,7 @@ Serial to IP interface.</p>
 <dl class="staticmethod">
 <dt id="pyad2.util.Firmware.upload">
 <em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads firmware to an AD2USB/AD2SERIAL device.</p>
+<dd><p>Uploads firmware to an AD2 device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1083,7 +1083,7 @@ Serial to IP interface.</p>
 </div>
 <div class="section" id="module-pyad2.zonetracking">
 <span id="zonetracking-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">zonetracking</span></tt> Module<a class="headerlink" href="#module-pyad2.zonetracking" title="Permalink to this headline">¶</a></h2>
-<p>Provides zone tracking functionality for the AD2USB device family.</p>
+<p>Provides zone tracking functionality for the AD2 device family.</p>
 <dl class="class">
 <dt id="pyad2.zonetracking.Zone">
 <em class="property">class </em><tt class="descclassname">pyad2.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em><big>)</big><a class="reference internal" href="_modules/pyad2/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
@@ -1160,7 +1160,7 @@ Serial to IP interface.</p>
 </div>
 <div class="section" id="module-pyad2.messages">
 <span id="messages-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">messages</span></tt> Module<a class="headerlink" href="#module-pyad2.messages" title="Permalink to this headline">¶</a></h2>
-<p>Message representations received from the panel through the AD2USB.</p>
+<p>Message representations received from the panel through the AD2 devices.</p>
 <dl class="class">
 <dt id="pyad2.messages.BaseMessage">
 <em class="property">class </em><tt class="descclassname">pyad2.messages.</tt><tt class="descname">BaseMessage</tt><a class="reference internal" href="_modules/pyad2/messages.html#BaseMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.messages.BaseMessage" title="Permalink to this definition">¶</a></dt>
@@ -1183,12 +1183,14 @@ Serial to IP interface.</p>
 <dl class="attribute">
 <dt id="pyad2.messages.ExpanderMessage.ZONE">
 <tt class="descname">ZONE</tt><em class="property"> = 0</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.ZONE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Flag indicating that the expander message relates to a Zone Expander.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="pyad2.messages.ExpanderMessage.RELAY">
 <tt class="descname">RELAY</tt><em class="property"> = 1</em><a class="headerlink" href="#pyad2.messages.ExpanderMessage.RELAY" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Flag indicating that the expander message relates to a Relay Expander.</p>
+</dd></dl>
 
 </dd></dl>
 

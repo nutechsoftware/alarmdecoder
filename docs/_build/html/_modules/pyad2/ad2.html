@@ -48,21 +48,21 @@
             
   <h1>Source code for pyad2.ad2</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides the full AD2USB class and factory.</span>
+<span class="sd">Provides the full AD2 class and factory.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">devices</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">util</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">messages</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">zonetracking</span>
 
-<div class="viewcode-block" id="Overseer"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer">[docs]</a><span class="k">class</span> <span class="nc">Overseer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
+<span class="kn">from</span> <span class="nn">.devices</span> <span class="kn">import</span> <span class="n">USBDevice</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">NoDeviceError</span>
+<span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">,</span> <span class="n">RFMessage</span><span class="p">,</span> <span class="n">LRRMessage</span>
+<span class="kn">from</span> <span class="nn">.zonetracking</span> <span class="kn">import</span> <span class="n">Zonetracker</span>
+
+<div class="viewcode-block" id="AD2Factory"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory">[docs]</a><span class="k">class</span> <span class="nc">AD2Factory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Factory for creation of AD2USB devices as well as provides attach/detach events.&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -74,19 +74,19 @@
     <span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Overseer.find_all"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.find_all"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns all AD2USB devices located on the system.</span>
 
 <span class="sd">        :returns: list of devices found</span>
-<span class="sd">        :raises: util.CommError</span>
+<span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Overseer.devices"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.devices">[docs]</a>    <span class="k">def</span> <span class="nf">devices</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.devices"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.devices">[docs]</a>    <span class="k">def</span> <span class="nf">devices</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a cached list of AD2USB devices located on the system.</span>
 
@@ -95,7 +95,7 @@
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span>
 </div>
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Overseer.create"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.create"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.create">[docs]</a>    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Factory method that returns the requested AD2USB device, or the first device.</span>
 
@@ -103,18 +103,18 @@
 <span class="sd">        :type device: tuple</span>
 
 <span class="sd">        :returns: AD2USB object utilizing the specified device.</span>
-<span class="sd">        :raises: util.NoDeviceError</span>
+<span class="sd">        :raises: NoDeviceError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__devices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">util</span><span class="o">.</span><span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No AD2USB devices present.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No AD2USB devices present.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">device</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">vendor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">sernum</span><span class="p">,</span> <span class="n">ifcount</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="n">device</span>
-        <span class="n">device</span> <span class="o">=</span> <span class="n">devices</span><span class="o">.</span><span class="n">USBDevice</span><span class="p">((</span><span class="n">sernum</span><span class="p">,</span> <span class="n">ifcount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="p">((</span><span class="n">sernum</span><span class="p">,</span> <span class="n">ifcount</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">AD2</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </div>
@@ -127,7 +127,7 @@
 <span class="sd">        :param detached_event: Event to trigger when a device is detached.</span>
 <span class="sd">        :type detached_event: function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_detect_thread</span> <span class="o">=</span> <span class="n">Overseer</span><span class="o">.</span><span class="n">DetectThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_detect_thread</span> <span class="o">=</span> <span class="n">AD2Factory</span><span class="o">.</span><span class="n">DetectThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">attached_event</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">on_attached</span> <span class="o">+=</span> <span class="n">attached_event</span>
@@ -135,61 +135,61 @@
         <span class="k">if</span> <span class="n">detached_event</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">on_detached</span> <span class="o">+=</span> <span class="n">detached_event</span>
 
-        <span class="n">Overseer</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+        <span class="n">AD2Factory</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<div class="viewcode-block" id="Overseer.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clean up and shut down.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Overseer.start"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.start"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Starts the detection thread, if not already running.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_detect_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Overseer.stop"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.stop"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stops the detection thread.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_detect_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Overseer.get_device"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.get_device">[docs]</a>    <span class="k">def</span> <span class="nf">get_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.get_device"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.get_device">[docs]</a>    <span class="k">def</span> <span class="nf">get_device</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Factory method that returns the requested AD2USB device, or the first device.</span>
 
 <span class="sd">        :param device: Tuple describing the USB device to open, as returned by find_all().</span>
 <span class="sd">        :type device: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Overseer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">AD2Factory</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Overseer.DetectThread"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.DetectThread">[docs]</a>    <span class="k">class</span> <span class="nc">DetectThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.DetectThread"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.DetectThread">[docs]</a>    <span class="k">class</span> <span class="nc">DetectThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Thread that handles detection of added/removed devices.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overseer</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Constructor</span>
 
-<span class="sd">            :param overseer: Overseer object to use with the thread.</span>
-<span class="sd">            :type overseer: Overseer</span>
+<span class="sd">            :param factory: AD2Factory object to use with the thread.</span>
+<span class="sd">            :type factory: AD2Factory</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_overseer</span> <span class="o">=</span> <span class="n">overseer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_factory</span> <span class="o">=</span> <span class="n">factory</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
 
-<div class="viewcode-block" id="Overseer.DetectThread.stop"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.DetectThread.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.DetectThread.stop"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.DetectThread.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Stops the thread.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
 </div>
-<div class="viewcode-block" id="Overseer.DetectThread.run"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.Overseer.DetectThread.run">[docs]</a>        <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AD2Factory.DetectThread.run"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2Factory.DetectThread.run">[docs]</a>        <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            The actual detection process.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
@@ -199,20 +199,20 @@
 
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">Overseer</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+                    <span class="n">AD2Factory</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
-                    <span class="n">current_devices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">Overseer</span><span class="o">.</span><span class="n">devices</span><span class="p">())</span>
+                    <span class="n">current_devices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">AD2Factory</span><span class="o">.</span><span class="n">devices</span><span class="p">())</span>
                     <span class="n">new_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">current_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">last_devices</span><span class="p">]</span>
                     <span class="n">removed_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">last_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_devices</span><span class="p">]</span>
                     <span class="n">last_devices</span> <span class="o">=</span> <span class="n">current_devices</span>
 
                     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">new_devices</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_overseer</span><span class="o">.</span><span class="n">on_attached</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_factory</span><span class="o">.</span><span class="n">on_attached</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
                     <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">removed_devices</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_overseer</span><span class="o">.</span><span class="n">on_detached</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_factory</span><span class="o">.</span><span class="n">on_detached</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-                <span class="k">except</span> <span class="n">util</span><span class="o">.</span><span class="n">CommError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
                     <span class="k">pass</span>
 
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
@@ -220,7 +220,7 @@
 </div></div></div>
 <div class="viewcode-block" id="AD2"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2">[docs]</a><span class="k">class</span> <span class="nc">AD2</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High-level wrapper around AD2USB/AD2SERIAL devices.</span>
+<span class="sd">    High-level wrapper around AD2 devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># High-level Events</span>
@@ -268,11 +268,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param device: The low-level device used for this AD2USB interface.</span>
-<span class="sd">        :type device: devices.Device</span>
+<span class="sd">        :param device: The low-level device used for this AD2 interface.</span>
+<span class="sd">        :type device: Device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zonetracker</span> <span class="o">=</span> <span class="n">zonetracking</span><span class="o">.</span><span class="n">Zonetracker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zonetracker</span> <span class="o">=</span> <span class="n">Zonetracker</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span> <span class="o">=</span> <span class="bp">None</span>
@@ -294,7 +294,7 @@
     <span class="nd">@property</span>
 <div class="viewcode-block" id="AD2.id"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The ID of the AD2USB device.</span>
+<span class="sd">        The ID of the AD2 device.</span>
 
 <span class="sd">        :returns: The identification string for the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -320,7 +320,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="bp">None</span>
 </div>
@@ -332,7 +334,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the configuration from the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;C</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;C</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="AD2.save_config"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2.save_config">[docs]</a>    <span class="k">def</span> <span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -361,13 +363,13 @@
 
         <span class="n">config_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">config_entries</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;C{0}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_string</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;C{0}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_string</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="AD2.reboot"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2.reboot">[docs]</a>    <span class="k">def</span> <span class="nf">reboot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reboots the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="AD2.fault_zone"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2.fault_zone">[docs]</a>    <span class="k">def</span> <span class="nf">fault_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">simulate_wire_problem</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -388,7 +390,7 @@
 
         <span class="n">status</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">simulate_wire_problem</span> <span class="k">else</span> <span class="mi">1</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;L{0:02}{1}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;L{0:02}{1}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="AD2.clear_zone"><a class="viewcode-back" href="../../pyad2.html#pyad2.ad2.AD2.clear_zone">[docs]</a>    <span class="k">def</span> <span class="nf">clear_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -397,7 +399,7 @@
 <span class="sd">        :param zone: The zone to clear.</span>
 <span class="sd">        :type zone: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;L{0:02}0</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;L{0:02}0</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">))</span>
 </div>
     <span class="k">def</span> <span class="nf">_wire_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -420,19 +422,19 @@
 <span class="sd">        :returns: An object representing the message.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">raise</span> <span class="n">InvalidMessageError</span><span class="p">()</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">None</span>
 
         <span class="n">header</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;!&#39;</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!KPE&#39;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!EXP&#39;</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!REL&#39;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ExpanderMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -451,7 +453,7 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_handle_rfx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">RFMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">RFMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_rfx_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -466,7 +468,7 @@
 
 <span class="sd">        :returns: An object representing the LRR message.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">LRRMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">LRRMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">event_type</span> <span class="o">==</span> <span class="s">&#39;ALARM_PANIC&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_panic_status</span> <span class="o">=</span> <span class="bp">True</span>
@@ -518,7 +520,7 @@
 <span class="sd">        :param message: Message to update internal states with.</span>
 <span class="sd">        :type message: Message, ExpanderMessage, LRRMessage, or RFMessage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Message</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ac_power</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span><span class="p">,</span> <span class="n">old_status</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">ac_power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span>
 
@@ -560,8 +562,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_fire_status</span> <span class="o">=</span> <span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">fire_alarm</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">on_fire</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fire_status</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">RELAY</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">RELAY</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_relay_status</span><span class="p">[(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">)]</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">value</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">on_relay_changed</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -578,9 +580,9 @@
 
         <span class="c"># Retrieve a list of faults.</span>
         <span class="c"># NOTE: This only happens on first boot or after exiting programming mode.</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Message</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">message</span><span class="o">.</span><span class="n">ready</span> <span class="ow">and</span> <span class="s">&quot;Hit * for faults&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
                 <span class="k">return</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_zonetracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>

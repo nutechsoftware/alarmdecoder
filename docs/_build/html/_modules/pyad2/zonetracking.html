@@ -48,15 +48,16 @@
             
   <h1>Source code for pyad2.zonetracking</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides zone tracking functionality for the AD2USB device family.</span>
+<span class="sd">Provides zone tracking functionality for the AD2 device family.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">time</span>
+
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">ExpanderMessage</span>
 
 <div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -126,10 +127,8 @@
 <span class="sd">        :param message: Message to use to update the zone tracking.</span>
 <span class="sd">        :type message: Message or ExpanderMessage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">zone</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">messages</span><span class="o">.</span><span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
                 <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expander_to_zone</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
 
                 <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span>
@@ -138,6 +137,9 @@
                 <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CHECK</span>
 
+                <span class="c"># NOTE: Expander zone faults are handled differently than regular messages.</span>
+                <span class="c"># We don&#39;t include them in self._zones_faulted because they are not reported</span>
+                <span class="c"># by the panel in it&#39;s rolling list of faults.</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
 
@@ -317,10 +319,7 @@
 
 <span class="sd">        :returns: Whether or not the zone is expired.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">Zonetracker</span><span class="o">.</span><span class="n">EXPIRE</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">True</span>
-
-        <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">Zonetracker</span><span class="o">.</span><span class="n">EXPIRE</span>
 
     <span class="k">def</span> <span class="nf">_expander_to_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
