@@ -1,4 +1,6 @@
-*.pyc
+build
+dist
 tmp
-bin/ad2-test
+*.pyc
 *.egg-info
+bin/ad2-test
