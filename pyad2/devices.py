@@ -284,10 +284,10 @@ class USBDevice(Device):
         Closes the device.
         """
         try:
+            Device.close(self)
+
             # HACK: Probably should fork pyftdi and make this call in .close().
             self._device.usb_dev.attach_kernel_driver(self._device_number)
-
-            Device.close(self)
 
         except:
             pass
