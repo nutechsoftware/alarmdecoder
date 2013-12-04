@@ -158,10 +158,10 @@ class AD2Factory(object):
                     last_devices = current_devices
 
                     for d in new_devices:
-                        self._factory.on_attached(d)
+                        self._factory.on_attached(device=d)
 
                     for d in removed_devices:
-                        self._factory.on_detached(d)
+                        self._factory.on_detached(device=d)
 
                 except CommError, err:
                     pass
@@ -416,7 +416,7 @@ class AD2(object):
         """
         msg = RFMessage(data)
 
-        self.on_rfx_message(msg)
+        self.on_rfx_message(message=msg)
 
         return msg
 
@@ -433,14 +433,14 @@ class AD2(object):
 
         if msg.event_type == 'ALARM_PANIC':
             self._panic_status = True
-            self.on_panic(True)
+            self.on_panic(status=True)
 
         elif msg.event_type == 'CANCEL':
             if self._panic_status == True:
                 self._panic_status = False
-                self.on_panic(False)
+                self.on_panic(status=False)
 
-        self.on_lrr_message(msg)
+        self.on_lrr_message(message=msg)
 
         return msg
 
@@ -486,19 +486,19 @@ class AD2(object):
                 self._power_status, old_status = message.ac_power, self._power_status
 
                 if old_status is not None:
-                    self.on_power_changed(self._power_status)
+                    self.on_power_changed(status=self._power_status)
 
             if message.alarm_sounding != self._alarm_status:
                 self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
 
                 if old_status is not None:
-                    self.on_alarm(self._alarm_status)
+                    self.on_alarm(status=self._alarm_status)
 
             if message.zone_bypassed != self._bypass_status:
                 self._bypass_status, old_status = message.zone_bypassed, self._bypass_status
 
                 if old_status is not None:
-                    self.on_bypass(self._bypass_status)
+                    self.on_bypass(status=self._bypass_status)
 
             if (message.armed_away | message.armed_home) != self._armed_status:
                 self._armed_status, old_status = message.armed_away | message.armed_home, self._armed_status
@@ -514,20 +514,20 @@ class AD2(object):
             else:
                 if message.battery_low == True or time.time() > self._battery_status[1] + AD2.BATTERY_TIMEOUT:
                     self._battery_status = (message.battery_low, time.time())
-                    self.on_low_battery(self._battery_status)
+                    self.on_low_battery(status=self._battery_status)
 
             if message.fire_alarm == self._fire_status[0]:
                 self._fire_status = (self._fire_status[0], time.time())
             else:
                 if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2.FIRE_TIMEOUT:
                     self._fire_status = (message.fire_alarm, time.time())
-                    self.on_fire(self._fire_status)
+                    self.on_fire(status=self._fire_status)
 
         elif isinstance(message, ExpanderMessage):
             if message.type == ExpanderMessage.RELAY:
                 self._relay_status[(message.address, message.channel)] = message.value
 
-                self.on_relay_changed(message)
+                self.on_relay_changed(message=message)
 
         self._update_zone_tracker(message)
 
@@ -548,42 +548,42 @@ class AD2(object):
 
         self._zonetracker.update(message)
 
-    def _on_open(self, sender, args):
+    def _on_open(self, sender, *args, **kwargs):
         """
         Internal handler for opening the device.
         """
-        self.on_open(args)
+        self.on_open(args, kwargs)
 
-    def _on_close(self, sender, args):
+    def _on_close(self, sender, *args, **kwargs):
         """
         Internal handler for closing the device.
         """
-        self.on_close(args)
+        self.on_close(args, kwargs)
 
-    def _on_read(self, sender, args):
+    def _on_read(self, sender, *args, **kwargs):
         """
         Internal handler for reading from the device.
         """
-        self.on_read(args)
+        self.on_read(args, kwargs)
 
-        msg = self._handle_message(args)
+        msg = self._handle_message(kwargs['data'])
         if msg:
-            self.on_message(msg)
+            self.on_message(message=msg)
 
-    def _on_write(self, sender, args):
+    def _on_write(self, sender, *args, **kwargs):
         """
         Internal handler for writing to the device.
         """
-        self.on_write(args)
+        self.on_write(args, kwargs)
 
-    def _on_zone_fault(self, sender, args):
+    def _on_zone_fault(self, sender, *args, **kwargs):
         """
         Internal handler for zone faults.
         """
-        self.on_zone_fault(args)
+        self.on_zone_fault(args, kwargs)
 
-    def _on_zone_restore(self, sender, args):
+    def _on_zone_restore(self, sender, *args, **kwargs):
         """
         Internal handler for zone restoration.
         """
-        self.on_zone_restore(args)
+        self.on_zone_restore(args, kwargs)

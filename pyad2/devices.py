@@ -304,7 +304,7 @@ class USBDevice(Device):
         try:
             self._device.write_data(data)
 
-            self.on_write(data)
+            self.on_write(data=data)
 
         except FtdiError, err:
             raise CommError('Error writing to device: {0}'.format(str(err)), err)
@@ -385,7 +385,7 @@ class USBDevice(Device):
                 ret = self._buffer
                 self._buffer = ''
 
-                self.on_read(ret)
+                self.on_read(data=ret)
 
         if timer:
             if timer.is_alive():
@@ -530,7 +530,7 @@ class SerialDevice(Device):
             raise CommError('Error writing to device.', err)
 
         else:
-            self.on_write(data)
+            self.on_write(data=data)
 
     def read(self):
         """
@@ -604,7 +604,7 @@ class SerialDevice(Device):
                 ret = self._buffer
                 self._buffer = ''
 
-                self.on_read(ret)
+                self.on_read(data=ret)
 
         if timer:
             if timer.is_alive():
@@ -797,7 +797,7 @@ class SocketDevice(Device):
             if data_sent == 0:
                 raise CommError('Error writing to device.')
 
-            self.on_write(data)
+            self.on_write(data=data)
 
         except (SSL.Error, socket.error), err:
             raise CommError('Error writing to device.', err)
@@ -880,7 +880,7 @@ class SocketDevice(Device):
                 ret = self._buffer
                 self._buffer = ''
 
-                self.on_read(ret)
+                self.on_read(data=ret)
 
         if timer:
             if timer.is_alive():
