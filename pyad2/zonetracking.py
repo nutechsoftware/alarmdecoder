@@ -238,7 +238,7 @@ class Zonetracker(object):
             self._zones[zone] = Zone(zone=zone, name=name, status=status)
 
         if status != Zone.CLEAR:
-            self.on_fault(zone)
+            self.on_fault(zone=zone)
 
     def _update_zone(self, zone, status=None):
         """
@@ -263,7 +263,7 @@ class Zonetracker(object):
             if zone in self._zones_faulted:
                 self._zones_faulted.remove(zone)
 
-            self.on_restore(zone)
+            self.on_restore(zone=zone)
 
     def _zone_expired(self, zone):
         """

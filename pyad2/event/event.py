@@ -2,11 +2,12 @@
 #
 
 # Based on pyevent originally found at http://www.emptypage.jp/notes/pyevent.en.html
-# 
+#
 # License: https://creativecommons.org/licenses/by/2.1/jp/deed.en
 #
 # Changes:
-#    Added type check in fire()
+#   * Added type check in fire()
+#   * Removed earg from fire() and added support for args/kwargs.
 
 class Event(object):
 
@@ -60,19 +61,19 @@ class EventHandler(object):
         self._getfunctionlist().remove(func)
         return self
 
-    def fire(self, earg=None):
+    def fire(self, *args, **kwargs):
 
         """Fire event and call all handler functions
 
-        You can call EventHandler object itself like e(earg) instead of
-        e.fire(earg).
+        You can call EventHandler object itself like e(*args, **kwargs) instead of
+        e.fire(*args, **kwargs).
         """
 
         for func in self._getfunctionlist():
             if type(func) == EventHandler:
-                func.fire(earg)
+                func.fire(*args, **kwargs)
             else:
-                func(self.obj, earg)
+                func(self.obj, *args, **kwargs)
 
     __iadd__ = add
     __isub__ = remove

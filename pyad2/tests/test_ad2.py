@@ -20,10 +20,10 @@ class TestAD2Factory(TestCase):
     def tearDown(self):
         self._factory.stop()
 
-    def attached_event(self, sender, args):
+    def attached_event(self, sender, *args, **kwargs):
         self._attached = True
 
-    def detached_event(self, sender, args):
+    def detached_event(self, sender, *args, **kwargs):
         self._detached = True
 
     def test_find_all(self):
@@ -114,43 +114,43 @@ class TestAD2(TestCase):
     def tearDown(self):
         pass
 
-    def on_panic(self, sender, args):
-        self._panicked = args
+    def on_panic(self, sender, *args, **kwargs):
+        self._panicked = kwargs['status']
 
-    def on_relay_changed(self, sender, args):
+    def on_relay_changed(self, sender, *args, **kwargs):
         self._relay_changed = True
 
-    def on_power_changed(self, sender, args):
-        self._power_changed = args
+    def on_power_changed(self, sender, *args, **kwargs):
+        self._power_changed = kwargs['status']
 
-    def on_alarm(self, sender, args):
-        self._alarmed = args
+    def on_alarm(self, sender, *args, **kwargs):
+        self._alarmed = kwargs['status']
 
-    def on_bypass(self, sender, args):
-        self._bypassed = args
+    def on_bypass(self, sender, *args, **kwargs):
+        self._bypassed = kwargs['status']
 
-    def on_battery(self, sender, args):
-        self._battery = args
+    def on_battery(self, sender, *args, **kwargs):
+        self._battery = kwargs['status']
 
-    def on_fire(self, sender, args):
-        self._fire = args
+    def on_fire(self, sender, *args, **kwargs):
+        self._fire = kwargs['status']
 
-    def on_arm(self, sender, args):
+    def on_arm(self, sender, *args, **kwargs):
         self._armed = True
 
-    def on_disarm(self, sender, args):
+    def on_disarm(self, sender, *args, **kwargs):
         self._armed = False
 
-    def on_config(self, sender, args):
+    def on_config(self, sender, *args, **kwargs):
         self._got_config = True
 
-    def on_message(self, sender, args):
+    def on_message(self, sender, *args, **kwargs):
         self._message_received = True
 
-    def on_rfx_message(self, sender, args):
+    def on_rfx_message(self, sender, *args, **kwargs):
         self._rfx_message_received = True
 
-    def on_lrr_message(self, sender, args):
+    def on_lrr_message(self, sender, *args, **kwargs):
         self._lrr_message_received = True
 
     def test_open(self):
@@ -195,14 +195,14 @@ class TestAD2(TestCase):
         msg = self._ad2._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertIsInstance(msg, Message)
 
-        self._ad2._on_read(self, '[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self._ad2._on_read(self, data='[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertTrue(self._message_received)
 
     def test_message_kpe(self):
         msg = self._ad2._handle_message('!KPE:[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertIsInstance(msg, Message)
 
-        self._ad2._on_read(self, '[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self._ad2._on_read(self, data='[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertTrue(self._message_received)
 
     def test_expander_message(self):

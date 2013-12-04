@@ -17,10 +17,10 @@ class TestZonetracking(TestCase):
     def tearDown(self):
         pass
 
-    def fault_event(self, sender, args):
+    def fault_event(self, sender, *args, **kwargs):
         self._faulted = True
 
-    def restore_event(self, sender, args):
+    def restore_event(self, sender, *args, **kwargs):
         self._restored = True
 
     def _build_expander_message(self, msg):
