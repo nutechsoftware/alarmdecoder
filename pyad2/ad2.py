@@ -423,10 +423,10 @@ class AD2(object):
         """
         Internal handler for zone faults.
         """
-        self.on_zone_fault(args, kwargs)
+        self.on_zone_fault(*args, **kwargs)
 
     def _on_zone_restore(self, sender, *args, **kwargs):
         """
         Internal handler for zone restoration.
         """
-        self.on_zone_restore(args, kwargs)
+        self.on_zone_restore(*args, **kwargs)
