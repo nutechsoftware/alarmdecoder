@@ -252,16 +252,16 @@ class RFMessage(BaseMessage):
             self.serial_number, self.value = values.split(',')
             self.value = int(self.value, 16)
 
-            is_bit_set = lambda b: self.value & (1 << b) > 0
+            is_bit_set = lambda b: self.value & (1 << (b - 1)) > 0
 
             # Bit 1 = unknown
             self.battery = is_bit_set(2)
             self.supervision = is_bit_set(3)
             # Bit 4 = unknown
-            self.loop[0] = is_bit_set(5)
+            self.loop[2] = is_bit_set(5)
             self.loop[1] = is_bit_set(6)
-            self.loop[2] = is_bit_set(7)
-            self.loop[3] = is_bit_set(8)
+            self.loop[3] = is_bit_set(7)
+            self.loop[0] = is_bit_set(8)
 
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
