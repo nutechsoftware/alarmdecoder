@@ -3,69 +3,11 @@ import time
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
 
-from ..ad2 import AD2Factory, AD2
+from ..ad2 import AD2
 from ..devices import USBDevice
 from ..messages import Message, RFMessage, LRRMessage, ExpanderMessage
 from ..event.event import Event, EventHandler
 from ..zonetracking import Zonetracker
-
-class TestAD2Factory(TestCase):
-    def setUp(self):
-        self._attached = False
-        self._detached = False
-
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            self._factory = AD2Factory()
-
-    def tearDown(self):
-        self._factory.stop()
-
-    def attached_event(self, sender, *args, **kwargs):
-        self._attached = True
-
-    def detached_event(self, sender, *args, **kwargs):
-        self._detached = True
-
-    def test_find_all(self):
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            devices = AD2Factory.find_all()
-
-            self.assertEquals(devices[0][2], 'AD2')
-
-    def test_create_default_param(self):
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            device = AD2Factory.create()
-
-            self.assertEquals(device._device.interface, 'AD2')
-
-    def test_create_with_param(self):
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            device = AD2Factory.create((0, 0, 'AD2-1', 1, 'AD2'))
-            self.assertEquals(device._device.interface, 'AD2-1')
-
-            device = AD2Factory.create((0, 0, 'AD2-2', 1, 'AD2'))
-            self.assertEquals(device._device.interface, 'AD2-2')
-
-    def test_events(self):
-        self.assertEquals(self._attached, False)
-        self.assertEquals(self._detached, False)
-
-        # this is ugly, but it works.
-        self._factory.stop()
-        self._factory._detect_thread = AD2Factory.DetectThread(self._factory)
-        self._factory.on_attached += self.attached_event
-        self._factory.on_detached += self.detached_event
-
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            self._factory.start()
-
-            with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-2', 1, 'AD2')]):
-                AD2Factory.find_all()
-                time.sleep(1)
-                self._factory.stop()
-
-        self.assertEquals(self._attached, True)
-        self.assertEquals(self._detached, True)
 
 class TestAD2(TestCase):
     def setUp(self):
