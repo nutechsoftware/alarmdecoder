@@ -2,17 +2,21 @@ import time
 from pyad2 import AD2
 from pyad2.devices import SerialDevice
 
+# Configuration values
+SERIAL_DEVICE = '/dev/ttyUSB0'
+BAUDRATE = 115200
+
 def main():
     """
     Example application that opens a serial device and prints messages to the terminal.
     """
     try:
         # Retrieve the specified serial device.
-        device = AD2(SerialDevice(interface='/dev/ttyUSB0'))
+        device = AD2(SerialDevice(interface=SERIAL_DEVICE))
 
         # Set up an event handler and open the device
         device.on_message += handle_message
-        device.open(baudrate=115200)            # Override the default SerialDevice baudrate.
+        device.open(baudrate=BAUDRATE)            # Override the default SerialDevice baudrate.
         device.get_config()
 
         # Wait for events.

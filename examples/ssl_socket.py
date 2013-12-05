@@ -2,6 +2,13 @@ import time
 from pyad2 import AD2
 from pyad2.devices import SocketDevice
 
+# Configuration values
+HOSTNAME = 'localhost'
+PORT = 10000
+SSL_KEY = 'cert.key'
+SSL_CERT = 'cert.pem'
+SSL_CA = 'ca.pem'
+
 def main():
     """
     Example application that opens a device that has been exposed to the network
@@ -16,9 +23,9 @@ def main():
         # The key/cert attributes can either be a filesystem path or an X509/PKey
         # object from pyopenssl.
         ssl_device.ssl = True
-        ssl_device.ssl_key = 'cert.key'         # Client private key
-        ssl_device.ssl_certificate = 'cert.pem' # Client certificate
-        ssl_device.ssl_ca = 'ca.pem'            # CA certificate
+        ssl_device.ssl_ca = SSL_CA              # CA certificate
+        ssl_device.ssl_key = SSL_KEY            # Client private key
+        ssl_device.ssl_certificate = SSL_CERT   # Client certificate
 
         device = AD2(ssl_device)
 

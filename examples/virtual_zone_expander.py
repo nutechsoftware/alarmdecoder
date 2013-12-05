@@ -2,6 +2,10 @@ import time
 from pyad2 import AD2
 from pyad2.devices import USBDevice
 
+# Configuration values
+TARGET_ZONE = 41
+WAIT_TIME = 10
+
 def main():
     """
     Example application that periodically faults a virtual zone and then
@@ -36,11 +40,10 @@ def main():
         # Wait for events.
         last_update = time.time()
         while True:
-            if time.time() - last_update > 10:
-                # Fault zone 41 every 10 seconds.
-                device.fault_zone(41)
-
+            if time.time() - last_update > WAIT_TIME:
                 last_update = time.time()
+
+                device.fault_zone(TARGET_ZONE)
 
             time.sleep(1)
 
