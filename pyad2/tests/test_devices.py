@@ -4,6 +4,7 @@ from serial import Serial, SerialException
 from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
 from usb.core import USBError, Device as USBCoreDevice
 import socket
+import time
 from OpenSSL import SSL, crypto
 from ..devices import USBDevice, SerialDevice, SocketDevice
 from ..util import NoDeviceError, CommError, TimeoutError
@@ -17,8 +18,47 @@ class TestUSBDevice(TestCase):
         self._device._device.usb_dev.bus = 0
         self._device._device.usb_dev.address = 0
 
+        self._attached = False
+        self._detached = False
+
     def tearDown(self):
         self._device.close()
+
+    def attached_event(self, sender, *args, **kwargs):
+        self._attached = True
+
+    def detached_event(self, sender, *args, **kwargs):
+        self._detached = True
+
+    def test_find_default_param(self):
+        with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
+            device = USBDevice.find()
+
+            self.assertEquals(device.interface, 'AD2')
+
+    def test_find_with_param(self):
+        with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
+            device = USBDevice.find((0, 0, 'AD2-1', 1, 'AD2'))
+            self.assertEquals(device.interface, 'AD2-1')
+
+            device = USBDevice.find((0, 0, 'AD2-2', 1, 'AD2'))
+            self.assertEquals(device.interface, 'AD2-2')
+
+    def test_events(self):
+        self.assertEquals(self._attached, False)
+        self.assertEquals(self._detached, False)
+
+        # this is ugly, but it works.
+        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
+            USBDevice.start_detection(on_attached=self.attached_event, on_detached=self.detached_event)
+
+            with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-2', 1, 'AD2')]):
+                USBDevice.find_all()
+                time.sleep(1)
+                USBDevice.stop_detection()
+
+        self.assertEquals(self._attached, True)
+        self.assertEquals(self._detached, True)
 
     def test_find_all(self):
         with patch.object(USBDevice, 'find_all', return_value=[]) as mock:

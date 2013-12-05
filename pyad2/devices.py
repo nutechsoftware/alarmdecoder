@@ -142,23 +142,84 @@ class USBDevice(Device):
     BAUDRATE = 115200
     """Default baudrate for AD2USB devices."""
 
-    @staticmethod
-    def find_all():
+    __devices = []
+
+    @classmethod
+    def find_all(cls, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID):
         """
         Returns all FTDI devices matching our vendor and product IDs.
 
         :returns: list of devices
         :raises: CommError
         """
-        devices = []
+        cls.__devices = []
 
         try:
-            devices = Ftdi.find_all([(USBDevice.FTDI_VENDOR_ID, USBDevice.FTDI_PRODUCT_ID)], nocache=True)
+            cls.__devices = Ftdi.find_all([(vid, pid)], nocache=True)
 
         except (usb.core.USBError, FtdiError), err:
             raise CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
 
-        return devices
+        return cls.__devices
+
+    @classmethod
+    def devices(cls):
+        """
+        Returns a cached list of AD2USB devices located on the system.
+
+        :returns: cached list of devices found.
+        """
+        return cls.__devices
+
+    @classmethod
+    def find(cls, device=None):
+        """
+        Factory method that returns the requested USBDevice device, or the first device.
+
+        :param device: Tuple describing the USB device to open, as returned by find_all().
+        :type device: tuple
+
+        :returns: USBDevice object utilizing the specified device.
+        :raises: NoDeviceError
+        """
+        cls.find_all()
+
+        if len(cls.__devices) == 0:
+            raise NoDeviceError('No AD2USB devices present.')
+
+        if device is None:
+            device = cls.__devices[0]
+
+        vendor, product, sernum, ifcount, description = device
+
+        return USBDevice(interface=sernum)
+
+    @classmethod
+    def start_detection(cls, on_attached=None, on_detached=None):
+        """
+        Starts the device detection thread.
+
+        :param on_attached: function to be called when a device is attached.
+        :type on_attached: function
+        :param on_detached: function to be called when a device is detached.
+        :type on_detached: function
+        """
+        cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
+
+        cls.find_all()
+
+        cls.__detect_thread.start()
+
+    @classmethod
+    def stop_detection(cls):
+        """
+        Stops the device detection thread.
+        """
+        try:
+            cls.__detect_thread.stop()
+
+        except:
+            pass
 
     @property
     def interface(self):
@@ -267,7 +328,10 @@ class USBDevice(Device):
 
             self._device.set_baudrate(baudrate)
 
-            self._id = 'USB {0}:{1}'.format(self._device.usb_dev.bus, self._device.usb_dev.address)
+            if not self._serial_number:
+                self._serial_number = self._get_serial_number()
+
+            self._id = self._serial_number
 
         except (usb.core.USBError, FtdiError), err:
             raise NoDeviceError('Error opening device: {0}'.format(str(err)), err)
@@ -394,6 +458,71 @@ class USBDevice(Device):
                 raise TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
+
+    def _get_serial_number(self):
+        """
+        Retrieves the FTDI device serial number.
+
+        :returns: string containing the device serial number.
+        """
+        return usb.util.get_string(self._device.usb_dev, 64, self._device.usb_dev.iSerialNumber)
+
+    class DetectThread(threading.Thread):
+        """
+        Thread that handles detection of added/removed devices.
+        """
+        on_attached = event.Event('Called when an AD2USB device has been detected.')
+        on_detached = event.Event('Called when an AD2USB device has been removed.')
+
+        def __init__(self, on_attached=None, on_detached=None):
+            """
+            Constructor
+
+            :param factory: AD2Factory object to use with the thread.
+            :type factory: AD2Factory
+            """
+            threading.Thread.__init__(self)
+
+            if on_attached:
+                self.on_attached += on_attached
+
+            if on_detached:
+                self.on_detached += on_detached
+
+            self._running = False
+
+        def stop(self):
+            """
+            Stops the thread.
+            """
+            self._running = False
+
+        def run(self):
+            """
+            The actual detection process.
+            """
+            self._running = True
+
+            last_devices = set()
+
+            while self._running:
+                try:
+                    current_devices = set(USBDevice.find_all())
+
+                    new_devices = [d for d in current_devices if d not in last_devices]
+                    removed_devices = [d for d in last_devices if d not in current_devices]
+                    last_devices = current_devices
+
+                    for d in new_devices:
+                        self.on_attached(device=d)
+
+                    for d in removed_devices:
+                        self.on_detached(device=d)
+
+                except CommError, err:
+                    pass
+
+                time.sleep(0.25)
 
 
 class SerialDevice(Device):

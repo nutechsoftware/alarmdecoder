@@ -1,4 +1,4 @@
-import ad2
+from ad2 import AD2
 import devices
 import util
 import messages
