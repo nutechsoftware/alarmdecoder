@@ -920,8 +920,10 @@ class SocketDevice(Device):
         Closes the device.
         """
         try:
+            # TODO: Find a way to speed up this shutdown.
             if self.ssl:
                 self._device.shutdown()
+
             else:
                 self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
 
