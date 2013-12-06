@@ -85,6 +85,20 @@ class AD2(object):
         self.emulate_lrr = False
         self.deduplicate = False
 
+    def __enter__(self):
+        """
+        Support for context manager __enter__.
+        """
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """
+        Support for context manager __exit__.
+        """
+        self.close()
+
+        return False
+
     @property
     def id(self):
         """
@@ -106,6 +120,8 @@ class AD2(object):
         self._wire_events()
         self._device.open(baudrate=baudrate, no_reader_thread=no_reader_thread)
         self.get_config()
+
+        return self
 
     def close(self):
         """

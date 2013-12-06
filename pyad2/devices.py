@@ -37,6 +37,20 @@ class Device(object):
         self._running = False
         self._read_thread = Device.ReadThread(self)
 
+    def __enter__(self):
+        """
+        Support for context manager __enter__.
+        """
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """
+        Support for context manager __exit__.
+        """
+        self.close()
+
+        return False
+
     @property
     def id(self):
         """
@@ -338,10 +352,12 @@ class USBDevice(Device):
 
         else:
             self._running = True
+            self.on_open()
+
             if not no_reader_thread:
                 self._read_thread.start()
 
-            self.on_open()
+        return self
 
     def close(self):
         """
@@ -630,6 +646,8 @@ class SerialDevice(Device):
             if not no_reader_thread:
                 self._read_thread.start()
 
+        return self
+
     def close(self):
         """
         Closes the device.
@@ -890,11 +908,12 @@ class SocketDevice(Device):
 
         else:
             self._running = True
-
             self.on_open()
 
             if not no_reader_thread:
                 self._read_thread.start()
+
+        return self
 
     def close(self):
         """

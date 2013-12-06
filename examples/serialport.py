@@ -16,19 +16,15 @@ def main():
 
         # Set up an event handler and open the device
         device.on_message += handle_message
-        device.open(baudrate=BAUDRATE)          # Override the default SerialDevice
-                                                # baudrate since we're using a USB
-                                                # device over serial in this example.
 
-        # Wait for events.
-        while True:
-            time.sleep(1)
+        # Override the default SerialDevice baudrate since we're using a USB device
+        # over serial in this example.
+        with device.open(baudrate=BAUDRATE):
+            while True:
+                time.sleep(1)
 
     except Exception, ex:
         print 'Exception:', ex
-
-    finally:
-        device.close()
 
 def handle_message(sender, *args, **kwargs):
     """

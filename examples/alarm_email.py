@@ -24,17 +24,12 @@ def main():
 
         # Set up an event handler and open the device
         device.on_alarm += handle_alarm
-        device.open()
-
-        # Wait for events
-        while True:
-            time.sleep(1)
+        with device.open():
+            while True:
+                time.sleep(1)
 
     except Exception, ex:
         print 'Exception:', ex
-
-    finally:
-        device.close()
 
 def handle_alarm(sender, *args, **kwargs):
     """

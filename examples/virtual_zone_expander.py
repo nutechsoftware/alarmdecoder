@@ -34,23 +34,18 @@ def main():
         device.on_zone_fault += handle_zone_fault
         device.on_zone_restore += handle_zone_restore
 
-        device.open()
+        with device.open():
+            last_update = time.time()
+            while True:
+                if time.time() - last_update > WAIT_TIME:
+                    last_update = time.time()
 
-        # Wait for events.
-        last_update = time.time()
-        while True:
-            if time.time() - last_update > WAIT_TIME:
-                last_update = time.time()
+                    device.fault_zone(TARGET_ZONE)
 
-                device.fault_zone(TARGET_ZONE)
-
-            time.sleep(1)
+                time.sleep(1)
 
     except Exception, ex:
         print 'Exception:', ex
-
-    finally:
-        device.close()
 
 def handle_zone_fault(sender, *args, **kwargs):
     """
