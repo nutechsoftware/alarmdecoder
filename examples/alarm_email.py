@@ -1,8 +1,8 @@
 import time
 import smtplib
 from email.mime.text import MIMEText
-from pyad2 import AD2
-from pyad2.devices import USBDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import USBDevice
 
 # Configuration values
 SUBJECT = "Alarm Decoder - ALARM"
@@ -20,7 +20,7 @@ def main():
     """
     try:
         # Retrieve the first USB device
-        device = AD2(USBDevice.find())
+        device = AlarmDecoder(USBDevice.find())
 
         # Set up an event handler and open the device
         device.on_alarm += handle_alarm
@@ -33,7 +33,7 @@ def main():
 
 def handle_alarm(sender, *args, **kwargs):
     """
-    Handles alarm events from the AD2.
+    Handles alarm events from the AlarmDecoder.
     """
     status = kwargs['status']
     text = "Alarm status: {0}".format(status)

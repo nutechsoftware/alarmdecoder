@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import SocketDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import SocketDevice
 
 # Configuration values
 HOSTNAME = 'localhost'
@@ -27,7 +27,7 @@ def main():
         ssl_device.ssl_key = SSL_KEY            # Client private key
         ssl_device.ssl_certificate = SSL_CERT   # Client certificate
 
-        device = AD2(ssl_device)
+        device = AlarmDecoder(ssl_device)
 
         # Set up an event handler and open the device
         device.on_message += handle_message
@@ -40,7 +40,7 @@ def main():
 
 def handle_message(sender, *args, **kwargs):
     """
-    Handles message events from the AD2.
+    Handles message events from the AlarmDecoder.
     """
     msg = kwargs['message']
 

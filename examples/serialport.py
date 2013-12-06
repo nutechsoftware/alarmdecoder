@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import SerialDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import SerialDevice
 
 # Configuration values
 SERIAL_DEVICE = '/dev/ttyUSB0'
@@ -12,7 +12,7 @@ def main():
     """
     try:
         # Retrieve the specified serial device.
-        device = AD2(SerialDevice(interface=SERIAL_DEVICE))
+        device = AlarmDecoder(SerialDevice(interface=SERIAL_DEVICE))
 
         # Set up an event handler and open the device
         device.on_message += handle_message
@@ -28,7 +28,7 @@ def main():
 
 def handle_message(sender, *args, **kwargs):
     """
-    Handles message events from the AD2.
+    Handles message events from the AlarmDecoder.
     """
     msg = kwargs['message']
 

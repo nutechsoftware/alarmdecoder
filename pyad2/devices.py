@@ -1,5 +1,5 @@
 """
-Contains different types of devices belonging to the AD2 family.
+Contains different types of devices belonging to the Alarm Decoder (AD2) family.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -18,7 +18,7 @@ from .event import event
 
 class Device(object):
     """
-    Generic parent device to all AD2 products.
+    Generic parent device to all Alarm Decoder (AD2) products.
     """
 
     # Generic device events
@@ -494,8 +494,10 @@ class USBDevice(Device):
             """
             Constructor
 
-            :param factory: AD2Factory object to use with the thread.
-            :type factory: AD2Factory
+            :param on_attached: Function to call when a device is attached.
+            :type on_attached: function
+            :param on_detached: Function to call when a device is detached.
+            :type on_detached: function
             """
             threading.Thread.__init__(self)
 
@@ -763,8 +765,8 @@ class SerialDevice(Device):
 
 class SocketDevice(Device):
     """
-    Device that supports communication with an AD2 that is exposed via ser2sock or another
-    Serial to IP interface.
+    Device that supports communication with an Alarm Decoder (AD2) that is
+    exposed via ser2sock or another Serial to IP interface.
     """
 
     @property

@@ -1,10 +1,9 @@
 """
-Provides utility classes for the AD2 devices.
+Provides utility classes for the Alarm Decoder (AD2) devices.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-import ad2
 import time
 import threading
 
@@ -34,7 +33,7 @@ class InvalidMessageError(Exception):
 
 class Firmware(object):
     """
-    Represents firmware for the AD2 devices.
+    Represents firmware for the Alarm Decoder devices.
     """
 
     # Constants
@@ -48,14 +47,14 @@ class Firmware(object):
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
-        Uploads firmware to an AD2 device.
+        Uploads firmware to an Alarm Decoder device.
 
         :param filename: The firmware filename
         :type filename: str
         :param progress_callback: Callback function used to report progress.
         :type progress_callback: function
 
-        :raises: util.NoDeviceError, util.TimeoutError
+        :raises: NoDeviceError, TimeoutError
         """
 
         def do_upload():

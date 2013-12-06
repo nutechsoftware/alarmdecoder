@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import SocketDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import SocketDevice
 
 # Configuration values
 HOSTNAME = 'localhost'
@@ -13,7 +13,7 @@ def main():
     """
     try:
         # Retrieve an AD2 device that has been exposed with ser2sock on localhost:10000.
-        device = AD2(SocketDevice(interface=(HOSTNAME, PORT)))
+        device = AlarmDecoder(SocketDevice(interface=(HOSTNAME, PORT)))
 
         # Set up an event handler and open the device
         device.on_message += handle_message
@@ -26,7 +26,7 @@ def main():
 
 def handle_message(sender, *args, **kwargs):
     """
-    Handles message events from the AD2.
+    Handles message events from the AlarmDecoder.
     """
     msg = kwargs['message']
 

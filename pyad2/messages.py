@@ -1,5 +1,6 @@
 """
-Message representations received from the panel through the AD2 devices.
+Message representations received from the panel through the Alarm Decoder (AD2)
+devices.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """

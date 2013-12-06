@@ -1,5 +1,5 @@
 """
-Provides zone tracking functionality for the AD2 device family.
+Provides zone tracking functionality for the Alarm Decoder (AD2) device family.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """

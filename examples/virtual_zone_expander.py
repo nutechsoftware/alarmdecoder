@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import USBDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import USBDevice
 
 # Configuration values
 TARGET_ZONE = 41
@@ -12,23 +12,23 @@ def main():
     restores it.
 
     This is an advanced feature that allows you to emulate a virtual zone.  When
-    the AD2 is configured to emulate a relay expander we can fault and restore
-    those zones programmatically at will. These events can also be seen by others,
-    such as home automation platforms which allows you to connect other devices or
-    services and monitor them as you would any pyhysical zone.
+    the Alarm Decoder is configured to emulate a relay expander we can fault and
+    restore those zones programmatically at will. These events can also be seen by
+    others, such as home automation platforms which allows you to connect other
+    devices or services and monitor them as you would any pyhysical zone.
 
     For example, you could connect a ZigBee device and receiver and fault or
     restore it's zone(s) based on the data received.
 
     In order for this to happen you need to perform a couple configuration steps:
 
-    1. Enable zone expander emulation on your AD2 device by hitting '!' in a
-       terminal and going through the prompts.
+    1. Enable zone expander emulation on your Alarm Decoder device by hitting '!'
+       in a terminal and going through the prompts.
     2. Enable the zone expander in your panel programming.
     """
     try:
         # Retrieve the first USB device
-        device = AD2(USBDevice.find())
+        device = AlarmDecoder(USBDevice.find())
 
         # Set up an event handlers and open the device
         device.on_zone_fault += handle_zone_fault

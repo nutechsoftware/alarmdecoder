@@ -4,9 +4,9 @@ def readme():
     with open('README.md') as f:
         return f.read()
 
-setup(name='pyad2',
+setup(name='alarmdecoder',
     version='0.5',
-    description='Python interface library for the AD2 family of alarm devices.',
+    description='Python interface library for the Alarm Decoder (AD2) family of alarm devices, including: the AD2USB, AD2SERIAL and AD2PI.',
     long_description=readme(),
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -17,12 +17,12 @@ setup(name='pyad2',
         'Topic :: Home Automation',
         'Topic :: Security',
     ],
-    keywords='alarm data ad2 ad2usb ad2serial ad2pi security ademco dsc',
-    url='http://github.com/nutechsoftware/pyad2',
+    keywords='alarmdecoder alarm decoder ad2 ad2usb ad2serial ad2pi security ademco dsc',
+    url='http://github.com/nutechsoftware/alarmdecoder',
     author='Nu Tech Software Solutions, Inc.',
     author_email='general@support.nutech.com',
     license='MIT',
-    packages=['pyad2', 'pyad2.event'],
+    packages=['alarmdecoder', 'alarmdecoder.event'],
     install_requires=[
         'pyopenssl',
         'pyusb>=1.0.0b1',

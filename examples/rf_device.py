@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import USBDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import USBDevice
 
 RF_DEVICE_SERIAL_NUMBER = '0252254'
 
@@ -18,7 +18,7 @@ def main():
     """
     try:
         # Retrieve the first USB device
-        device = AD2(USBDevice.find())
+        device = AlarmDecoder(USBDevice.find())
 
         # Set up an event handler and open the device
         device.on_rfx_message += handle_rfx
@@ -31,7 +31,7 @@ def main():
 
 def handle_rfx(sender, *args, **kwargs):
     """
-    Handles RF message events from the AD2.
+    Handles RF message events from the AlarmDecoder.
     """
     msg = kwargs['message']
 

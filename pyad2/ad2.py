@@ -1,5 +1,5 @@
 """
-Provides the full AD2 class and factory.
+Provides the full AlarmDecoder class.
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -12,9 +12,9 @@ from .util import CommError, NoDeviceError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
 
-class AD2(object):
+class AlarmDecoder(object):
     """
-    High-level wrapper around AD2 devices.
+    High-level wrapper around Alarm Decoder (AD2) devices.
     """
 
     # High-level Events
@@ -62,7 +62,7 @@ class AD2(object):
         """
         Constructor
 
-        :param device: The low-level device used for this AD2 interface.
+        :param device: The low-level device used for this Alarm Decoder interface.
         :type device: Device
         """
         self._device = device
@@ -102,7 +102,7 @@ class AD2(object):
     @property
     def id(self):
         """
-        The ID of the AD2 device.
+        The ID of the Alarm Decoder device.
 
         :returns: The identification string for the device.
         """
@@ -134,7 +134,7 @@ class AD2(object):
 
     def send(self, data):
         """
-        Sends data to the AD2 device.
+        Sends data to the Alarm Decoder device.
 
         :param data: The data to send.
         :type data: str
@@ -371,14 +371,14 @@ class AD2(object):
             if message.battery_low == self._battery_status[0]:
                 self._battery_status = (self._battery_status[0], time.time())
             else:
-                if message.battery_low == True or time.time() > self._battery_status[1] + AD2.BATTERY_TIMEOUT:
+                if message.battery_low == True or time.time() > self._battery_status[1] + AlarmDecoder.BATTERY_TIMEOUT:
                     self._battery_status = (message.battery_low, time.time())
                     self.on_low_battery(status=self._battery_status)
 
             if message.fire_alarm == self._fire_status[0]:
                 self._fire_status = (self._fire_status[0], time.time())
             else:
-                if message.fire_alarm == True or time.time() > self._fire_status[1] + AD2.FIRE_TIMEOUT:
+                if message.fire_alarm == True or time.time() > self._fire_status[1] + AlarmDecoder.FIRE_TIMEOUT:
                     self._fire_status = (message.fire_alarm, time.time())
                     self.on_fire(status=self._fire_status)
 

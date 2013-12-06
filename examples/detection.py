@@ -1,6 +1,6 @@
 import time
-from pyad2 import AD2
-from pyad2.devices import USBDevice
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.devices import USBDevice
 
 __devices = {}
 
@@ -33,12 +33,12 @@ def main():
 
 def create_device(device_args):
     """
-    Creates an AD2 from the specified USB device arguments.
+    Creates an AlarmDecoder from the specified USB device arguments.
 
     :param device_args: Tuple containing information on the USB device to open.
     :type device_args: Tuple (vid, pid, serialnumber, interface_count, description)
     """
-    device = AD2(USBDevice.find(device_args))
+    device = AlarmDecoder(USBDevice.find(device_args))
     device.on_message += handle_message
     device.open()
 
@@ -46,7 +46,7 @@ def create_device(device_args):
 
 def handle_message(sender, *args, **kwargs):
     """
-    Handles message events from the AD2.
+    Handles message events from the AlarmDecoder.
     """
     msg = kwargs['message']
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# pyad2 documentation build configuration file, created by
+# alarmdecoder documentation build configuration file, created by
 # sphinx-quickstart on Sat Jun  8 14:38:46 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'pyad2'
-copyright = u'2013, Author'
+project = u'alarmdecoder'
+copyright = u'2013, Nu Tech Software Solutions, Inc.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -167,7 +167,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pyad2doc'
+htmlhelp_basename = 'alarmdecoderdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -186,8 +186,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'pyad2.tex', u'pyad2 Documentation',
-   u'Author', 'manual'),
+  ('index', 'alarmdecoder.tex', u'AlarmDecoder Documentation',
+   u'Nu Tech Software Solutions, Inc.', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -216,8 +216,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyad2', u'pyad2 Documentation',
-     [u'Author'], 1)
+    ('index', 'alarmdecoder', u'AlarmDecoder Documentation',
+     [u'Nu Tech Software Solutions, Inc.'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -230,8 +230,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'pyad2', u'pyad2 Documentation',
-   u'Author', 'pyad2', 'One line description of project.',
+  ('index', 'alarmdecoder', u'AlarmDecoder Documentation',
+   u'Nu Tech Software Solutions, Inc.', 'alarmdecoder', 'Python library for the Alarm Decoder (AD2) device family.',
    'Miscellaneous'),
 ]
 
@@ -251,10 +251,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'pyad2'
-epub_author = u'Author'
-epub_publisher = u'Author'
-epub_copyright = u'2013, Author'
+epub_title = u'alarmdecoder'
+epub_author = u'Nu Tech Software Solutions, Inc.'
+epub_publisher = u'Nu Tech Software Solutions, Inc.'
+epub_copyright = u'2013, Nu Tech Software Solutions, Inc.'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

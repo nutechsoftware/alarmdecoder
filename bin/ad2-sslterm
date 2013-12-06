@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import pyad2
+import alarmdecoder
 import sys, select
 import termios, tty
 import time
@@ -23,7 +23,7 @@ def main():
     try:
         print "Opening connection to {0}:{1}\r".format(host, port)
 
-        dev = pyad2.devices.SocketDevice(interface=(host, int(port)))
+        dev = alarmdecoder.devices.SocketDevice(interface=(host, int(port)))
         dev.ssl = True
         dev.ssl_certificate = client_cert
         dev.ssl_key = client_key
