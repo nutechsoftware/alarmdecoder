@@ -119,7 +119,6 @@ class AD2(object):
         """
         self._wire_events()
         self._device.open(baudrate=baudrate, no_reader_thread=no_reader_thread)
-        self.get_config()
 
         return self
 
@@ -412,6 +411,8 @@ class AD2(object):
         """
         Internal handler for opening the device.
         """
+        self.get_config()
+
         self.on_open(args, kwargs)
 
     def _on_close(self, sender, *args, **kwargs):
