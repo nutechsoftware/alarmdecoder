@@ -1,10 +1,10 @@
-pyad2 Package
+alarmdecoder Package
 ================
 
-:mod:`ad2` Module
+:mod:`alarmdecoder` Module
 --------------------
 
-.. automodule:: pyad2.ad2
+.. automodule:: alarmdecoder.alarmdecoder
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ pyad2 Package
 :mod:`devices` Module
 ---------------------
 
-.. automodule:: pyad2.devices
+.. automodule:: alarmdecoder.devices
     :members:
     :undoc-members:
     :show-inheritance:
@@ -20,7 +20,7 @@ pyad2 Package
 :mod:`util` Module
 ------------------
 
-.. automodule:: pyad2.util
+.. automodule:: alarmdecoder.util
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,7 +28,7 @@ pyad2 Package
 :mod:`zonetracking` Module
 --------------------------
 
-.. automodule:: pyad2.zonetracking
+.. automodule:: alarmdecoder.zonetracking
     :members:
     :undoc-members:
     :show-inheritance:
@@ -36,7 +36,7 @@ pyad2 Package
 :mod:`panels` Module
 --------------------
 
-.. automodule:: pyad2.panels
+.. automodule:: alarmdecoder.panels
     :members:
     :undoc-members:
     :show-inheritance:
@@ -44,7 +44,7 @@ pyad2 Package
 :mod:`messages` Module
 ----------------------
 
-.. automodule:: pyad2.messages
+.. automodule:: alarmdecoder.messages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -54,5 +54,5 @@ Subpackages
 
 .. toctree::
 
-    pyad2.event
+    alarmdecoder.event
 

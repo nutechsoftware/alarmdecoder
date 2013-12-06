@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2.event.event &mdash; pyad2  documentation</title>
+    <title>alarmdecoder.event.event &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2  documentation" href="../../../index.html" />
+    <link rel="top" title="alarmdecoder  documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,18 +46,19 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2.event.event</h1><div class="highlight"><pre>
+  <h1>Source code for alarmdecoder.event.event</h1><div class="highlight"><pre>
 <span class="c"># event.py (improved)</span>
 <span class="c">#</span>
 
 <span class="c"># Based on pyevent originally found at http://www.emptypage.jp/notes/pyevent.en.html</span>
-<span class="c"># </span>
+<span class="c">#</span>
 <span class="c"># License: https://creativecommons.org/licenses/by/2.1/jp/deed.en</span>
 <span class="c">#</span>
 <span class="c"># Changes:</span>
-<span class="c">#    Added type check in fire()</span>
+<span class="c">#   * Added type check in fire()</span>
+<span class="c">#   * Removed earg from fire() and added support for args/kwargs.</span>
 
-<div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../../pyad2.event.html#pyad2.event.event.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Event"><a class="viewcode-back" href="../../../alarmdecoder.event.html#alarmdecoder.event.event.Event">[docs]</a><span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
@@ -71,7 +72,7 @@
         <span class="k">pass</span>
 
 </div>
-<div class="viewcode-block" id="EventHandler"><a class="viewcode-back" href="../../../pyad2.event.html#pyad2.event.event.EventHandler">[docs]</a><span class="k">class</span> <span class="nc">EventHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="EventHandler"><a class="viewcode-back" href="../../../alarmdecoder.event.html#alarmdecoder.event.event.EventHandler">[docs]</a><span class="k">class</span> <span class="nc">EventHandler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
 
@@ -88,7 +89,7 @@
             <span class="n">eventhandler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">__eventhandler__</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">return</span> <span class="n">eventhandler</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="p">,</span> <span class="p">[])</span>
 
-<div class="viewcode-block" id="EventHandler.add"><a class="viewcode-back" href="../../../pyad2.event.html#pyad2.event.event.EventHandler.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="EventHandler.add"><a class="viewcode-back" href="../../../alarmdecoder.event.html#alarmdecoder.event.event.EventHandler.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;Add new event handler function.</span>
 
@@ -99,7 +100,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_getfunctionlist</span><span class="p">()</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </div>
-<div class="viewcode-block" id="EventHandler.remove"><a class="viewcode-back" href="../../../pyad2.event.html#pyad2.event.event.EventHandler.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<div class="viewcode-block" id="EventHandler.remove"><a class="viewcode-back" href="../../../alarmdecoder.event.html#alarmdecoder.event.event.EventHandler.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;Remove existing event handler function.</span>
 
@@ -109,19 +110,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_getfunctionlist</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span>
 </div>
-<div class="viewcode-block" id="EventHandler.fire"><a class="viewcode-back" href="../../../pyad2.event.html#pyad2.event.event.EventHandler.fire">[docs]</a>    <span class="k">def</span> <span class="nf">fire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">earg</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="EventHandler.fire"><a class="viewcode-back" href="../../../alarmdecoder.event.html#alarmdecoder.event.event.EventHandler.fire">[docs]</a>    <span class="k">def</span> <span class="nf">fire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="sd">&quot;&quot;&quot;Fire event and call all handler functions</span>
 
-<span class="sd">        You can call EventHandler object itself like e(earg) instead of</span>
-<span class="sd">        e.fire(earg).</span>
+<span class="sd">        You can call EventHandler object itself like e(*args, **kwargs) instead of</span>
+<span class="sd">        e.fire(*args, **kwargs).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getfunctionlist</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="o">==</span> <span class="n">EventHandler</span><span class="p">:</span>
-                <span class="n">func</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span><span class="n">earg</span><span class="p">)</span>
+                <span class="n">func</span><span class="o">.</span><span class="n">fire</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">earg</span><span class="p">)</span>
+                <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
     <span class="n">__iadd__</span> <span class="o">=</span> <span class="n">add</span>
     <span class="n">__isub__</span> <span class="o">=</span> <span class="n">remove</span>
@@ -159,12 +160,12 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Author.
+        &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

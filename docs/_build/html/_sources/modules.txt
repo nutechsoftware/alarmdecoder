@@ -1,7 +1,7 @@
-pyad2
-========
+alarmdecoder
+============
 
 .. toctree::
    :maxdepth: 4
 
-   pyad2
+   alarmdecoder

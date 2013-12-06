@@ -4,7 +4,7 @@ event Package
 :mod:`event` Package
 --------------------
 
-.. automodule:: pyad2.event
+.. automodule:: alarmdecoder.event
     :members:
     :undoc-members:
     :show-inheritance:
@@ -12,7 +12,7 @@ event Package
 :mod:`event` Module
 -------------------
 
-.. automodule:: pyad2.event.event
+.. automodule:: alarmdecoder.event.event
     :members:
     :undoc-members:
     :show-inheritance:

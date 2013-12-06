@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>event Package &mdash; pyad2  documentation</title>
+    <title>event Package &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -23,9 +23,9 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pyad2  documentation" href="index.html" />
-    <link rel="up" title="pyad2 Package" href="pyad2.html" />
-    <link rel="prev" title="pyad2 Package" href="pyad2.html" /> 
+    <link rel="top" title="alarmdecoder  documentation" href="index.html" />
+    <link rel="up" title="alarmdecoder Package" href="alarmdecoder.html" />
+    <link rel="prev" title="alarmdecoder Package" href="alarmdecoder.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,10 +38,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pyad2.html" title="pyad2 Package"
+          <a href="alarmdecoder.html" title="alarmdecoder Package"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">pyad2  documentation</a> &raquo;</li>
-          <li><a href="pyad2.html" accesskey="U">pyad2 Package</a> &raquo;</li> 
+        <li><a href="index.html">alarmdecoder  documentation</a> &raquo;</li>
+          <li><a href="alarmdecoder.html" accesskey="U">alarmdecoder Package</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,40 +54,40 @@
 <h1>event Package<a class="headerlink" href="#event-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">event</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-pyad2.event"></span></div>
-<div class="section" id="module-pyad2.event.event">
-<span id="event-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">event</span></tt> Module<a class="headerlink" href="#module-pyad2.event.event" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-alarmdecoder.event"></span></div>
+<div class="section" id="module-alarmdecoder.event.event">
+<span id="event-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">event</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.event.event" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="pyad2.event.event.Event">
-<em class="property">class </em><tt class="descclassname">pyad2.event.event.</tt><tt class="descname">Event</tt><big>(</big><em>doc=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/event/event.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.event.event.Event" title="Permalink to this definition">¶</a></dt>
+<dt id="alarmdecoder.event.event.Event">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.event.event.</tt><tt class="descname">Event</tt><big>(</big><em>doc=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/event/event.html#Event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.event.event.Event" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 </dd></dl>
 
 <dl class="class">
-<dt id="pyad2.event.event.EventHandler">
-<em class="property">class </em><tt class="descclassname">pyad2.event.event.</tt><tt class="descname">EventHandler</tt><big>(</big><em>event</em>, <em>obj</em><big>)</big><a class="reference internal" href="_modules/pyad2/event/event.html#EventHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.event.event.EventHandler" title="Permalink to this definition">¶</a></dt>
+<dt id="alarmdecoder.event.event.EventHandler">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.event.event.</tt><tt class="descname">EventHandler</tt><big>(</big><em>event</em>, <em>obj</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/event/event.html#EventHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.event.event.EventHandler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="method">
-<dt id="pyad2.event.event.EventHandler.add">
-<tt class="descname">add</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/pyad2/event/event.html#EventHandler.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.event.event.EventHandler.add" title="Permalink to this definition">¶</a></dt>
+<dt id="alarmdecoder.event.event.EventHandler.add">
+<tt class="descname">add</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/event/event.html#EventHandler.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.event.event.EventHandler.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new event handler function.</p>
 <p>Event handler function must be defined like func(sender, earg).
 You can add handler also by using &#8216;+=&#8217; operator.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.event.event.EventHandler.remove">
-<tt class="descname">remove</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/pyad2/event/event.html#EventHandler.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.event.event.EventHandler.remove" title="Permalink to this definition">¶</a></dt>
+<dt id="alarmdecoder.event.event.EventHandler.remove">
+<tt class="descname">remove</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/event/event.html#EventHandler.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.event.event.EventHandler.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove existing event handler function.</p>
 <p>You can remove handler also by using &#8216;-=&#8217; operator.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyad2.event.event.EventHandler.fire">
-<tt class="descname">fire</tt><big>(</big><em>earg=None</em><big>)</big><a class="reference internal" href="_modules/pyad2/event/event.html#EventHandler.fire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyad2.event.event.EventHandler.fire" title="Permalink to this definition">¶</a></dt>
+<dt id="alarmdecoder.event.event.EventHandler.fire">
+<tt class="descname">fire</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/event/event.html#EventHandler.fire"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.event.event.EventHandler.fire" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fire event and call all handler functions</p>
-<p>You can call EventHandler object itself like e(earg) instead of
-e.fire(earg).</p>
+<p>You can call EventHandler object itself like e(<a href="#id2"><span class="problematic" id="id3">*</span></a>args, <a href="#id4"><span class="problematic" id="id5">**</span></a>kwargs) instead of
+e.fire(<a href="#id6"><span class="problematic" id="id7">*</span></a>args, <a href="#id8"><span class="problematic" id="id9">**</span></a>kwargs).</p>
 </dd></dl>
 
 </dd></dl>
@@ -105,17 +105,17 @@ e.fire(earg).</p>
   <ul>
 <li><a class="reference internal" href="#">event Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">event</span></tt> Package</a></li>
-<li><a class="reference internal" href="#module-pyad2.event.event"><tt class="docutils literal"><span class="pre">event</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-alarmdecoder.event.event"><tt class="docutils literal"><span class="pre">event</span></tt> Module</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="pyad2.html"
-                        title="previous chapter">pyad2 Package</a></p>
+  <p class="topless"><a href="alarmdecoder.html"
+                        title="previous chapter">alarmdecoder Package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/pyad2.event.txt"
+    <li><a href="_sources/alarmdecoder.event.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -145,14 +145,14 @@ e.fire(earg).</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="pyad2.html" title="pyad2 Package"
+          <a href="alarmdecoder.html" title="alarmdecoder Package"
              >previous</a> |</li>
-        <li><a href="index.html">pyad2  documentation</a> &raquo;</li>
-          <li><a href="pyad2.html" >pyad2 Package</a> &raquo;</li> 
+        <li><a href="index.html">alarmdecoder  documentation</a> &raquo;</li>
+          <li><a href="alarmdecoder.html" >alarmdecoder Package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Author.
+        &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

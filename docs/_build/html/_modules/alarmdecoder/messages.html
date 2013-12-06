@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2.messages &mdash; pyad2  documentation</title>
+    <title>alarmdecoder.messages &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2  documentation" href="../../index.html" />
+    <link rel="top" title="alarmdecoder  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,9 +46,10 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2.messages</h1><div class="highlight"><pre>
+  <h1>Source code for alarmdecoder.messages</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Message representations received from the panel through the AD2 devices.</span>
+<span class="sd">Message representations received from the panel through the Alarm Decoder (AD2)</span>
+<span class="sd">devices.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -57,15 +58,19 @@
 
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">InvalidMessageError</span>
 
-<div class="viewcode-block" id="BaseMessage"><a class="viewcode-back" href="../../pyad2.html#pyad2.messages.BaseMessage">[docs]</a><span class="k">class</span> <span class="nc">BaseMessage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseMessage"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.BaseMessage">[docs]</a><span class="k">class</span> <span class="nc">BaseMessage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for messages.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">raw</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The raw message text&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -73,10 +78,55 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span>
 </div>
-<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../pyad2.html#pyad2.messages.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+<div class="viewcode-block" id="Message"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.Message">[docs]</a><span class="k">class</span> <span class="nc">Message</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a message from the alarm panel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the panel is in a ready state&quot;&quot;&quot;</span>
+    <span class="n">armed_away</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the panel is armed away&quot;&quot;&quot;</span>
+    <span class="n">armed_home</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the panel is armed home&quot;&quot;&quot;</span>
+    <span class="n">backlight_on</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the keypad backlight is on&quot;&quot;&quot;</span>
+    <span class="n">programming_mode</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not we&#39;re in programming mode&quot;&quot;&quot;</span>
+    <span class="n">beeps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Number of beeps associated with a message&quot;&quot;&quot;</span>
+    <span class="n">zone_bypassed</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not a zone is bypassed&quot;&quot;&quot;</span>
+    <span class="n">ac_power</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the panel is on AC power&quot;&quot;&quot;</span>
+    <span class="n">chime_on</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the chime is enabled&quot;&quot;&quot;</span>
+    <span class="n">alarm_event_occurred</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not an alarm event has occurred&quot;&quot;&quot;</span>
+    <span class="n">alarm_sounding</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not an alarm is sounding&quot;&quot;&quot;</span>
+    <span class="n">battery_low</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not there is a low battery&quot;&quot;&quot;</span>
+    <span class="n">entry_delay_off</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the entry delay is enabled&quot;&quot;&quot;</span>
+    <span class="n">fire_alarm</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not a fire alarm is sounding&quot;&quot;&quot;</span>
+    <span class="n">check_zone</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not there are zones that require attention.&quot;&quot;&quot;</span>
+    <span class="n">perimeter_only</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether or not the perimeter is armed&quot;&quot;&quot;</span>
+    <span class="n">numeric_code</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The numeric code associated with the message&quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The human-readable text to be displayed on the panel LCD&quot;&quot;&quot;</span>
+    <span class="n">cursor_location</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Current cursor location on the keypad&quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Address mask this message is intended for&quot;&quot;&quot;</span>
+    <span class="n">bitfield</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The bitfield associated with this message&quot;&quot;&quot;</span>
+    <span class="n">panel_data</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The panel data field associated with this message&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -85,34 +135,18 @@
 <span class="sd">        :param data: Message data to parse.</span>
 <span class="sd">        :type data: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ready</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">armed_away</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">armed_home</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">backlight_on</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">programming_mode</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">beeps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zone_bypassed</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ac_power</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">chime_on</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alarm_event_occurred</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">alarm_sounding</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">battery_low</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">entry_delay_off</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_zone</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">perimeter_only</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">numeric_code</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cursor_location</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">BaseMessage</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(&quot;(?:[^&quot;]|&quot;&quot;)*&quot;|[^,]*),(&quot;(?:[^&quot;]|&quot;&quot;)*&quot;|[^,]*),(&quot;(?:[^&quot;]|&quot;&quot;)*&quot;|[^,]*),(&quot;(?:[^&quot;]|&quot;&quot;)*&quot;|[^,]*)&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        String conversion operator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span>
 
     <span class="k">def</span> <span class="nf">_parse_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -155,14 +189,8 @@
 
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">[</span><span class="mi">19</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x01</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cursor_location</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="mi">21</span><span class="p">:</span><span class="mi">23</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>    <span class="c"># Alpha character index that the cursor is on.</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        String conversion operator.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw</span>
 </div>
-<div class="viewcode-block" id="ExpanderMessage"><a class="viewcode-back" href="../../pyad2.html#pyad2.messages.ExpanderMessage">[docs]</a><span class="k">class</span> <span class="nc">ExpanderMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpanderMessage"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.ExpanderMessage">[docs]</a><span class="k">class</span> <span class="nc">ExpanderMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a message from a zone or relay expansion module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -172,6 +200,16 @@
     <span class="n">RELAY</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="sd">&quot;&quot;&quot;Flag indicating that the expander message relates to a Relay Expander.&quot;&quot;&quot;</span>
 
+
+    <span class="nb">type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Expander message type: ExpanderMessage.ZONE or ExpanderMessage.RELAY&quot;&quot;&quot;</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Address of expander&quot;&quot;&quot;</span>
+    <span class="n">channel</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Channel on the expander&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Value associated with the message&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
@@ -179,11 +217,7 @@
 <span class="sd">        :param data: The message data to parse.</span>
 <span class="sd">        :type data: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">BaseMessage</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -220,10 +254,21 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidMessageError</span><span class="p">(</span><span class="s">&#39;Unknown expander message header: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </div>
-<div class="viewcode-block" id="RFMessage"><a class="viewcode-back" href="../../pyad2.html#pyad2.messages.RFMessage">[docs]</a><span class="k">class</span> <span class="nc">RFMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+<div class="viewcode-block" id="RFMessage"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.RFMessage">[docs]</a><span class="k">class</span> <span class="nc">RFMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a message from an RF receiver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">serial_number</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Serial number of the RF device&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;Value associated with this message&quot;&quot;&quot;</span>
+    <span class="n">battery</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Battery low indication&quot;&quot;&quot;</span>
+    <span class="n">supervision</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Supervision required indication&quot;&quot;&quot;</span>
+    <span class="n">loop</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="sd">&quot;&quot;&quot;Loop indicators&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -232,12 +277,7 @@
 <span class="sd">        :param data: The message data to parse</span>
 <span class="sd">        :type data: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">serial_number</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">battery</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">supervision</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">loop</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">BaseMessage</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -262,25 +302,31 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">serial_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
 
-            <span class="n">is_bit_set</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">b</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">is_bit_set</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">b</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
             <span class="c"># Bit 1 = unknown</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">battery</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">supervision</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-            <span class="c"># Bit 8 = unknown</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="c"># Bit 4 = unknown</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidMessageError</span><span class="p">(</span><span class="s">&#39;Received invalid message: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-
 </div>
-<div class="viewcode-block" id="LRRMessage"><a class="viewcode-back" href="../../pyad2.html#pyad2.messages.LRRMessage">[docs]</a><span class="k">class</span> <span class="nc">LRRMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
+<div class="viewcode-block" id="LRRMessage"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.LRRMessage">[docs]</a><span class="k">class</span> <span class="nc">LRRMessage</span><span class="p">(</span><span class="n">BaseMessage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent a message from a Long Range Radio.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">event_data</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Data associated with the LRR message.  Usually user ID or zone.&quot;&quot;&quot;</span>
+    <span class="n">partition</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="sd">&quot;&quot;&quot;The partition that this message applies to&quot;&quot;&quot;</span>
+    <span class="n">event_type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;The type of the event that occurred&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -289,10 +335,7 @@
 <span class="sd">        :param data: The message data to parse.</span>
 <span class="sd">        :type data: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">raw</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_data</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">partition</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">event_type</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">BaseMessage</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_parse_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -351,12 +394,12 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Author.
+        &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

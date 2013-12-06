@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2.zonetracking &mdash; pyad2  documentation</title>
+    <title>alarmdecoder.zonetracking &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2  documentation" href="../../index.html" />
+    <link rel="top" title="alarmdecoder  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,9 +46,9 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2.zonetracking</h1><div class="highlight"><pre>
+  <h1>Source code for alarmdecoder.zonetracking</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides zone tracking functionality for the AD2 device family.</span>
+<span class="sd">Provides zone tracking functionality for the Alarm Decoder (AD2) device family.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -59,7 +59,7 @@
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 <span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">ExpanderMessage</span>
 
-<div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Representation of a panel zone.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -101,7 +101,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s">&#39;Zone({0}, {1}, ts {2})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">zone</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">STATUS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="Zonetracker"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zonetracker">[docs]</a><span class="k">class</span> <span class="nc">Zonetracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Zonetracker"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker">[docs]</a><span class="k">class</span> <span class="nc">Zonetracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles tracking of zone and their statuses.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -120,7 +120,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="Zonetracker.update"><a class="viewcode-back" href="../../pyad2.html#pyad2.zonetracking.Zonetracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<div class="viewcode-block" id="Zonetracker.update"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update zone statuses based on the current message.</span>
 
@@ -148,6 +148,10 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># Panel is ready, restore all zones.</span>
+            <span class="c">#</span>
+            <span class="c"># NOTE: This will need to be updated to support panels with multiple partitions.</span>
+            <span class="c"># In it&#39;s current state a ready on partition #1 will end up clearing all zones, even</span>
+            <span class="c"># if they exist elsewhere and it shouldn&#39;t.</span>
             <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ready</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">)</span>
@@ -283,7 +287,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span> <span class="o">=</span> <span class="n">Zone</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_fault</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_fault</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_update_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -308,7 +312,7 @@
             <span class="k">if</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_restore</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_restore</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_zone_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -372,12 +376,12 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Author.
+        &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

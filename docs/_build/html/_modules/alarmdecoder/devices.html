@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyad2.devices &mdash; pyad2  documentation</title>
+    <title>alarmdecoder.devices &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyad2  documentation" href="../../index.html" />
+    <link rel="top" title="alarmdecoder  documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -46,9 +46,9 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for pyad2.devices</h1><div class="highlight"><pre>
+  <h1>Source code for alarmdecoder.devices</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Contains different types of devices belonging to the AD2 family.</span>
+<span class="sd">Contains different types of devices belonging to the Alarm Decoder (AD2) family.</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -65,9 +65,9 @@
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 
-<div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generic parent device to all AD2 products.</span>
+<span class="sd">    Generic parent device to all Alarm Decoder (AD2) products.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Generic device events</span>
@@ -86,6 +86,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">ReadThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Support for context manager __enter__.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Support for context manager __exit__.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">False</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -96,7 +110,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
 
     <span class="nd">@id.setter</span>
-<div class="viewcode-block" id="Device.id"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.id"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the device ID.</span>
 
@@ -105,7 +119,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">value</span>
 </div>
-<div class="viewcode-block" id="Device.is_reader_alive"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.is_reader_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_reader_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.is_reader_alive"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.is_reader_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_reader_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Indicates whether or not the reader thread is alive.</span>
 
@@ -113,13 +127,13 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Device.stop_reader"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.stop_reader">[docs]</a>    <span class="k">def</span> <span class="nf">stop_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.stop_reader"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.stop_reader">[docs]</a>    <span class="k">def</span> <span class="nf">stop_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stops the reader thread.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Device.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.close"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -133,7 +147,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Device.ReadThread"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.ReadThread">[docs]</a>    <span class="k">class</span> <span class="nc">ReadThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.ReadThread"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.ReadThread">[docs]</a>    <span class="k">class</span> <span class="nc">ReadThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reader thread which processes messages from the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -152,13 +166,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
 
-<div class="viewcode-block" id="Device.ReadThread.stop"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.ReadThread.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.ReadThread.stop"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.ReadThread.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Stops the running thread.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
 </div>
-<div class="viewcode-block" id="Device.ReadThread.run"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.Device.ReadThread.run">[docs]</a>        <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Device.ReadThread.run"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device.ReadThread.run">[docs]</a>        <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            The actual read process.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
@@ -178,7 +192,7 @@
 
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 </div></div></div>
-<div class="viewcode-block" id="USBDevice"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice">[docs]</a><span class="k">class</span> <span class="nc">USBDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice">[docs]</a><span class="k">class</span> <span class="nc">USBDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    AD2USB device exposed with PyFTDI&#39;s interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -191,23 +205,84 @@
     <span class="n">BAUDRATE</span> <span class="o">=</span> <span class="mi">115200</span>
     <span class="sd">&quot;&quot;&quot;Default baudrate for AD2USB devices.&quot;&quot;&quot;</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="USBDevice.find_all"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">():</span>
+    <span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="USBDevice.find_all"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">FTDI_VENDOR_ID</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">FTDI_PRODUCT_ID</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns all FTDI devices matching our vendor and product IDs.</span>
 
 <span class="sd">        :returns: list of devices</span>
 <span class="sd">        :raises: CommError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">devices</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="o">.</span><span class="n">find_all</span><span class="p">([(</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_VENDOR_ID</span><span class="p">,</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_PRODUCT_ID</span><span class="p">)],</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="o">.</span><span class="n">find_all</span><span class="p">([(</span><span class="n">vid</span><span class="p">,</span> <span class="n">pid</span><span class="p">)],</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating AD2USB devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">devices</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="USBDevice.devices"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.devices">[docs]</a>    <span class="k">def</span> <span class="nf">devices</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a cached list of AD2USB devices located on the system.</span>
+
+<span class="sd">        :returns: cached list of devices found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="USBDevice.find"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Factory method that returns the requested USBDevice device, or the first device.</span>
+
+<span class="sd">        :param device: Tuple describing the USB device to open, as returned by find_all().</span>
+<span class="sd">        :type device: tuple</span>
+
+<span class="sd">        :returns: USBDevice object utilizing the specified device.</span>
+<span class="sd">        :raises: NoDeviceError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__devices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No AD2USB devices present.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">vendor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">sernum</span><span class="p">,</span> <span class="n">ifcount</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="n">device</span>
+
+        <span class="k">return</span> <span class="n">USBDevice</span><span class="p">(</span><span class="n">interface</span><span class="o">=</span><span class="n">sernum</span><span class="p">)</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="USBDevice.start_detection"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.start_detection">[docs]</a>    <span class="k">def</span> <span class="nf">start_detection</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">on_attached</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">on_detached</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts the device detection thread.</span>
+
+<span class="sd">        :param on_attached: function to be called when a device is attached.</span>
+<span class="sd">        :type on_attached: function</span>
+<span class="sd">        :param on_detached: function to be called when a device is detached.</span>
+<span class="sd">        :type on_detached: function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">DetectThread</span><span class="p">(</span><span class="n">on_attached</span><span class="p">,</span> <span class="n">on_detached</span><span class="p">)</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+
+        <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="USBDevice.stop_detection"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.stop_detection">[docs]</a>    <span class="k">def</span> <span class="nf">stop_detection</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stops the device detection thread.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -216,18 +291,21 @@
 
 <span class="sd">        :returns: the interface used to connect to the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span>
 
     <span class="nd">@interface.setter</span>
-<div class="viewcode-block" id="USBDevice.interface"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.interface"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
-<span class="sd">        :param value: Tuple containing the serial number and endpoint number to use.</span>
-<span class="sd">        :type value: tuple</span>
+<span class="sd">        :param value: May specify either the serial number or the device index.</span>
+<span class="sd">        :type value: str or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="n">value</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -240,7 +318,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span>
 
     <span class="nd">@serial_number.setter</span>
-<div class="viewcode-block" id="USBDevice.serial_number"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.serial_number">[docs]</a>    <span class="k">def</span> <span class="nf">serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.serial_number"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.serial_number">[docs]</a>    <span class="k">def</span> <span class="nf">serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the serial number of the device.</span>
 
@@ -259,7 +337,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
 
     <span class="nd">@description.setter</span>
-<div class="viewcode-block" id="USBDevice.description"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.description">[docs]</a>    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.description"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.description">[docs]</a>    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the description of the device.</span>
 
@@ -268,24 +346,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">value</span>
 </div>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param interface: Tuple containing the device number and endpoint number to use.</span>
-<span class="sd">        :type interface: tuple</span>
+<span class="sd">        :param interface: May specify either the serial number or the device index.</span>
+<span class="sd">        :type interface: str or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="n">interface</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="n">interface</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">=</span> <span class="n">interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_VENDOR_ID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_PRODUCT_ID</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="USBDevice.open"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
@@ -311,32 +391,37 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">set_baudrate</span><span class="p">(</span><span class="n">baudrate</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s">&#39;USB {0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">bus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_serial_number</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">()</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">no_reader_thread</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
 </div>
-<div class="viewcode-block" id="USBDevice.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.close"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
             <span class="c"># HACK: Probably should fork pyftdi and make this call in .close().</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">attach_kernel_driver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span><span class="p">)</span>
-
-            <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="USBDevice.write"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
@@ -348,12 +433,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">FtdiError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="USBDevice.read"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.read"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
@@ -370,7 +455,7 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
-<div class="viewcode-block" id="USBDevice.read_line"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.USBDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.read_line"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
@@ -429,7 +514,7 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -438,9 +523,76 @@
                 <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">ret</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_serial_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the FTDI device serial number.</span>
 
-</div></div>
-<div class="viewcode-block" id="SerialDevice"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice">[docs]</a><span class="k">class</span> <span class="nc">SerialDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<span class="sd">        :returns: string containing the device serial number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">usb</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">iSerialNumber</span><span class="p">)</span>
+
+<div class="viewcode-block" id="USBDevice.DetectThread"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.DetectThread">[docs]</a>    <span class="k">class</span> <span class="nc">DetectThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Thread that handles detection of added/removed devices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">on_attached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an AD2USB device has been detected.&#39;</span><span class="p">)</span>
+        <span class="n">on_detached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an AD2USB device has been removed.&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_attached</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">on_detached</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Constructor</span>
+
+<span class="sd">            :param on_attached: Function to call when a device is attached.</span>
+<span class="sd">            :type on_attached: function</span>
+<span class="sd">            :param on_detached: Function to call when a device is detached.</span>
+<span class="sd">            :type on_detached: function</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">on_attached</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_attached</span> <span class="o">+=</span> <span class="n">on_attached</span>
+
+            <span class="k">if</span> <span class="n">on_detached</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_detached</span> <span class="o">+=</span> <span class="n">on_detached</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="USBDevice.DetectThread.stop"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.DetectThread.stop">[docs]</a>        <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Stops the thread.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="USBDevice.DetectThread.run"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.DetectThread.run">[docs]</a>        <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            The actual detection process.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="n">last_devices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_running</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">current_devices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">find_all</span><span class="p">())</span>
+
+                    <span class="n">new_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">current_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">last_devices</span><span class="p">]</span>
+                    <span class="n">removed_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">last_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_devices</span><span class="p">]</span>
+                    <span class="n">last_devices</span> <span class="o">=</span> <span class="n">current_devices</span>
+
+                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">new_devices</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">on_attached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">removed_devices</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">on_detached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+
+</div></div></div>
+<div class="viewcode-block" id="SerialDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice">[docs]</a><span class="k">class</span> <span class="nc">SerialDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    AD2USB or AD2SERIAL device exposed with the pyserial interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -450,7 +602,7 @@
     <span class="sd">&quot;&quot;&quot;Default baudrate for Serial devices.&quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="SerialDevice.find_all"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.find_all"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">pattern</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns all serial ports present.</span>
 
@@ -483,7 +635,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
 
     <span class="nd">@interface.setter</span>
-<div class="viewcode-block" id="SerialDevice.interface"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.interface"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
@@ -505,7 +657,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">writeTimeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>     <span class="c"># Timeout = non-blocking to match pyftdi.</span>
 
-<div class="viewcode-block" id="SerialDevice.open"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
@@ -544,8 +696,10 @@
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">no_reader_thread</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
 </div>
-<div class="viewcode-block" id="SerialDevice.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.close"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -555,7 +709,7 @@
         <span class="k">except</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="SerialDevice.write"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
@@ -574,9 +728,9 @@
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 </div>
-<div class="viewcode-block" id="SerialDevice.read"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.read"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
@@ -593,7 +747,7 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
-<div class="viewcode-block" id="SerialDevice.read_line"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SerialDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SerialDevice.read_line"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
@@ -648,7 +802,7 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -658,10 +812,10 @@
 
         <span class="k">return</span> <span class="n">ret</span>
 </div></div>
-<div class="viewcode-block" id="SocketDevice"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice">[docs]</a><span class="k">class</span> <span class="nc">SocketDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice">[docs]</a><span class="k">class</span> <span class="nc">SocketDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device that supports communication with an AD2 that is exposed via ser2sock or another</span>
-<span class="sd">    Serial to IP interface.</span>
+<span class="sd">    Device that supports communication with an Alarm Decoder (AD2) that is</span>
+<span class="sd">    exposed via ser2sock or another Serial to IP interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
@@ -674,11 +828,11 @@
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
 
     <span class="nd">@interface.setter</span>
-<div class="viewcode-block" id="SocketDevice.interface"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.interface"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.interface">[docs]</a>    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
-<span class="sd">        :param value: Tuple containing the device number and endpoint number to use.</span>
+<span class="sd">        :param value: Tuple containing the host and port to use.</span>
 <span class="sd">        :type value: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -694,7 +848,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span>
 
     <span class="nd">@ssl.setter</span>
-<div class="viewcode-block" id="SocketDevice.ssl"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.ssl">[docs]</a>    <span class="k">def</span> <span class="nf">ssl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.ssl"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.ssl">[docs]</a>    <span class="k">def</span> <span class="nf">ssl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets whether or not SSL communication is in use.</span>
 
@@ -713,7 +867,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_certificate</span>
 
     <span class="nd">@ssl_certificate.setter</span>
-<div class="viewcode-block" id="SocketDevice.ssl_certificate"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.ssl_certificate">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_certificate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.ssl_certificate"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.ssl_certificate">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_certificate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL client certificate to use for authentication.</span>
 
@@ -732,7 +886,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_key</span>
 
     <span class="nd">@ssl_key.setter</span>
-<div class="viewcode-block" id="SocketDevice.ssl_key"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.ssl_key">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.ssl_key"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.ssl_key">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL client certificate key to use for authentication.</span>
 
@@ -751,7 +905,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_ca</span>
 
     <span class="nd">@ssl_ca.setter</span>
-<div class="viewcode-block" id="SocketDevice.ssl_ca"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.ssl_ca">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_ca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.ssl_ca"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.ssl_ca">[docs]</a>    <span class="k">def</span> <span class="nf">ssl_ca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL Certificate Authority certificate used for authentication.</span>
 
@@ -775,7 +929,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_key</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_ca</span> <span class="o">=</span> <span class="bp">None</span>
 
-<div class="viewcode-block" id="SocketDevice.open"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
@@ -795,6 +949,9 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">do_handshake</span><span class="p">()</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s">&#39;{0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
@@ -802,19 +959,22 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">no_reader_thread</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
 </div>
-<div class="viewcode-block" id="SocketDevice.close"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.close"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Closes the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="c"># TODO: Find a way to speed up this shutdown.</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ssl</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>     <span class="c"># Make sure that it closes immediately.</span>
 
@@ -823,7 +983,7 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">ex</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
-<div class="viewcode-block" id="SocketDevice.write"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
@@ -841,14 +1001,14 @@
             <span class="k">if</span> <span class="n">data_sent</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">SSL</span><span class="o">.</span><span class="n">Error</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error writing to device.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">data_sent</span>
 </div>
-<div class="viewcode-block" id="SocketDevice.read"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.read"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
@@ -865,7 +1025,7 @@
 
         <span class="k">return</span> <span class="n">data</span>
 </div>
-<div class="viewcode-block" id="SocketDevice.read_line"><a class="viewcode-back" href="../../pyad2.html#pyad2.devices.SocketDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="SocketDevice.read_line"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.read_line">[docs]</a>    <span class="k">def</span> <span class="nf">read_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">purge_buffer</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
@@ -924,7 +1084,7 @@
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -996,12 +1156,12 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyad2  documentation</a> &raquo;</li>
+        <li><a href="../../index.html">alarmdecoder  documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Author.
+        &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
