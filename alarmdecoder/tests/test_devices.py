@@ -5,6 +5,8 @@ from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
 from usb.core import USBError, Device as USBCoreDevice
 import socket
 import time
+import tempfile
+import os
 from OpenSSL import SSL, crypto
 from ..devices import USBDevice, SerialDevice, SocketDevice
 from ..util import NoDeviceError, CommError, TimeoutError
@@ -263,14 +265,8 @@ class TestSocketDevice(TestCase):
 
         mock.assert_called_with(self._device.interface)
 
-    def test_open_no_interface(self):
-        with self.assertRaises(NoDeviceError):
-            self._device.open(no_reader_thread=True)
-
-        self.assertFalse(self._device._running)
-
     def test_open_failed(self):
-        with patch.object(self._device._device, 'connect', side_effect=socket.error):
+        with patch.object(socket.socket, 'connect', side_effect=socket.error):
             with self.assertRaises(NoDeviceError):
                 self._device.open(no_reader_thread=True)
 
@@ -344,12 +340,20 @@ class TestSocketDevice(TestCase):
         self._device.ssl_certificate = ssl_cert
         self._device.ssl_ca = ssl_ca_cert
 
+        fileno, path = tempfile.mkstemp()
+
         # ..there has to be a better way..
         with patch.object(socket.socket, '__init__', return_value=None):
             with patch.object(socket.socket, 'connect', return_value=None) as mock:
                 with patch.object(socket.socket, '_sock'):
-                    with patch.object(socket.socket, 'fileno', return_value=1):
-                        self._device.open(no_reader_thread=True)
+                    with patch.object(socket.socket, 'fileno', return_value=fileno):
+                        try:
+                            self._device.open(no_reader_thread=True)
+                        except SSL.SysCallError, ex:
+                            pass
+
+        os.close(fileno)
+        os.unlink(path)
 
         mock.assert_called_with(self._device.interface)
         self.assertIsInstance(self._device._device, SSL.Connection)
@@ -360,10 +364,18 @@ class TestSocketDevice(TestCase):
         self._device.ssl_certificate = 'None'
         self._device.ssl_ca = 'None'
 
+        fileno, path = tempfile.mkstemp()
+
         # ..there has to be a better way..
         with patch.object(socket.socket, '__init__', return_value=None):
             with patch.object(socket.socket, 'connect', return_value=None) as mock:
                 with patch.object(socket.socket, '_sock'):
-                    with patch.object(socket.socket, 'fileno', return_value=1):
+                    with patch.object(socket.socket, 'fileno', return_value=fileno):
                         with self.assertRaises(CommError):
-                            self._device.open(no_reader_thread=True)
+                            try:
+                                self._device.open(no_reader_thread=True)
+                            except SSL.SysCallError, ex:
+                                pass
+
+        os.close(fileno)
+        os.unlink(path)
