@@ -8,10 +8,10 @@ def main():
     """
     Example application that watches for an event from a specific RF device.
 
-    This feature that allows you to watch for events from RF devices if you
-    have an RF receiver.  This is useful in the case of internal sensors,
-    which don't emit a FAULT if the sensor is tripped and the panel is armed
-    STAY.  It also will monitor sensors that aren't configured.
+    This feature allows you to watch for events from RF devices if you have
+    an RF receiver.  This is useful in the case of internal sensors, which
+    don't emit a FAULT if the sensor is tripped and the panel is armed STAY.
+    It also will monitor sensors that aren't configured.
 
     NOTE: You must have an RF receiver installed and enabled in your panel
           for RFX messages to be seen.
