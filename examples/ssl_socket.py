@@ -33,9 +33,6 @@ def main():
         device.on_message += handle_message
         device.open()
 
-        time.sleep(1)          # Allow time for SSL handshake to complete.
-        device.get_config()
-
         # Wait for events.
         while True:
             time.sleep(1)

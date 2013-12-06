@@ -105,6 +105,7 @@ class AD2(object):
         """
         self._wire_events()
         self._device.open(baudrate=baudrate, no_reader_thread=no_reader_thread)
+        self.get_config()
 
     def close(self):
         """

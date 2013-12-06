@@ -26,9 +26,6 @@ def main():
         device.on_alarm += handle_alarm
         device.open()
 
-        # Retrieve the device configuration
-        device.get_config()
-
         # Wait for events
         while True:
             time.sleep(1)

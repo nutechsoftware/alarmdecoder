@@ -23,7 +23,6 @@ def main():
         # Set up an event handler and open the device
         device.on_rfx_message += handle_rfx
         device.open()
-        device.get_config()
 
         # Wait for events.
         while True:

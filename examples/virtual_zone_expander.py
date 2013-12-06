@@ -35,7 +35,6 @@ def main():
         device.on_zone_restore += handle_zone_restore
 
         device.open()
-        device.get_config()
 
         # Wait for events.
         last_update = time.time()

@@ -17,7 +17,6 @@ def main():
         # Set up an event handler and open the device
         device.on_message += handle_message
         device.open(baudrate=BAUDRATE)            # Override the default SerialDevice baudrate.
-        device.get_config()
 
         # Wait for events.
         while True:

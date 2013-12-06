@@ -880,6 +880,9 @@ class SocketDevice(Device):
 
             self._device.connect((self._host, self._port))
 
+            if self._use_ssl:
+                self._device.do_handshake()
+
             self._id = '{0}:{1}'.format(self._host, self._port)
 
         except socket.error, err:

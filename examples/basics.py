@@ -13,7 +13,6 @@ def main():
         # Set up an event handler and open the device
         device.on_message += handle_message
         device.open()
-        device.get_config()
 
         # Wait for events.
         while True:
