@@ -19,13 +19,11 @@ def main():
     except Exception, ex:
         print 'Exception:', ex
 
-def handle_message(sender, *args, **kwargs):
+def handle_message(sender, message):
     """
     Handles message events from the AlarmDecoder.
     """
-    msg = kwargs['message']
-
-    print sender, msg.raw
+    print sender, message.raw
 
 if __name__ == '__main__':
     main()

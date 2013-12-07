@@ -29,15 +29,13 @@ def main():
     except Exception, ex:
         print 'Exception:', ex
 
-def handle_rfx(sender, *args, **kwargs):
+def handle_rfx(sender, message):
     """
     Handles RF message events from the AlarmDecoder.
     """
-    msg = kwargs['message']
-
     # Check for our target serial number and loop
-    if msg.serial_number == RF_DEVICE_SERIAL_NUMBER and msg.loop[0] == True:
-        print msg.serial_number, 'triggered loop #1'
+    if message.serial_number == RF_DEVICE_SERIAL_NUMBER and message.loop[0] == True:
+        print message.serial_number, 'triggered loop #1'
 
 if __name__ == '__main__':
     main()

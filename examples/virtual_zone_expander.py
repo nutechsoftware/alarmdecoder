@@ -47,23 +47,19 @@ def main():
     except Exception, ex:
         print 'Exception:', ex
 
-def handle_zone_fault(sender, *args, **kwargs):
+def handle_zone_fault(sender, zone):
     """
     Handles zone fault messages.
     """
-    zone = kwargs['zone']
-
     print 'zone faulted', zone
 
     # Restore the zone
     sender.clear_zone(zone)
 
-def handle_zone_restore(sender, *args, **kwargs):
+def handle_zone_restore(sender, zone):
     """
     Handles zone restore messages.
     """
-    zone = kwargs['zone']
-
     print 'zone cleared', zone
 
 if __name__ == '__main__':

@@ -44,31 +44,26 @@ def create_device(device_args):
 
     return device
 
-def handle_message(sender, *args, **kwargs):
+def handle_message(sender, message):
     """
     Handles message events from the AlarmDecoder.
     """
-    msg = kwargs['message']
+    print sender, message.raw
 
-    print sender, msg.raw
-
-def handle_attached(sender, *args, **kwargs):
+def handle_attached(sender, device):
     """
     Handles attached events from USBDevice.start_detection().
     """
-    device_args = kwargs['device']
-
     # Create the device from the specified device arguments.
-    device = create_device(device_args)
-    __devices[device.id] = device
+    dev = create_device(device)
+    __devices[dev.id] = dev
 
-    print 'attached', device.id
+    print 'attached', dev.id
 
-def handle_detached(sender, *args, **kwargs):
+def handle_detached(sender, device):
     """
     Handles detached events from USBDevice.start_detection().
     """
-    device = kwargs['device']
     vendor, product, sernum, ifcount, description = device
 
     # Close and remove the device from our list.
