@@ -155,19 +155,9 @@ class AlarmDecoder(object):
         Sets configuration entries on the device.
         """
         config_string = ''
-
-        # HACK: Both of these methods are ugly.. but I can't think of an
-        #       elegant way of doing it.
-
-        #config_string += 'ADDRESS={0}&'.format(self.address)
-        #config_string += 'CONFIGBITS={0:x}&'.format(self.configbits)
-        #config_string += 'MASK={0:x}&'.format(self.address_mask)
-        #config_string += 'EXP={0}&'.format(''.join(['Y' if z else 'N' for z in self.emulate_zone]))
-        #config_string += 'REL={0}&'.format(''.join(['Y' if r else 'N' for r in self.emulate_relay]))
-        #config_string += 'LRR={0}&'.format('Y' if self.emulate_lrr else 'N')
-        #config_string += 'DEDUPLICATE={0}'.format('Y' if self.deduplicate else 'N')
-
         config_entries = []
+
+        # HACK: This is ugly.. but I can't think of an elegant way of doing it.
         config_entries.append(('ADDRESS',
                                '{0}'.format(self.address)))
         config_entries.append(('CONFIGBITS',
@@ -437,7 +427,7 @@ class AlarmDecoder(object):
         """
         self.on_read(args, kwargs)
 
-        msg = self._handle_message(kwargs['data'])
+        msg = self._handle_message(kwargs.get('data', None))
         if msg:
             self.on_message(message=msg)
 

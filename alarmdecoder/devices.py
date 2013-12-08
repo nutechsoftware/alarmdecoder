@@ -158,6 +158,7 @@ class USBDevice(Device):
     """Default baudrate for AD2USB devices."""
 
     __devices = []
+    __detect_thread = None
 
     @classmethod
     def find_all(cls, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID):
@@ -638,10 +639,9 @@ class SerialDevice(Device):
         if self._port is None:
             raise NoDeviceError('No device interface specified.')
 
-        self._device.port = self._port
-
         # Open the device and start up the reader thread.
         try:
+            self._device.port = self._port
             self._device.open()
             # NOTE: Setting the baudrate before opening the
             #       port caused issues with Moschip 7840/7820
@@ -685,7 +685,7 @@ class SerialDevice(Device):
         try:
             self._device.write(data)
 
-        except serial.SerialTimeoutException, err:
+        except serial.SerialTimeoutException:
             pass
 
         except serial.SerialException, err:
@@ -808,8 +808,7 @@ class SocketDevice(Device):
         :param value: Tuple containing the host and port to use.
         :type value: tuple
         """
-        self._host = value[0]
-        self._port = value[1]
+        self._host, self._port = value
 
     @property
     def ssl(self):

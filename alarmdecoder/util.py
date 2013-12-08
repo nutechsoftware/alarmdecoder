@@ -49,6 +49,7 @@ class Firmware(object):
     STAGE_UPLOADING = 4
     STAGE_DONE = 5
 
+    # FIXME: Rewrite this monstrosity.
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
