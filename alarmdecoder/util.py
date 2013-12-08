@@ -66,13 +66,13 @@ class Firmware(object):
             """
             Perform the actual firmware upload to the device.
             """
-            with open(filename) as f:
-                for line in f:
+            with open(filename) as upload_file:
+                for line in upload_file:
                     line = line.rstrip()
 
                     if line[0] == ':':
                         dev.write(line + "\r")
-                        res = dev.read_line(timeout=10.0)
+                        dev.read_line(timeout=10.0)
 
                         if progress_callback is not None:
                             progress_callback(Firmware.STAGE_UPLOADING)
@@ -81,9 +81,11 @@ class Firmware(object):
 
         def read_until(pattern, timeout=0.0):
             """
-            Read characters until a specific pattern is found or the timeout is hit.
+            Read characters until a specific pattern is found or the timeout is
+            hit.
             """
             def timeout_event():
+                """Handles the read timeout event."""
                 timeout_event.reading = False
 
             timeout_event.reading = True
@@ -93,7 +95,6 @@ class Firmware(object):
                 timer = threading.Timer(timeout, timeout_event)
                 timer.start()
 
-            buf = ''
             position = 0
 
             while timeout_event.reading:
@@ -108,7 +109,7 @@ class Firmware(object):
                         else:
                             position = 0
 
-                except Exception, err:
+                except Exception:
                     pass
 
             if timer:
@@ -118,6 +119,7 @@ class Firmware(object):
                     raise TimeoutError('Timeout while waiting for line terminator.')
 
         def stage_callback(stage):
+            """Callback to update progress for the specified stage."""
             if progress_callback is not None:
                 progress_callback(stage)
 

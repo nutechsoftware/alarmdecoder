@@ -1,12 +1,17 @@
+"""Setup script"""
+
 from setuptools import setup
 
 def readme():
-    with open('README.md') as f:
-        return f.read()
+    """Returns the contents of README.md"""
+
+    with open('README.md') as readme_file:
+        return readme_file.read()
 
 setup(name='alarmdecoder',
     version='0.5',
-    description='Python interface library for the Alarm Decoder (AD2) family of alarm devices, including: the AD2USB, AD2SERIAL and AD2PI.',
+    description='Python interface library for the Alarm Decoder (AD2) family '
+                'of alarm devices, including: the AD2USB, AD2SERIAL and AD2PI.',
     long_description=readme(),
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -17,7 +22,8 @@ setup(name='alarmdecoder',
         'Topic :: Home Automation',
         'Topic :: Security',
     ],
-    keywords='alarmdecoder alarm decoder ad2 ad2usb ad2serial ad2pi security ademco dsc',
+    keywords='alarmdecoder alarm decoder ad2 ad2usb ad2serial ad2pi security '
+             'ademco dsc',
     url='http://github.com/nutechsoftware/alarmdecoder',
     author='Nu Tech Software Solutions, Inc.',
     author_email='general@support.nutech.com',

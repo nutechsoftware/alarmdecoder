@@ -110,12 +110,12 @@ class Message(BaseMessage):
 
         :raises: InvalidMessageError
         """
-        m = self._regex.match(data)
+        match = self._regex.match(data)
 
-        if m is None:
+        if match is None:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
-        self.bitfield, self.numeric_code, self.panel_data, alpha = m.group(1, 2, 3, 4)
+        self.bitfield, self.numeric_code, self.panel_data, alpha = match.group(1, 2, 3, 4)
         self.mask = int(self.panel_data[3:3+8], 16)
 
         is_bit_set = lambda bit: not self.bitfield[bit] == "0"
@@ -141,7 +141,8 @@ class Message(BaseMessage):
         self.text = alpha.strip('"')
 
         if int(self.panel_data[19:21], 16) & 0x01 > 0:
-            self.cursor_location = int(self.bitfield[21:23], 16)    # Alpha character index that the cursor is on.
+            # Current cursor location on the alpha display.
+            self.cursor_location = int(self.bitfield[21:23], 16)
 
 
 class ExpanderMessage(BaseMessage):

@@ -82,7 +82,7 @@ class Zonetracker(object):
         """
         if isinstance(message, ExpanderMessage):
             if message.type == ExpanderMessage.ZONE:
-                zone = self._expander_to_zone(message.address, message.channel)
+                zone = self.expander_to_zone(message.address, message.channel)
 
                 status = Zone.CLEAR
                 if message.value == 1:
@@ -90,9 +90,10 @@ class Zonetracker(object):
                 elif message.value == 2:
                     status = Zone.CHECK
 
-                # NOTE: Expander zone faults are handled differently than regular messages.
-                # We don't include them in self._zones_faulted because they are not reported
-                # by the panel in it's rolling list of faults.
+                # NOTE: Expander zone faults are handled differently than
+                #       regular messages.  We don't include them in
+                #       self._zones_faulted because they are not reported
+                #       by the panel in it's rolling list of faults.
                 try:
                     self._update_zone(zone, status=status)
 
@@ -102,12 +103,13 @@ class Zonetracker(object):
         else:
             # Panel is ready, restore all zones.
             #
-            # NOTE: This will need to be updated to support panels with multiple partitions.
-            # In it's current state a ready on partition #1 will end up clearing all zones, even
-            # if they exist elsewhere and it shouldn't.
+            # NOTE: This will need to be updated to support panels with
+            #       multiple partitions.  In it's current state a ready on
+            #       partition #1 will end up clearing all zones, even if they
+            #       exist elsewhere and it shouldn't.
             if message.ready:
-                for z in self._zones_faulted:
-                    self._update_zone(z, Zone.CLEAR)
+                for zone in self._zones_faulted:
+                    self._update_zone(zone, Zone.CLEAR)
 
                 self._last_zone_fault = 0
 
@@ -121,17 +123,18 @@ class Zonetracker(object):
                 except ValueError:
                     zone = int(message.numeric_code, 16)
 
-                # NOTE: Odd case for ECP failures.  Apparently they report as zone 191 (0xBF) regardless
-                # of whether or not the 3-digit mode is enabled... so we have to pull it out of the
-                # alpha message.
+                # NOTE: Odd case for ECP failures.  Apparently they report as
+                #       zone 191 (0xBF) regardless of whether or not the
+                #       3-digit mode is enabled... so we have to pull it out
+                #       of the alpha message.
                 if zone == 191:
                     zone_regex = re.compile('^CHECK (\d+).*$')
 
-                    m = zone_regex.match(message.text)
-                    if m is None:
+                    match = zone_regex.match(message.text)
+                    if match is None:
                         return
 
-                    zone = m.group(1)
+                    zone = match.group(1)
 
                 # Add new zones and clear expired ones.
                 if zone in self._zones_faulted:
@@ -151,6 +154,25 @@ class Zonetracker(object):
                 self._last_zone_fault = zone
 
             self._clear_expired_zones()
+
+    def expander_to_zone(self, address, channel):
+        """
+        Convert an address and channel into a zone number.
+
+        :param address: The expander address
+        :type address: int
+        :param channel: The channel
+        :type channel: int
+
+        :returns: The zone number associated with an address and channel.
+        """
+
+        # TODO: This is going to need to be reworked to support the larger
+        #       panels without fixed addressing on the expanders.
+
+        idx = address - 7   # Expanders start at address 7.
+
+        return address + channel + (idx * 7) + 1
 
     def _clear_zones(self, zone):
         """
@@ -277,22 +299,3 @@ class Zonetracker(object):
         :returns: Whether or not the zone is expired.
         """
         return time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE
-
-    def _expander_to_zone(self, address, channel):
-        """
-        Convert an address and channel into a zone number.
-
-        :param address: The expander address
-        :type address: int
-        :param channel: The channel
-        :type channel: int
-
-        :returns: The zone number associated with an address and channel.
-        """
-
-        # TODO: This is going to need to be reworked to support the larger
-        #       panels without fixed addressing on the expanders.
-
-        idx = address - 7   # Expanders start at address 7.
-
-        return address + channel + (idx * 7) + 1

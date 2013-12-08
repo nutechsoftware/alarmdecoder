@@ -26,7 +26,7 @@ class TestZonetracking(TestCase):
 
     def _build_expander_message(self, msg):
         msg = ExpanderMessage(msg)
-        zone = self._zonetracker._expander_to_zone(msg.address, msg.channel)
+        zone = self._zonetracker.expander_to_zone(msg.address, msg.channel)
 
         return zone, msg
 

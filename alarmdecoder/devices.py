@@ -13,8 +13,7 @@ import serial.tools.list_ports
 import socket
 
 from OpenSSL import SSL, crypto
-from pyftdi.pyftdi.ftdi import *
-from pyftdi.pyftdi.usbtools import *
+from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
 from .util import CommError, TimeoutError, NoDeviceError
 from .event import event
 
@@ -46,7 +45,7 @@ class Device(object):
         """
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
         """
         Support for context manager __exit__.
         """
@@ -96,7 +95,7 @@ class Device(object):
             self._read_thread.stop()
             self._device.close()
 
-        except:
+        except Exception:
             pass
 
         self.on_close()
@@ -136,13 +135,11 @@ class Device(object):
                 try:
                     self._device.read_line(timeout=self.READ_TIMEOUT)
 
-                except TimeoutError, err:
+                except TimeoutError:
                     pass
 
-                except Exception, err:
+                except Exception:
                     self._running = False
-
-                    #raise err
 
                 time.sleep(0.01)
 
@@ -192,9 +189,11 @@ class USBDevice(Device):
     @classmethod
     def find(cls, device=None):
         """
-        Factory method that returns the requested USBDevice device, or the first device.
+        Factory method that returns the requested USBDevice device, or the
+        first device.
 
-        :param device: Tuple describing the USB device to open, as returned by find_all().
+        :param device: Tuple describing the USB device to open, as returned
+                       by find_all().
         :type device: tuple
 
         :returns: USBDevice object utilizing the specified device.
@@ -236,7 +235,7 @@ class USBDevice(Device):
         try:
             cls.__detect_thread.stop()
 
-        except:
+        except Exception:
             pass
 
     @property
@@ -305,20 +304,23 @@ class USBDevice(Device):
         """
         Constructor
 
-        :param interface: May specify either the serial number or the device index.
+        :param interface: May specify either the serial number or the device
+                          index.
         :type interface: str or int
         """
         Device.__init__(self)
 
         self._device = Ftdi()
 
+        self._interface = 0
         self._device_number = 0
         self._serial_number = None
-        self.interface = interface
         self._vendor_id = USBDevice.FTDI_VENDOR_ID
         self._product_id = USBDevice.FTDI_PRODUCT_ID
         self._endpoint = 0
         self._description = None
+
+        self.interface = interface
 
     def open(self, baudrate=BAUDRATE, no_reader_thread=False):
         """
@@ -326,7 +328,8 @@ class USBDevice(Device):
 
         :param baudrate: The baudrate to use.
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically start the reader thread.
+        :param no_reader_thread: Whether or not to automatically start the
+                                 reader thread.
         :type no_reader_thread: bool
 
         :raises: NoDeviceError
@@ -370,10 +373,10 @@ class USBDevice(Device):
         try:
             Device.close(self)
 
-            # HACK: Probably should fork pyftdi and make this call in .close().
+            # HACK: Probably should fork pyftdi and make this call in .close()
             self._device.usb_dev.attach_kernel_driver(self._device_number)
 
-        except:
+        except Exception:
             pass
 
     def write(self, data):
@@ -416,7 +419,8 @@ class USBDevice(Device):
 
         :param timeout: Read timeout
         :type timeout: float
-        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :param purge_buffer: Indicates whether to purge the buffer prior to
+                             reading.
         :type purge_buffer: bool
 
         :returns: The line that was read.
@@ -427,6 +431,7 @@ class USBDevice(Device):
             self._buffer = ''
 
         def timeout_event():
+            """Handles read timeout event"""
             timeout_event.reading = False
 
         timeout_event.reading = True
@@ -451,7 +456,8 @@ class USBDevice(Device):
                             if self._buffer[-2] == "\r":
                                 self._buffer = self._buffer[:-2]
 
-                                # ignore if we just got \r\n with nothing else in the buffer.
+                                # Ignore if we just got \r\n with nothing else
+                                # in the buffer.
                                 if len(self._buffer) != 0:
                                     got_line = True
                                     break
@@ -531,17 +537,17 @@ class USBDevice(Device):
                 try:
                     current_devices = set(USBDevice.find_all())
 
-                    new_devices = [d for d in current_devices if d not in last_devices]
-                    removed_devices = [d for d in last_devices if d not in current_devices]
+                    new_devices = [dev for dev in current_devices if dev not in last_devices]
+                    removed_devices = [dev for dev in last_devices if dev not in current_devices]
                     last_devices = current_devices
 
-                    for d in new_devices:
-                        self.on_attached(device=d)
+                    for dev in new_devices:
+                        self.on_attached(device=dev)
 
-                    for d in removed_devices:
-                        self.on_detached(device=d)
+                    for dev in removed_devices:
+                        self.on_detached(device=dev)
 
-                except CommError, err:
+                except CommError:
                     pass
 
                 time.sleep(0.25)
@@ -575,7 +581,7 @@ class SerialDevice(Device):
             else:
                 devices = serial.tools.list_ports.comports()
 
-        except SerialException, err:
+        except serial.SerialException, err:
             raise CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
 
         return devices
@@ -610,7 +616,8 @@ class SerialDevice(Device):
 
         self._port = interface
         self._id = interface
-        self._device = serial.Serial(timeout=0, writeTimeout=0)     # Timeout = non-blocking to match pyftdi.
+        # Timeout = non-blocking to match pyftdi.
+        self._device = serial.Serial(timeout=0, writeTimeout=0)
 
     def open(self, baudrate=BAUDRATE, no_reader_thread=False):
         """
@@ -618,7 +625,8 @@ class SerialDevice(Device):
 
         :param baudrate: The baudrate to use with the device.
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically start the reader thread.
+        :param no_reader_thread: Whether or not to automatically start the
+                                 reader thread.
         :type no_reader_thread: bool
 
         :raises: NoDeviceError
@@ -635,12 +643,13 @@ class SerialDevice(Device):
         # Open the device and start up the reader thread.
         try:
             self._device.open()
-            self._device.baudrate = baudrate            # NOTE: Setting the baudrate before opening the
-                                                        #       port caused issues with Moschip 7840/7820
-                                                        #       USB Serial Driver converter. (mos7840)
-                                                        #
-                                                        #       Moving it to this point seems to resolve
-                                                        #       all issues with it.
+            # NOTE: Setting the baudrate before opening the
+            #       port caused issues with Moschip 7840/7820
+            #       USB Serial Driver converter. (mos7840)
+            #
+            #       Moving it to this point seems to resolve
+            #       all issues with it.
+            self._device.baudrate = baudrate
 
         except (serial.SerialException, ValueError), err:
             raise NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
@@ -661,7 +670,7 @@ class SerialDevice(Device):
         try:
             Device.close(self)
 
-        except:
+        except Exception:
             pass
 
     def write(self, data):
@@ -708,13 +717,19 @@ class SerialDevice(Device):
 
         :param timeout: The read timeout.
         :type timeout: float
-        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :param purge_buffer: Indicates whether to purge the buffer prior to
+                             reading.
         :type purge_buffer: bool
 
         :returns: The line read.
         :raises: CommError, TimeoutError
         """
+
+        if purge_buffer:
+            self._buffer = ''
+
         def timeout_event():
+            """Handles read timeout event"""
             timeout_event.reading = False
 
         timeout_event.reading = True
@@ -731,7 +746,8 @@ class SerialDevice(Device):
             while timeout_event.reading:
                 buf = self._device.read(1)
 
-                if buf != '' and buf != "\xff":     # AD2SERIAL specifically apparently sends down \xFF on boot.
+                # NOTE: AD2SERIAL apparently sends down \xFF on boot.
+                if buf != '' and buf != "\xff":
                     self._buffer += buf
 
                     if buf == "\n":
@@ -739,7 +755,8 @@ class SerialDevice(Device):
                             if self._buffer[-2] == "\r":
                                 self._buffer = self._buffer[:-2]
 
-                                # ignore if we just got \r\n with nothing else in the buffer.
+                                # Ignore if we just got \r\n with nothing else
+                                # in the buffer.
                                 if len(self._buffer) != 0:
                                     got_line = True
                                     break
@@ -854,7 +871,8 @@ class SocketDevice(Device):
     @property
     def ssl_ca(self):
         """
-        Retrieves the SSL Certificate Authority certificate used for authentication.
+        Retrieves the SSL Certificate Authority certificate used for
+        authentication.
 
         :returns: The CA path
         """
@@ -891,7 +909,8 @@ class SocketDevice(Device):
 
         :param baudrate: The baudrate to use
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically open the reader thread.
+        :param no_reader_thread: Whether or not to automatically open the reader
+                                 thread.
         :type no_reader_thread: bool
 
         :raises: NoDeviceError, CommError
@@ -932,11 +951,12 @@ class SocketDevice(Device):
                 self._device.shutdown()
 
             else:
-                self._device.shutdown(socket.SHUT_RDWR)     # Make sure that it closes immediately.
+                # Make sure that it closes immediately.
+                self._device.shutdown(socket.SHUT_RDWR)
 
             Device.close(self)
 
-        except Exception, ex:
+        except Exception:
             pass
 
     def write(self, data):
@@ -987,7 +1007,8 @@ class SocketDevice(Device):
 
         :param timeout: The read timeout.
         :type timeout: float
-        :param purge_buffer: Indicates whether to purge the buffer prior to reading.
+        :param purge_buffer: Indicates whether to purge the buffer prior to
+                             reading.
         :type purge_buffer: bool
 
         :returns: The line read from the device.
@@ -998,6 +1019,7 @@ class SocketDevice(Device):
             self._buffer = ''
 
         def timeout_event():
+            """Handles read timeout event"""
             timeout_event.reading = False
 
         timeout_event.reading = True
@@ -1022,7 +1044,8 @@ class SocketDevice(Device):
                             if self._buffer[-2] == "\r":
                                 self._buffer = self._buffer[:-2]
 
-                                # ignore if we just got \r\n with nothing else in the buffer.
+                                # Ignore if we just got \r\n with nothing else
+                                # in the buffer.
                                 if len(self._buffer) != 0:
                                     got_line = True
                                     break
@@ -1051,6 +1074,10 @@ class SocketDevice(Device):
         return ret
 
     def _init_ssl(self):
+        """
+        Initializes our device as an SSL connection.
+        """
+
         try:
             ctx = SSL.Context(SSL.TLSv1_METHOD)
 
@@ -1078,4 +1105,7 @@ class SocketDevice(Device):
             raise CommError('Error setting up SSL connection.', err)
 
     def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):
+        """
+        SSL verification callback.
+        """
         return ok

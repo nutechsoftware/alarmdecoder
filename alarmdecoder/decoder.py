@@ -5,10 +5,9 @@ Provides the full AlarmDecoder class.
 """
 
 import time
-import threading
 
 from .event import event
-from .util import CommError, NoDeviceError
+from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
 
@@ -45,13 +44,13 @@ class AlarmDecoder(object):
     on_write = event.Event('Called when data has been written to the device.')
 
     # Constants
-    F1 = unichr(1) + unichr(1) + unichr(1)
+    KEY_F1 = unichr(1) + unichr(1) + unichr(1)
     """Represents panel function key #1"""
-    F2 = unichr(2) + unichr(2) + unichr(2)
+    KEY_F2 = unichr(2) + unichr(2) + unichr(2)
     """Represents panel function key #2"""
-    F3 = unichr(3) + unichr(3) + unichr(3)
+    KEY_F3 = unichr(3) + unichr(3) + unichr(3)
     """Represents panel function key #3"""
-    F4 = unichr(4) + unichr(4) + unichr(4)
+    KEY_F4 = unichr(4) + unichr(4) + unichr(4)
     """Represents panel function key #4"""
 
     BATTERY_TIMEOUT = 30
@@ -63,7 +62,8 @@ class AlarmDecoder(object):
         """
         Constructor
 
-        :param device: The low-level device used for this Alarm Decoder interface.
+        :param device: The low-level device used for this Alarm Decoder
+                       interface.
         :type device: Device
         """
         self._device = device
@@ -92,7 +92,7 @@ class AlarmDecoder(object):
         """
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
         """
         Support for context manager __exit__.
         """
@@ -115,7 +115,8 @@ class AlarmDecoder(object):
 
         :param baudrate: The baudrate used for the device.
         :type baudrate: int
-        :param no_reader_thread: Specifies whether or not the automatic reader thread should be started or not
+        :param no_reader_thread: Specifies whether or not the automatic reader
+                                 thread should be started or not
         :type no_reader_thread: bool
         """
         self._wire_events()
@@ -155,7 +156,8 @@ class AlarmDecoder(object):
         """
         config_string = ''
 
-        # HACK: Both of these methods are ugly.. but I can't think of an elegant way of doing it.
+        # HACK: Both of these methods are ugly.. but I can't think of an
+        #       elegant way of doing it.
 
         #config_string += 'ADDRESS={0}&'.format(self.address)
         #config_string += 'CONFIGBITS={0:x}&'.format(self.configbits)
@@ -166,13 +168,20 @@ class AlarmDecoder(object):
         #config_string += 'DEDUPLICATE={0}'.format('Y' if self.deduplicate else 'N')
 
         config_entries = []
-        config_entries.append(('ADDRESS', '{0}'.format(self.address)))
-        config_entries.append(('CONFIGBITS', '{0:x}'.format(self.configbits)))
-        config_entries.append(('MASK', '{0:x}'.format(self.address_mask)))
-        config_entries.append(('EXP', ''.join(['Y' if z else 'N' for z in self.emulate_zone])))
-        config_entries.append(('REL', ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
-        config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
-        config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
+        config_entries.append(('ADDRESS',
+                               '{0}'.format(self.address)))
+        config_entries.append(('CONFIGBITS',
+                               '{0:x}'.format(self.configbits)))
+        config_entries.append(('MASK',
+                               '{0:x}'.format(self.address_mask)))
+        config_entries.append(('EXP',
+                               ''.join(['Y' if z else 'N' for z in self.emulate_zone])))
+        config_entries.append(('REL',
+                               ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
+        config_entries.append(('LRR',
+                               'Y' if self.emulate_lrr else 'N'))
+        config_entries.append(('DEDUPLICATE',
+                               'Y' if self.deduplicate else 'N'))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -199,7 +208,9 @@ class AlarmDecoder(object):
         #
         # Format (expander index, channel)
         if isinstance(zone, tuple):
-            zone = self._zonetracker._expander_to_zone(*zone)
+            expander_idx, channel = zone
+
+            zone = self._zonetracker.expander_to_zone(expander_idx, channel)
 
         status = 2 if simulate_wire_problem else 1
 
@@ -313,22 +324,22 @@ class AlarmDecoder(object):
         """
         _, config_string = data.split('>')
         for setting in config_string.split('&'):
-            k, v = setting.split('=')
+            key, val = setting.split('=')
 
-            if k == 'ADDRESS':
-                self.address = int(v)
-            elif k == 'CONFIGBITS':
-                self.configbits = int(v, 16)
-            elif k == 'MASK':
-                self.address_mask = int(v, 16)
-            elif k == 'EXP':
-                self.emulate_zone = [v[z] == 'Y' for z in range(5)]
-            elif k == 'REL':
-                self.emulate_relay = [v[r] == 'Y' for r in range(4)]
-            elif k == 'LRR':
-                self.emulate_lrr = (v == 'Y')
-            elif k == 'DEDUPLICATE':
-                self.deduplicate = (v == 'Y')
+            if key == 'ADDRESS':
+                self.address = int(val)
+            elif key == 'CONFIGBITS':
+                self.configbits = int(val, 16)
+            elif key == 'MASK':
+                self.address_mask = int(val, 16)
+            elif key == 'EXP':
+                self.emulate_zone = [val[z] == 'Y' for z in range(5)]
+            elif key == 'REL':
+                self.emulate_relay = [val[r] == 'Y' for r in range(4)]
+            elif key == 'LRR':
+                self.emulate_lrr = (val == 'Y')
+            elif key == 'DEDUPLICATE':
+                self.deduplicate = (val == 'Y')
 
         self.on_config_received()
 
