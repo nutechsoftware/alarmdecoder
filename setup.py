@@ -23,7 +23,7 @@ setup(name='alarmdecoder',
         'Topic :: Security',
     ],
     keywords='alarmdecoder alarm decoder ad2 ad2usb ad2serial ad2pi security '
-             'ademco dsc',
+             'ademco dsc nutech',
     url='http://github.com/nutechsoftware/alarmdecoder',
     author='Nu Tech Software Solutions, Inc.',
     author_email='general@support.nutech.com',
