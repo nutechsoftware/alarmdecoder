@@ -3,6 +3,7 @@ from unittest import TestCase
 from ..messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from ..util import InvalidMessageError
 
+
 class TestMessages(TestCase):
     def setUp(self):
         pass

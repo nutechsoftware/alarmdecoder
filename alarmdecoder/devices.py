@@ -4,10 +4,12 @@ Contains different types of devices belonging to the Alarm Decoder (AD2) family.
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-import usb.core, usb.util
+import usb.core
+import usb.util
 import time
 import threading
-import serial, serial.tools.list_ports
+import serial
+import serial.tools.list_ports
 import socket
 
 from OpenSSL import SSL, crypto
@@ -15,6 +17,7 @@ from pyftdi.pyftdi.ftdi import *
 from pyftdi.pyftdi.usbtools import *
 from .util import CommError, TimeoutError, NoDeviceError
 from .event import event
+
 
 class Device(object):
     """
@@ -142,6 +145,7 @@ class Device(object):
                     #raise err
 
                 time.sleep(0.01)
+
 
 class USBDevice(Device):
     """
@@ -334,11 +338,11 @@ class USBDevice(Device):
         # Open the device and start up the thread.
         try:
             self._device.open(self._vendor_id,
-                             self._product_id,
-                             self._endpoint,
-                             self._device_number,
-                             self._serial_number,
-                             self._description)
+                              self._product_id,
+                              self._endpoint,
+                              self._device_number,
+                              self._serial_number,
+                              self._description)
 
             self._device.set_baudrate(baudrate)
 
@@ -762,6 +766,7 @@ class SerialDevice(Device):
                 raise TimeoutError('Timeout while waiting for line terminator.')
 
         return ret
+
 
 class SocketDevice(Device):
     """

@@ -4,6 +4,7 @@ from mock import Mock, MagicMock
 from ..messages import Message, ExpanderMessage
 from ..zonetracking import Zonetracker, Zone
 
+
 class TestZonetracking(TestCase):
     def setUp(self):
         self._zonetracker = Zonetracker()
@@ -135,7 +136,7 @@ class TestZonetracking(TestCase):
             self._zonetracker.update(msg)
 
         self.assertIn(4, self._zonetracker._zones_faulted)
-        self._zonetracker._zones[4].timestamp -= 35 # forcefully expire the zone
+        self._zonetracker._zones[4].timestamp -= 35     # forcefully expire the zone
 
         # generic message to force an update.
         msg = Message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')

@@ -7,11 +7,13 @@ Provides utility classes for the Alarm Decoder (AD2) devices.
 import time
 import threading
 
+
 class NoDeviceError(Exception):
     """
     No devices found.
     """
     pass
+
 
 class CommError(Exception):
     """
@@ -19,17 +21,20 @@ class CommError(Exception):
     """
     pass
 
+
 class TimeoutError(Exception):
     """
     There was a timeout while trying to communicate with the device.
     """
     pass
 
+
 class InvalidMessageError(Exception):
     """
     The format of the panel message was invalid.
     """
     pass
+
 
 class Firmware(object):
     """

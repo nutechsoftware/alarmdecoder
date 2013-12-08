@@ -9,6 +9,7 @@ import re
 
 from .util import InvalidMessageError
 
+
 class BaseMessage(object):
     """
     Base class for messages.
@@ -28,6 +29,7 @@ class BaseMessage(object):
         String conversion operator.
         """
         return self.raw
+
 
 class Message(BaseMessage):
     """
@@ -141,6 +143,7 @@ class Message(BaseMessage):
         if int(self.panel_data[19:21], 16) & 0x01 > 0:
             self.cursor_location = int(self.bitfield[21:23], 16)    # Alpha character index that the cursor is on.
 
+
 class ExpanderMessage(BaseMessage):
     """
     Represents a message from a zone or relay expansion module.
@@ -150,7 +153,6 @@ class ExpanderMessage(BaseMessage):
     """Flag indicating that the expander message relates to a Zone Expander."""
     RELAY = 1
     """Flag indicating that the expander message relates to a Relay Expander."""
-
 
     type = None
     """Expander message type: ExpanderMessage.ZONE or ExpanderMessage.RELAY"""
@@ -204,6 +206,7 @@ class ExpanderMessage(BaseMessage):
             self.type = ExpanderMessage.RELAY
         else:
             raise InvalidMessageError('Unknown expander message header: {0}'.format(data))
+
 
 class RFMessage(BaseMessage):
     """
@@ -266,6 +269,7 @@ class RFMessage(BaseMessage):
 
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
+
 
 class LRRMessage(BaseMessage):
     """

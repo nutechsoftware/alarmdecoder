@@ -9,6 +9,7 @@
 #   * Added type check in fire()
 #   * Removed earg from fire() and added support for args/kwargs.
 
+
 class Event(object):
 
     def __init__(self, doc=None):

@@ -164,6 +164,7 @@ class TestUSBDevice(TestCase):
             with self.assertRaises(CommError):
                 self._device.read_line()
 
+
 class TestSerialDevice(TestCase):
     def setUp(self):
         self._device = SerialDevice()
@@ -249,6 +250,7 @@ class TestSerialDevice(TestCase):
 
             with self.assertRaises(CommError):
                 self._device.read_line()
+
 
 class TestSocketDevice(TestCase):
     def setUp(self):

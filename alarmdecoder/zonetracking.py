@@ -10,6 +10,7 @@ import time
 from .event import event
 from .messages import ExpanderMessage
 
+
 class Zone(object):
     """
     Representation of a panel zone.
@@ -22,7 +23,7 @@ class Zone(object):
     CHECK = 2   # Wire fault
     """Status indicating that there is a wiring issue with the zone."""
 
-    STATUS = { CLEAR: 'CLEAR', FAULT: 'FAULT', CHECK: 'CHECK' }
+    STATUS = {CLEAR: 'CLEAR', FAULT: 'FAULT', CHECK: 'CHECK'}
 
     def __init__(self, zone=0, name='', status=CLEAR):
         """
@@ -51,6 +52,7 @@ class Zone(object):
         Human readable representation operator.
         """
         return 'Zone({0}, {1}, ts {2})'.format(self.zone, Zone.STATUS[self.status], self.timestamp)
+
 
 class Zonetracker(object):
     """

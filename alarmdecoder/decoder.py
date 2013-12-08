@@ -12,6 +12,7 @@ from .util import CommError, NoDeviceError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
 
+
 class AlarmDecoder(object):
     """
     High-level wrapper around Alarm Decoder (AD2) devices.
@@ -237,8 +238,8 @@ class AlarmDecoder(object):
             raise InvalidMessageError()
 
         msg = None
-
         header = data[0:4]
+
         if header[0] != '!' or header == '!KPE':
             msg = Message(data)
 
@@ -295,7 +296,7 @@ class AlarmDecoder(object):
             self.on_panic(status=True)
 
         elif msg.event_type == 'CANCEL':
-            if self._panic_status == True:
+            if self._panic_status is True:
                 self._panic_status = False
                 self.on_panic(status=False)
 
@@ -321,11 +322,9 @@ class AlarmDecoder(object):
             elif k == 'MASK':
                 self.address_mask = int(v, 16)
             elif k == 'EXP':
-                for z in range(5):
-                    self.emulate_zone[z] = (v[z] == 'Y')
+                self.emulate_zone = [v[z] == 'Y' for z in range(5)]
             elif k == 'REL':
-                for r in range(4):
-                    self.emulate_relay[r] = (v[r] == 'Y')
+                self.emulate_relay = [v[r] == 'Y' for r in range(4)]
             elif k == 'LRR':
                 self.emulate_lrr = (v == 'Y')
             elif k == 'DEDUPLICATE':
@@ -371,14 +370,14 @@ class AlarmDecoder(object):
             if message.battery_low == self._battery_status[0]:
                 self._battery_status = (self._battery_status[0], time.time())
             else:
-                if message.battery_low == True or time.time() > self._battery_status[1] + AlarmDecoder.BATTERY_TIMEOUT:
+                if message.battery_low is True or time.time() > self._battery_status[1] + AlarmDecoder.BATTERY_TIMEOUT:
                     self._battery_status = (message.battery_low, time.time())
                     self.on_low_battery(status=self._battery_status)
 
             if message.fire_alarm == self._fire_status[0]:
                 self._fire_status = (self._fire_status[0], time.time())
             else:
-                if message.fire_alarm == True or time.time() > self._fire_status[1] + AlarmDecoder.FIRE_TIMEOUT:
+                if message.fire_alarm is True or time.time() > self._fire_status[1] + AlarmDecoder.FIRE_TIMEOUT:
                     self._fire_status = (message.fire_alarm, time.time())
                     self.on_fire(status=self._fire_status)
 

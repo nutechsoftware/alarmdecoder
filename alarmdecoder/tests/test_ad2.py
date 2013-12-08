@@ -9,6 +9,7 @@ from ..messages import Message, RFMessage, LRRMessage, ExpanderMessage
 from ..event.event import Event, EventHandler
 from ..zonetracking import Zonetracker
 
+
 class TestAlarmDecoder(TestCase):
     def setUp(self):
         self._panicked = False
