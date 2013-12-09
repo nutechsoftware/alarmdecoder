@@ -538,15 +538,13 @@ class USBDevice(Device):
                 try:
                     current_devices = set(USBDevice.find_all())
 
-                    new_devices = [dev for dev in current_devices if dev not in last_devices]
-                    removed_devices = [dev for dev in last_devices if dev not in current_devices]
-                    last_devices = current_devices
-
-                    for dev in new_devices:
+                    for dev in current_devices.difference(last_devices):
                         self.on_attached(device=dev)
 
-                    for dev in removed_devices:
+                    for dev in last_devices.difference(current_devices):
                         self.on_detached(device=dev)
+
+                    last_devices = current_devices
 
                 except CommError:
                     pass
