@@ -90,7 +90,7 @@ class Message(BaseMessage):
         """
         BaseMessage.__init__(self)
 
-        self._regex = re.compile('("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*),("(?:[^"]|"")*"|[^,]*)')
+        self._regex = re.compile('^(!KPE:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
 
         if data is not None:
             self._parse_message(data)
@@ -115,7 +115,7 @@ class Message(BaseMessage):
         if match is None:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
-        self.bitfield, self.numeric_code, self.panel_data, alpha = match.group(1, 2, 3, 4)
+        header, self.bitfield, self.numeric_code, self.panel_data, alpha = match.group(1, 2, 3, 4, 5)
         self.mask = int(self.panel_data[3:3+8], 16)
 
         is_bit_set = lambda bit: not self.bitfield[bit] == "0"
