@@ -17,8 +17,8 @@ class TestAlarmDecoder(TestCase):
         self._power_changed = False
         self._alarmed = False
         self._bypassed = False
-        self._battery = (False, 0)
-        self._fire = (False, 0)
+        self._battery = False
+        self._fire = False
         self._armed = False
         self._got_config = False
         self._message_received = False
@@ -240,21 +240,21 @@ class TestAlarmDecoder(TestCase):
 
     def test_battery_low_event(self):
         msg = self._decoder._handle_message('[0000000000010000----],000,[f707000600e5800c0c020000],"                                "')
-        self.assertEquals(self._battery[0], True)
+        self.assertEquals(self._battery, True)
 
         # force the timeout to expire.
-        with patch.object(time, 'time', return_value=self._battery[1] + 35):
+        with patch.object(time, 'time', return_value=self._decoder._battery_status[1] + 35):
             msg = self._decoder._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-            self.assertEquals(self._battery[0], False)
+            self.assertEquals(self._battery, False)
 
     def test_fire_alarm_event(self):
         msg = self._decoder._handle_message('[0000000000000100----],000,[f707000600e5800c0c020000],"                                "')
-        self.assertEquals(self._fire[0], True)
+        self.assertEquals(self._fire, True)
 
         # force the timeout to expire.
-        with patch.object(time, 'time', return_value=self._fire[1] + 35):
+        with patch.object(time, 'time', return_value=self._decoder._battery_status[1] + 35):
             msg = self._decoder._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-            self.assertEquals(self._fire[0], False)
+            self.assertEquals(self._fire, False)
 
     def test_hit_for_faults(self):
         self._decoder._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"Hit * for faults                "')
