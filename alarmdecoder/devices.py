@@ -418,7 +418,7 @@ class USBDevice(Device):
         """
         Reads a line from the device.
 
-        :param timeout: Read timeout
+        :param timeout: The read timeout.
         :type timeout: float
         :param purge_buffer: Indicates whether to purge the buffer prior to
                              reading.
@@ -428,21 +428,18 @@ class USBDevice(Device):
         :raises: CommError, TimeoutError
         """
 
-        if purge_buffer:
-            self._buffer = ''
-
         def timeout_event():
             """Handles read timeout event"""
             timeout_event.reading = False
-
         timeout_event.reading = True
 
-        got_line = False
-        ret = None
+        if purge_buffer:
+            self._buffer = ''
 
-        timer = None
+        got_line, ret = False, None
+
+        timer = threading.Timer(timeout, timeout_event)
         if timeout > 0:
-            timer = threading.Timer(timeout, timeout_event)
             timer.start()
 
         try:
@@ -453,36 +450,26 @@ class USBDevice(Device):
                     self._buffer += buf
 
                     if buf == "\n":
-                        if len(self._buffer) > 1:
-                            if self._buffer[-2] == "\r":
-                                self._buffer = self._buffer[:-2]
+                        self._buffer = self._buffer.rstrip("\r\n")
 
-                                # Ignore if we just got \r\n with nothing else
-                                # in the buffer.
-                                if len(self._buffer) != 0:
-                                    got_line = True
-                                    break
-                        else:
-                            self._buffer = self._buffer[:-1]
+                        if len(self._buffer) > 0:
+                            got_line = True
+                            break
 
         except (usb.core.USBError, FtdiError), err:
-            if timer:
-                timer.cancel()
-
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
-                ret = self._buffer
-                self._buffer = ''
+                ret, self._buffer = self._buffer, ''
 
                 self.on_read(data=ret)
 
-        if timer:
-            if timer.is_alive():
-                timer.cancel()
             else:
                 raise TimeoutError('Timeout while waiting for line terminator.')
+
+        finally:
+            timer.cancel()
 
         return ret
 
@@ -719,25 +706,22 @@ class SerialDevice(Device):
                              reading.
         :type purge_buffer: bool
 
-        :returns: The line read.
+        :returns: The line that was read.
         :raises: CommError, TimeoutError
         """
-
-        if purge_buffer:
-            self._buffer = ''
 
         def timeout_event():
             """Handles read timeout event"""
             timeout_event.reading = False
-
         timeout_event.reading = True
 
-        got_line = False
-        ret = None
+        if purge_buffer:
+            self._buffer = ''
 
-        timer = None
+        got_line, ret = False, None
+
+        timer = threading.Timer(timeout, timeout_event)
         if timeout > 0:
-            timer = threading.Timer(timeout, timeout_event)
             timer.start()
 
         try:
@@ -749,36 +733,26 @@ class SerialDevice(Device):
                     self._buffer += buf
 
                     if buf == "\n":
-                        if len(self._buffer) > 1:
-                            if self._buffer[-2] == "\r":
-                                self._buffer = self._buffer[:-2]
+                        self._buffer = self._buffer.rstrip("\r\n")
 
-                                # Ignore if we just got \r\n with nothing else
-                                # in the buffer.
-                                if len(self._buffer) != 0:
-                                    got_line = True
-                                    break
-                        else:
-                            self._buffer = self._buffer[:-1]
+                        if len(self._buffer) > 0:
+                            got_line = True
+                            break
 
         except (OSError, serial.SerialException), err:
-            if timer:
-                timer.cancel()
-
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
-                ret = self._buffer
-                self._buffer = ''
+                ret, self._buffer = self._buffer, ''
 
                 self.on_read(data=ret)
 
-        if timer:
-            if timer.is_alive():
-                timer.cancel()
             else:
                 raise TimeoutError('Timeout while waiting for line terminator.')
+
+        finally:
+            timer.cancel()
 
         return ret
 
@@ -1008,25 +982,22 @@ class SocketDevice(Device):
                              reading.
         :type purge_buffer: bool
 
-        :returns: The line read from the device.
+        :returns: The line that was read.:
         :raises: CommError, TimeoutError
         """
-
-        if purge_buffer:
-            self._buffer = ''
 
         def timeout_event():
             """Handles read timeout event"""
             timeout_event.reading = False
-
         timeout_event.reading = True
 
-        got_line = False
-        ret = None
+        if purge_buffer:
+            self._buffer = ''
 
-        timer = None
+        got_line, ret = False, None
+
+        timer = threading.Timer(timeout, timeout_event)
         if timeout > 0:
-            timer = threading.Timer(timeout, timeout_event)
             timer.start()
 
         try:
@@ -1037,36 +1008,26 @@ class SocketDevice(Device):
                     self._buffer += buf
 
                     if buf == "\n":
-                        if len(self._buffer) > 1:
-                            if self._buffer[-2] == "\r":
-                                self._buffer = self._buffer[:-2]
+                        self._buffer = self._buffer.rstrip("\r\n")
 
-                                # Ignore if we just got \r\n with nothing else
-                                # in the buffer.
-                                if len(self._buffer) != 0:
-                                    got_line = True
-                                    break
-                        else:
-                            self._buffer = self._buffer[:-1]
+                        if len(self._buffer) > 0:
+                            got_line = True
+                            break
 
         except socket.error, err:
-            if timer:
-                timer.cancel()
-
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
-                ret = self._buffer
-                self._buffer = ''
+                ret, self._buffer = self._buffer, ''
 
                 self.on_read(data=ret)
 
-        if timer:
-            if timer.is_alive():
-                timer.cancel()
             else:
                 raise TimeoutError('Timeout while waiting for line terminator.')
+
+        finally:
+            timer.cancel()
 
         return ret
 
