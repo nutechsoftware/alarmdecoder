@@ -25,7 +25,7 @@ Requirements
 
 Documentation
 -------------
-API documentation can be found [here](http://github.com/nutechsoftware/alarmdecoder/tree/master/docs/_build/html).
+API documentation can be found [here](http://github.com/nutechsoftware/alarmdecoder/tree/master/docs/build/html).
 
 Examples
 --------

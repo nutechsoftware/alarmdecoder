@@ -53,17 +53,19 @@
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">usb.core</span><span class="o">,</span> <span class="nn">usb.util</span>
+<span class="kn">import</span> <span class="nn">usb.core</span>
+<span class="kn">import</span> <span class="nn">usb.util</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">serial</span><span class="o">,</span> <span class="nn">serial.tools.list_ports</span>
+<span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">serial.tools.list_ports</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 
 <span class="kn">from</span> <span class="nn">OpenSSL</span> <span class="kn">import</span> <span class="n">SSL</span><span class="p">,</span> <span class="n">crypto</span>
-<span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">pyftdi.pyftdi.usbtools</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="n">Ftdi</span><span class="p">,</span> <span class="n">FtdiError</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
+
 
 <div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -92,7 +94,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Support for context manager __exit__.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -142,7 +144,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
@@ -182,15 +184,14 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">read_line</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">READ_TIMEOUT</span><span class="p">)</span>
 
-                <span class="k">except</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">TimeoutError</span><span class="p">:</span>
                     <span class="k">pass</span>
 
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
 
-                    <span class="c">#raise err</span>
-
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+
 </div></div></div>
 <div class="viewcode-block" id="USBDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice">[docs]</a><span class="k">class</span> <span class="nc">USBDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -206,6 +207,7 @@
     <span class="sd">&quot;&quot;&quot;Default baudrate for AD2USB devices.&quot;&quot;&quot;</span>
 
     <span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__detect_thread</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="USBDevice.find_all"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">FTDI_VENDOR_ID</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">FTDI_PRODUCT_ID</span><span class="p">):</span>
@@ -237,9 +239,11 @@
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="USBDevice.find"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Factory method that returns the requested USBDevice device, or the first device.</span>
+<span class="sd">        Factory method that returns the requested USBDevice device, or the</span>
+<span class="sd">        first device.</span>
 
-<span class="sd">        :param device: Tuple describing the USB device to open, as returned by find_all().</span>
+<span class="sd">        :param device: Tuple describing the USB device to open, as returned</span>
+<span class="sd">                       by find_all().</span>
 <span class="sd">        :type device: tuple</span>
 
 <span class="sd">        :returns: USBDevice object utilizing the specified device.</span>
@@ -281,7 +285,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
     <span class="nd">@property</span>
@@ -350,20 +354,23 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param interface: May specify either the serial number or the device index.</span>
+<span class="sd">        :param interface: May specify either the serial number or the device</span>
+<span class="sd">                          index.</span>
 <span class="sd">        :type interface: str or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="p">()</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">=</span> <span class="n">interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_VENDOR_ID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_PRODUCT_ID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span> <span class="o">=</span> <span class="n">interface</span>
 
 <div class="viewcode-block" id="USBDevice.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -371,7 +378,8 @@
 
 <span class="sd">        :param baudrate: The baudrate to use.</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically start the reader thread.</span>
+<span class="sd">        :param no_reader_thread: Whether or not to automatically start the</span>
+<span class="sd">                                 reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
 <span class="sd">        :raises: NoDeviceError</span>
@@ -383,11 +391,11 @@
         <span class="c"># Open the device and start up the thread.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span><span class="p">,</span>
-                             <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">)</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_description</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">set_baudrate</span><span class="p">(</span><span class="n">baudrate</span><span class="p">)</span>
 
@@ -415,10 +423,10 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-            <span class="c"># HACK: Probably should fork pyftdi and make this call in .close().</span>
+            <span class="c"># HACK: Probably should fork pyftdi and make this call in .close()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">attach_kernel_driver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span><span class="p">)</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="USBDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -459,29 +467,28 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
-<span class="sd">        :param timeout: Read timeout</span>
+<span class="sd">        :param timeout: The read timeout.</span>
 <span class="sd">        :type timeout: float</span>
-<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to reading.</span>
+<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
+<span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
 <span class="sd">        :returns: The line that was read.</span>
 <span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Handles read timeout event&quot;&quot;&quot;</span>
+            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
+
         <span class="k">if</span> <span class="n">purge_buffer</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
-            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">got_line</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span>
 
-        <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
-
-        <span class="n">got_line</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
-
-        <span class="n">timer</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -492,35 +499,26 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">+=</span> <span class="n">buf</span>
 
                     <span class="k">if</span> <span class="n">buf</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">)</span>
 
-                                <span class="c"># ignore if we just got \r\n with nothing else in the buffer.</span>
-                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                                    <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
-                                    <span class="k">break</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="k">break</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
@@ -576,17 +574,15 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">current_devices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">find_all</span><span class="p">())</span>
 
-                    <span class="n">new_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">current_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">last_devices</span><span class="p">]</span>
-                    <span class="n">removed_devices</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">last_devices</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_devices</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">dev</span> <span class="ow">in</span> <span class="n">current_devices</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">last_devices</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">on_attached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">dev</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">dev</span> <span class="ow">in</span> <span class="n">last_devices</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">current_devices</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">on_detached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">dev</span><span class="p">)</span>
+
                     <span class="n">last_devices</span> <span class="o">=</span> <span class="n">current_devices</span>
 
-                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">new_devices</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">on_attached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-
-                    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">removed_devices</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">on_detached</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
-
-                <span class="k">except</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="n">CommError</span><span class="p">:</span>
                     <span class="k">pass</span>
 
                 <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
@@ -620,7 +616,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">devices</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">list_ports</span><span class="o">.</span><span class="n">comports</span><span class="p">()</span>
 
-        <span class="k">except</span> <span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating serial devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">devices</span>
@@ -655,7 +651,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">interface</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">interface</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">writeTimeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>     <span class="c"># Timeout = non-blocking to match pyftdi.</span>
+        <span class="c"># Timeout = non-blocking to match pyftdi.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">writeTimeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SerialDevice.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">BAUDRATE</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -663,7 +660,8 @@
 
 <span class="sd">        :param baudrate: The baudrate to use with the device.</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically start the reader thread.</span>
+<span class="sd">        :param no_reader_thread: Whether or not to automatically start the</span>
+<span class="sd">                                 reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
 <span class="sd">        :raises: NoDeviceError</span>
@@ -675,17 +673,17 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No device interface specified.&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
-
         <span class="c"># Open the device and start up the reader thread.</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">baudrate</span> <span class="o">=</span> <span class="n">baudrate</span>            <span class="c"># NOTE: Setting the baudrate before opening the</span>
-                                                        <span class="c">#       port caused issues with Moschip 7840/7820</span>
-                                                        <span class="c">#       USB Serial Driver converter. (mos7840)</span>
-                                                        <span class="c">#</span>
-                                                        <span class="c">#       Moving it to this point seems to resolve</span>
-                                                        <span class="c">#       all issues with it.</span>
+            <span class="c"># NOTE: Setting the baudrate before opening the</span>
+            <span class="c">#       port caused issues with Moschip 7840/7820</span>
+            <span class="c">#       USB Serial Driver converter. (mos7840)</span>
+            <span class="c">#</span>
+            <span class="c">#       Moving it to this point seems to resolve</span>
+            <span class="c">#       all issues with it.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">baudrate</span> <span class="o">=</span> <span class="n">baudrate</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device on port {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
@@ -706,7 +704,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="SerialDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -721,7 +719,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialTimeoutException</span><span class="p">:</span>
             <span class="k">pass</span>
 
         <span class="k">except</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
@@ -753,64 +751,60 @@
 
 <span class="sd">        :param timeout: The read timeout.</span>
 <span class="sd">        :type timeout: float</span>
-<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to reading.</span>
+<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
+<span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
-<span class="sd">        :returns: The line read.</span>
+<span class="sd">        :returns: The line that was read.</span>
 <span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
-            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
 
+        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Handles read timeout event&quot;&quot;&quot;</span>
+            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
 
-        <span class="n">got_line</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">purge_buffer</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-        <span class="n">timer</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">got_line</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span>
+
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span><span class="p">:</span>
                 <span class="n">buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">buf</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span> <span class="ow">and</span> <span class="n">buf</span> <span class="o">!=</span> <span class="s">&quot;</span><span class="se">\xff</span><span class="s">&quot;</span><span class="p">:</span>     <span class="c"># AD2SERIAL specifically apparently sends down \xFF on boot.</span>
+                <span class="c"># NOTE: AD2SERIAL apparently sends down \xFF on boot.</span>
+                <span class="k">if</span> <span class="n">buf</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span> <span class="ow">and</span> <span class="n">buf</span> <span class="o">!=</span> <span class="s">&quot;</span><span class="se">\xff</span><span class="s">&quot;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">+=</span> <span class="n">buf</span>
 
                     <span class="k">if</span> <span class="n">buf</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">)</span>
 
-                                <span class="c"># ignore if we just got \r\n with nothing else in the buffer.</span>
-                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                                    <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
-                                    <span class="k">break</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="k">break</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+
         <span class="k">return</span> <span class="n">ret</span>
+
 </div></div>
 <div class="viewcode-block" id="SocketDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice">[docs]</a><span class="k">class</span> <span class="nc">SocketDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -835,8 +829,7 @@
 <span class="sd">        :param value: Tuple containing the host and port to use.</span>
 <span class="sd">        :type value: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">value</span>
 </div>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ssl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -898,7 +891,8 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ssl_ca</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieves the SSL Certificate Authority certificate used for authentication.</span>
+<span class="sd">        Retrieves the SSL Certificate Authority certificate used for</span>
+<span class="sd">        authentication.</span>
 
 <span class="sd">        :returns: The CA path</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -935,7 +929,8 @@
 
 <span class="sd">        :param baudrate: The baudrate to use</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically open the reader thread.</span>
+<span class="sd">        :param no_reader_thread: Whether or not to automatically open the reader</span>
+<span class="sd">                                 thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
 <span class="sd">        :raises: NoDeviceError, CommError</span>
@@ -976,11 +971,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>     <span class="c"># Make sure that it closes immediately.</span>
+                <span class="c"># Make sure that it closes immediately.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>
 
             <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
 <div class="viewcode-block" id="SocketDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -1031,27 +1027,26 @@
 
 <span class="sd">        :param timeout: The read timeout.</span>
 <span class="sd">        :type timeout: float</span>
-<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to reading.</span>
+<span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
+<span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
-<span class="sd">        :returns: The line read from the device.</span>
+<span class="sd">        :returns: The line that was read.:</span>
 <span class="sd">        :raises: CommError, TimeoutError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Handles read timeout event&quot;&quot;&quot;</span>
+            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
 
         <span class="k">if</span> <span class="n">purge_buffer</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
 
-        <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
-            <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">got_line</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">False</span><span class="p">,</span> <span class="bp">None</span>
 
-        <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
-
-        <span class="n">got_line</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
-
-        <span class="n">timer</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
             <span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -1062,39 +1057,34 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">+=</span> <span class="n">buf</span>
 
                     <span class="k">if</span> <span class="n">buf</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">:</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">)</span>
 
-                                <span class="c"># ignore if we just got \r\n with nothing else in the buffer.</span>
-                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                                    <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
-                                    <span class="k">break</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="k">break</span>
 
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
-                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">,</span> <span class="s">&#39;&#39;</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ret</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">timer</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">ret</span>
 </div>
     <span class="k">def</span> <span class="nf">_init_ssl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes our device as an SSL connection.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ctx</span> <span class="o">=</span> <span class="n">SSL</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">SSL</span><span class="o">.</span><span class="n">TLSv1_METHOD</span><span class="p">)</span>
 
@@ -1122,6 +1112,9 @@
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error setting up SSL connection.&#39;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_verify_ssl_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">x509</span><span class="p">,</span> <span class="n">errnum</span><span class="p">,</span> <span class="n">errdepth</span><span class="p">,</span> <span class="n">ok</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        SSL verification callback.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">ok</span></div>
 </pre></div>
 

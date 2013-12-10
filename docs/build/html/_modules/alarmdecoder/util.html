@@ -56,29 +56,34 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 
+
 <div class="viewcode-block" id="NoDeviceError"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.NoDeviceError">[docs]</a><span class="k">class</span> <span class="nc">NoDeviceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    No devices found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
+
 </div>
 <div class="viewcode-block" id="CommError"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.CommError">[docs]</a><span class="k">class</span> <span class="nc">CommError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    There was an error communicating with the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
+
 </div>
 <div class="viewcode-block" id="TimeoutError"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.TimeoutError">[docs]</a><span class="k">class</span> <span class="nc">TimeoutError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    There was a timeout while trying to communicate with the device.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
+
 </div>
 <div class="viewcode-block" id="InvalidMessageError"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.InvalidMessageError">[docs]</a><span class="k">class</span> <span class="nc">InvalidMessageError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The format of the panel message was invalid.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
+
 </div>
 <div class="viewcode-block" id="Firmware"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.Firmware">[docs]</a><span class="k">class</span> <span class="nc">Firmware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -93,6 +98,7 @@
     <span class="n">STAGE_UPLOADING</span> <span class="o">=</span> <span class="mi">4</span>
     <span class="n">STAGE_DONE</span> <span class="o">=</span> <span class="mi">5</span>
 
+    <span class="c"># FIXME: Rewrite this monstrosity.</span>
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Firmware.upload"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.Firmware.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -110,13 +116,13 @@
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Perform the actual firmware upload to the device.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">upload_file</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">upload_file</span><span class="p">:</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
 
                     <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;:&#39;</span><span class="p">:</span>
                         <span class="n">dev</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s">&quot;</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
-                        <span class="n">res</span> <span class="o">=</span> <span class="n">dev</span><span class="o">.</span><span class="n">read_line</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
+                        <span class="n">dev</span><span class="o">.</span><span class="n">read_line</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">)</span>
 
                         <span class="k">if</span> <span class="n">progress_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                             <span class="n">progress_callback</span><span class="p">(</span><span class="n">Firmware</span><span class="o">.</span><span class="n">STAGE_UPLOADING</span><span class="p">)</span>
@@ -125,9 +131,11 @@
 
         <span class="k">def</span> <span class="nf">read_until</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Read characters until a specific pattern is found or the timeout is hit.</span>
+<span class="sd">            Read characters until a specific pattern is found or the timeout is</span>
+<span class="sd">            hit.</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
+                <span class="sd">&quot;&quot;&quot;Handles the read timeout event.&quot;&quot;&quot;</span>
                 <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">False</span>
 
             <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span> <span class="o">=</span> <span class="bp">True</span>
@@ -137,7 +145,6 @@
                 <span class="n">timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">timeout_event</span><span class="p">)</span>
                 <span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-            <span class="n">buf</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
             <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="k">while</span> <span class="n">timeout_event</span><span class="o">.</span><span class="n">reading</span><span class="p">:</span>
@@ -152,7 +159,7 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
 
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                     <span class="k">pass</span>
 
             <span class="k">if</span> <span class="n">timer</span><span class="p">:</span>
@@ -162,6 +169,7 @@
                     <span class="k">raise</span> <span class="n">TimeoutError</span><span class="p">(</span><span class="s">&#39;Timeout while waiting for line terminator.&#39;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">stage_callback</span><span class="p">(</span><span class="n">stage</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Callback to update progress for the specified stage.&quot;&quot;&quot;</span>
             <span class="k">if</span> <span class="n">progress_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">progress_callback</span><span class="p">(</span><span class="n">stage</span><span class="p">)</span>
 

@@ -212,12 +212,14 @@
 <dl class="classmethod">
 <dt id="alarmdecoder.devices.USBDevice.find">
 <em class="property">classmethod </em><tt class="descname">find</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.find" title="Permalink to this definition">¶</a></dt>
-<dd><p>Factory method that returns the requested USBDevice device, or the first device.</p>
+<dd><p>Factory method that returns the requested USBDevice device, or the
+first device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>device</strong> (<em>tuple</em>) &#8211; Tuple describing the USB device to open, as returned by find_all().</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>device</strong> (<em>tuple</em>) &#8211; Tuple describing the USB device to open, as returned
+by find_all().</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">USBDevice object utilizing the specified device.</td>
 </tr>
@@ -303,7 +305,8 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use.</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the reader thread.</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the
+reader thread.</li>
 </ul>
 </td>
 </tr>
@@ -361,8 +364,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>float</em>) &#8211; Read timeout</li>
-<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to reading.</li>
+<li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
+<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
+reading.</li>
 </ul>
 </td>
 </tr>
@@ -462,7 +466,8 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use with the device.</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the reader thread.</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the
+reader thread.</li>
 </ul>
 </td>
 </tr>
@@ -521,11 +526,12 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
-<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to reading.</li>
+<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
+reading.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line read.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
@@ -602,7 +608,8 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.SocketDevice.ssl_ca">
 <tt class="descname">ssl_ca</tt><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice.ssl_ca"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice.ssl_ca" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieves the SSL Certificate Authority certificate used for authentication.</p>
+<dd><p>Retrieves the SSL Certificate Authority certificate used for
+authentication.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -623,7 +630,8 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically open the reader thread.</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically open the reader
+thread.</li>
 </ul>
 </td>
 </tr>
@@ -684,11 +692,12 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
-<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to reading.</li>
+<li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
+reading.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line read from the device.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.:</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
@@ -856,6 +865,27 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<em>Message or ExpanderMessage</em>) &#8211; Message to use to update the zone tracking.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.zonetracking.Zonetracker.expander_to_zone">
+<tt class="descname">expander_to_zone</tt><big>(</big><em>address</em>, <em>channel</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.expander_to_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.expander_to_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an address and channel into a zone number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>address</strong> (<em>int</em>) &#8211; The expander address</li>
+<li><strong>channel</strong> (<em>int</em>) &#8211; The channel</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The zone number associated with an address and channel.</p>
+</td>
 </tr>
 </tbody>
 </table>
