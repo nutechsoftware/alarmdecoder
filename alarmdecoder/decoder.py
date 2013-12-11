@@ -20,30 +20,30 @@ class AlarmDecoder(object):
     """
 
     # High-level Events
-    on_arm = event.Event('This event is called when the panel is armed.')
-    on_disarm = event.Event('This event is called when the panel is disarmed.')
-    on_power_changed = event.Event('This event is called when panel power switches between AC and DC.')
-    on_alarm = event.Event('This event is called when the alarm is triggered.')
-    on_fire = event.Event('This event is called when a fire is detected.')
-    on_bypass = event.Event('This event is called when a zone is bypassed.')
-    on_boot = event.Event('This event is called when the device finishes booting.')
-    on_config_received = event.Event('This event is called when the device receives its configuration.')
-    on_zone_fault = event.Event('This event is called when :py:class:`alarmdecoder.zonetracking.Zonetracker` detects a zone fault.')
-    on_zone_restore = event.Event('This event is called when :py:class:`alarmdecoder.zonetracking.Zonetracker` detects that a fault is restored.')
-    on_low_battery = event.Event('This event is called when the device detects a low battery.')
-    on_panic = event.Event('This event is called when the device detects a panic.')
-    on_relay_changed = event.Event('This event is called when a relay is opened or closed on an expander board.')
+    on_arm = event.Event("This event is called when the panel is armed.\n\n**Callback definition:** *def callback(device)*")
+    on_disarm = event.Event("This event is called when the panel is disarmed.\n\n**Callback definition:** *def callback(device)*")
+    on_power_changed = event.Event("This event is called when panel power switches between AC and DC.\n\n**Callback definition:** *def callback(device, status)*")
+    on_alarm = event.Event("This event is called when the alarm is triggered.\n\n**Callback definition:** *def callback(device, status)*")
+    on_fire = event.Event("This event is called when a fire is detected.\n\n**Callback definition:** *def callback(device, status)*")
+    on_bypass = event.Event("This event is called when a zone is bypassed.  \n\n\n\n**Callback definition:** *def callback(device, status)*")
+    on_boot = event.Event("This event is called when the device finishes booting.\n\n**Callback definition:** *def callback(device)*")
+    on_config_received = event.Event("This event is called when the device receives its configuration. \n\n**Callback definition:** *def callback(device)*")
+    on_zone_fault = event.Event("This event is called when :py:class:`~alarmdecoder.zonetracking.Zonetracker` detects a zone fault.\n\n**Callback definition:** *def callback(device, zone)*")
+    on_zone_restore = event.Event("This event is called when :py:class:`~alarmdecoder.zonetracking.Zonetracker` detects that a fault is restored.\n\n**Callback definition:** *def callback(device, zone)*")
+    on_low_battery = event.Event("This event is called when the device detects a low battery.\n\n**Callback definition:** *def callback(device, status)*")
+    on_panic = event.Event("This event is called when the device detects a panic.\n\n**Callback definition:** *def callback(device, status)*")
+    on_relay_changed = event.Event("This event is called when a relay is opened or closed on an expander board.\n\n**Callback definition:** *def callback(device, message)*")
 
     # Mid-level Events
-    on_message = event.Event('This event is called when any message is received.')
-    on_lrr_message = event.Event('This event is called when an :py:class:`alarmdecoder.messages.LRRMessage` is received.')
-    on_rfx_message = event.Event('This event is called when an :py:class:`alarmdecoder.messages.RFMessage` is received.')
+    on_message = event.Event("This event is called when any message is received.\n\n**Callback definition:** *def callback(device, message)*")
+    on_lrr_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
+    on_rfx_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
 
     # Low-level Events
-    on_open = event.Event('This event is called when the device has been opened.')
-    on_close = event.Event('This event is called when the device has been closed.')
-    on_read = event.Event('This event is called when a line has been read from the device.')
-    on_write = event.Event('This event is called when data has been written to the device.')
+    on_open = event.Event("This event is called when the device has been opened.\n\n**Callback definition:** *def callback(device)*")
+    on_close = event.Event("This event is called when the device has been closed.\n\n**Callback definition:** *def callback(device)*")
+    on_read = event.Event("This event is called when a line has been read from the device.\n\n**Callback definition:** *def callback(device, data)*")
+    on_write = event.Event("This event is called when data has been written to the device.\n\n**Callback definition:** *def callback(device, data)*")
 
     # Constants
     KEY_F1 = unichr(1) + unichr(1) + unichr(1)
@@ -291,7 +291,7 @@ class AlarmDecoder(object):
         :param data: panel data to parse
         :type data: string
 
-        :returns: :py:class:`alarmdecoder.messages.Message`
+        :returns: :py:class:`~alarmdecoder.messages.Message`
         """
         if data is None:
             raise InvalidMessageError()
@@ -331,7 +331,7 @@ class AlarmDecoder(object):
         :param data: RF message to parse
         :type data: string
 
-        :returns: :py:class:`alarmdecoder.messages.RFMessage`
+        :returns: :py:class:`~alarmdecoder.messages.RFMessage`
         """
         msg = RFMessage(data)
 
@@ -346,7 +346,7 @@ class AlarmDecoder(object):
         :param data: LRR message to parse
         :type data: string
 
-        :returns: :py:class:`alarmdecoder.messages.LRRMessage`
+        :returns: :py:class:`~alarmdecoder.messages.LRRMessage`
         """
         msg = LRRMessage(data)
 
@@ -395,8 +395,8 @@ class AlarmDecoder(object):
         """
         Updates internal device states.
 
-        :param message: :py:class:`alarmdecoder.messages.Message` to update internal states with
-        :type message: :py:class:`alarmdecoder.messages.Message`, :py:class:`alarmdecoder.messages.ExpanderMessage`, :py:class:`alarmdecoder.messages.LRRMessage`, or :py:class:`alarmdecoder.messages.RFMessage`
+        :param message: :py:class:`~alarmdecoder.messages.Message` to update internal states with
+        :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`
         """
         if isinstance(message, Message):
             self._update_power_status(message)
@@ -416,7 +416,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the AC power state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: bool indicating the new status
         """
@@ -433,7 +433,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the alarm state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: bool indicating the new status
         """
@@ -451,7 +451,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the zone bypass state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: bool indicating the new status
         """
@@ -469,7 +469,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the armed state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: bool indicating the new status
         """
@@ -491,7 +491,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the battery state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: boolean indicating the new status
         """
@@ -511,7 +511,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the fire alarm state.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.Message`
+        :type message: :py:class:`~alarmdecoder.messages.Message`
 
         :returns: boolean indicating the new status
         """
@@ -531,7 +531,7 @@ class AlarmDecoder(object):
         Uses the provided message to update the expander states.
 
         :param message: message to use to update
-        :type message: :py:class:`alarmdecoder.messages.ExpanderMessage`
+        :type message: :py:class:`~alarmdecoder.messages.ExpanderMessage`
 
         :returns: boolean indicating the new status
         """
@@ -545,10 +545,10 @@ class AlarmDecoder(object):
 
     def _update_zone_tracker(self, message):
         """
-        Trigger an update of the :py:class:`alarmdecoder.messages.Zonetracker`.
+        Trigger an update of the :py:class:`~alarmdecoder.messages.Zonetracker`.
 
         :param message: message to update the zonetracker with
-        :type message: :py:class:`alarmdecoder.messages.Message`, :py:class:`alarmdecoder.messages.ExpanderMessage`, :py:class:`alarmdecoder.messages.LRRMessage`, or :py:class:`alarmdecoder.messages.RFMessage`
+        :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`
         """
 
         # Retrieve a list of faults.

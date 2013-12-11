@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Welcome to alarmdecoder’s documentation! &mdash; alarmdecoder  documentation</title>
+    <title>Welcome to Alarm Decoder’s documentation! &mdash; alarmdecoder  documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -48,10 +48,42 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="welcome-to-alarmdecoder-s-documentation">
-<h1>Welcome to alarmdecoder&#8217;s documentation!<a class="headerlink" href="#welcome-to-alarmdecoder-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-alarm-decoder-s-documentation">
+<h1>Welcome to Alarm Decoder&#8217;s documentation!<a class="headerlink" href="#welcome-to-alarm-decoder-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>This is the API documentation for the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> Python library.  It provides support for interacting with the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) family of security alarm devices, including the <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a>, <a class="reference external" href="http://www.alarmdecoder.com">AD2SERIAL</a> and <a class="reference external" href="http://www.alarmdecoder.com">AD2PI</a>.</p>
 <p>The source code, requirements and examples for this project may be found <a class="reference external" href="http://github.com/nutechsoftware/alarmdecoder">here</a>.</p>
+<p>Please see the <a class="reference external" href="http://github.com/nutechsoftware/alarmdecoder/tree/master/examples">examples</a> directory for more samples, but a basic one is included below:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">alarmdecoder</span> <span class="kn">import</span> <span class="n">AlarmDecoder</span>
+<span class="kn">from</span> <span class="nn">alarmdecoder.devices</span> <span class="kn">import</span> <span class="n">USBDevice</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example application that prints messages from the panel to the terminal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># Retrieve the first USB device</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">AlarmDecoder</span><span class="p">(</span><span class="n">USBDevice</span><span class="o">.</span><span class="n">find</span><span class="p">())</span>
+
+        <span class="c"># Set up an event handler and open the device</span>
+        <span class="n">device</span><span class="o">.</span><span class="n">on_message</span> <span class="o">+=</span> <span class="n">handle_message</span>
+        <span class="k">with</span> <span class="n">device</span><span class="o">.</span><span class="n">open</span><span class="p">():</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;Exception:&#39;</span><span class="p">,</span> <span class="n">ex</span>
+
+<span class="k">def</span> <span class="nf">handle_message</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles message events from the AlarmDecoder.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">print</span> <span class="n">sender</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">raw</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>Table of Contents:</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -84,7 +116,7 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to alarmdecoder&#8217;s documentation!</a><ul>
+<li><a class="reference internal" href="#">Welcome to Alarm Decoder&#8217;s documentation!</a><ul>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>

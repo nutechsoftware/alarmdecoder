@@ -62,7 +62,7 @@ class Firmware(object):
         :param progress_callback: callback function used to report progress
         :type progress_callback: function
 
-        :raises: :py:class:`alarmdecoder.util.NoDeviceError`, :py:class:`alarmdecoder.util.TimeoutError`
+        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`, :py:class:`~alarmdecoder.util.TimeoutError`
         """
 
         def do_upload():

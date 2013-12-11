@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="alarmdecoder  documentation" href="index.html" />
-    <link rel="prev" title="Welcome to alarmdecoder’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to Alarm Decoder’s documentation!" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +37,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to alarmdecoder’s documentation!"
+          <a href="index.html" title="Welcome to Alarm Decoder’s documentation!"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">alarmdecoder  documentation</a> &raquo;</li> 
       </ul>
@@ -62,120 +62,140 @@
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_arm">
 <tt class="descname">on_arm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_arm" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the panel is armed.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_disarm">
 <tt class="descname">on_disarm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_disarm" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the panel is disarmed.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_power_changed">
 <tt class="descname">on_power_changed</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_power_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when panel power switches between AC and DC.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_alarm">
 <tt class="descname">on_alarm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_alarm" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the alarm is triggered.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_fire">
 <tt class="descname">on_fire</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_fire" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when a fire is detected.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_bypass">
 <tt class="descname">on_bypass</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_bypass" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when a zone is bypassed.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_boot">
 <tt class="descname">on_boot</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_boot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device finishes booting.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_config_received">
 <tt class="descname">on_config_received</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_config_received" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device receives its configuration.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_zone_fault">
 <tt class="descname">on_zone_fault</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_zone_fault" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.zonetracking.Zonetracker</span></tt></a> detects a zone fault.</p>
+<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">Zonetracker</span></tt></a> detects a zone fault.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, zone)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_zone_restore">
 <tt class="descname">on_zone_restore</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_zone_restore" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.zonetracking.Zonetracker</span></tt></a> detects that a fault is restored.</p>
+<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">Zonetracker</span></tt></a> detects that a fault is restored.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, zone)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_low_battery">
 <tt class="descname">on_low_battery</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_low_battery" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device detects a low battery.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_panic">
 <tt class="descname">on_panic</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_panic" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device detects a panic.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_relay_changed">
 <tt class="descname">on_relay_changed</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_relay_changed" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when a relay is opened or closed on an expander board.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_message">
 <tt class="descname">on_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when any message is received.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_lrr_message">
 <tt class="descname">on_lrr_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_lrr_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.LRRMessage" title="alarmdecoder.messages.LRRMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.LRRMessage</span></tt></a> is received.</p>
+<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.LRRMessage" title="alarmdecoder.messages.LRRMessage"><tt class="xref py py-class docutils literal"><span class="pre">LRRMessage</span></tt></a> is received.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_rfx_message">
 <tt class="descname">on_rfx_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_rfx_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.RFMessage" title="alarmdecoder.messages.RFMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.RFMessage</span></tt></a> is received.</p>
+<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.RFMessage" title="alarmdecoder.messages.RFMessage"><tt class="xref py py-class docutils literal"><span class="pre">RFMessage</span></tt></a> is received.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_open" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device has been opened.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_close">
 <tt class="descname">on_close</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device has been closed.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_read">
 <tt class="descname">on_read</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_read" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when a line has been read from the device.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, data)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_write">
 <tt class="descname">on_write</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when data has been written to the device.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, data)</em></p>
 </dd></dl>
 
 <dl class="attribute">
@@ -408,24 +428,28 @@ Also supports SSL if using <a class="reference external" href="http://github.com
 <dt id="alarmdecoder.devices.Device.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_open" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device has been opened.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_close">
 <tt class="descname">on_close</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device has been closed.</p>
+<p><strong>Callback definition:</strong> def callback(device)*</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_read">
 <tt class="descname">on_read</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_read" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when a line has been read from the device.</p>
+<p><strong>Callback definition:</strong> def callback(device, data)*</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_write">
 <tt class="descname">on_write</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_write" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when data has been written to the device.</p>
+<p><strong>Callback definition:</strong> def callback(device, data)*</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -528,7 +552,7 @@ Also supports SSL if using <a class="reference external" href="http://github.com
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -562,7 +586,7 @@ by find_all().</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a> object utilizing the specified device</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -577,8 +601,8 @@ by find_all().</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>on_attached</strong> (<em>function</em>) &#8211; function to be called when a device is attached</li>
-<li><strong>on_detached</strong> (<em>function</em>) &#8211; function to be called when a device is detached</li>
+<li><strong>on_attached</strong> (<em>function</em>) &#8211; function to be called when a device is attached  <strong>Callback definition:</strong> <em>def callback(thread, device)</em></li>
+<li><strong>on_detached</strong> (<em>function</em>) &#8211; function to be called when a device is detached  <strong>Callback definition:</strong> <em>def callback(thread, device)</em></li>
 </ul>
 </td>
 </tr>
@@ -649,7 +673,7 @@ reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -672,7 +696,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -688,7 +712,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -712,7 +736,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -728,12 +752,14 @@ reading.</li>
 <dt id="alarmdecoder.devices.USBDevice.DetectThread.on_attached">
 <tt class="descname">on_attached</tt><a class="headerlink" href="#alarmdecoder.devices.USBDevice.DetectThread.on_attached" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when an <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device has been detected.</p>
+<p><strong>Callback definition:</strong> def callback(thread, device*</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.DetectThread.on_detached">
 <tt class="descname">on_detached</tt><a class="headerlink" href="#alarmdecoder.devices.USBDevice.DetectThread.on_detached" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when an <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device has been removed.</p>
+<p><strong>Callback definition:</strong> def callback(thread, device*</p>
 </dd></dl>
 
 <dl class="method">
@@ -775,7 +801,7 @@ reading.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -810,7 +836,7 @@ reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -833,7 +859,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">py:class:<cite>alarmdecoder.util.CommError</cite></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">py:class:<cite>~alarmdecoder.util.CommError</cite></td>
 </tr>
 </tbody>
 </table>
@@ -849,7 +875,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -873,7 +899,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -974,7 +1000,7 @@ thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -999,7 +1025,7 @@ thread.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of bytes sent</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -1015,7 +1041,7 @@ thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -1039,7 +1065,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1383,12 +1409,14 @@ devices.</p>
 <dt id="alarmdecoder.zonetracking.Zonetracker.on_fault">
 <tt class="descname">on_fault</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_fault" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device detects a zone fault.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, zone)</em></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.zonetracking.Zonetracker.on_restore">
 <tt class="descname">on_restore</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_restore" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device detects that a fault is restored.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, zone)</em></p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1433,7 +1461,7 @@ devices.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.Message</span></tt></a> or <a class="reference internal" href="#alarmdecoder.messages.ExpanderMessage" title="alarmdecoder.messages.ExpanderMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.ExpanderMessage</span></tt></a>) &#8211; message to use to update the zone tracking</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> or <a class="reference internal" href="#alarmdecoder.messages.ExpanderMessage" title="alarmdecoder.messages.ExpanderMessage"><tt class="xref py py-class docutils literal"><span class="pre">ExpanderMessage</span></tt></a>) &#8211; message to use to update the zone tracking</td>
 </tr>
 </tbody>
 </table>
@@ -1543,7 +1571,7 @@ devices.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1580,7 +1608,7 @@ devices.</p>
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to alarmdecoder&#8217;s documentation!</a></p>
+                        title="previous chapter">Welcome to Alarm Decoder&#8217;s documentation!</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/alarmdecoder.txt"
@@ -1613,7 +1641,7 @@ devices.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to alarmdecoder’s documentation!"
+          <a href="index.html" title="Welcome to Alarm Decoder’s documentation!"
              >previous</a> |</li>
         <li><a href="index.html">alarmdecoder  documentation</a> &raquo;</li> 
       </ul>

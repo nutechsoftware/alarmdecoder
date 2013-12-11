@@ -35,10 +35,10 @@ class Device(object):
     """
 
     # Generic device events
-    on_open = event.Event('This event is called when the device has been opened.')
-    on_close = event.Event('This event is called when the device has been closed.')
-    on_read = event.Event('This event is called when a line has been read from the device.')
-    on_write = event.Event('This event is called when data has been written to the device.')
+    on_open = event.Event("This event is called when the device has been opened.\n\n**Callback definition:** *def callback(device)*")
+    on_close = event.Event("This event is called when the device has been closed.\n\n**Callback definition:** def callback(device)*")
+    on_read = event.Event("This event is called when a line has been read from the device.\n\n**Callback definition:** def callback(device, data)*")
+    on_write = event.Event("This event is called when data has been written to the device.\n\n**Callback definition:** def callback(device, data)*")
 
     def __init__(self):
         """
@@ -124,7 +124,7 @@ class Device(object):
             Constructor
 
             :param device: device used by the reader thread
-            :type device: :py:class:`alarmdecoder.devices.Device`
+            :type device: :py:class:`~alarmdecoder.devices.Device`
             """
             threading.Thread.__init__(self)
             self._device = device
@@ -177,7 +177,7 @@ class USBDevice(Device):
         Returns all FTDI devices matching our vendor and product IDs.
 
         :returns: list of devices
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         cls.__devices = []
 
@@ -209,7 +209,7 @@ class USBDevice(Device):
         :type device: tuple
 
         :returns: :py:class:`USBDevice` object utilizing the specified device
-        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
+        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`
         """
         cls.find_all()
 
@@ -228,9 +228,10 @@ class USBDevice(Device):
         """
         Starts the device detection thread.
 
-        :param on_attached: function to be called when a device is attached
+        :param on_attached: function to be called when a device is attached  **Callback definition:** *def callback(thread, device)*
         :type on_attached: function
-        :param on_detached: function to be called when a device is detached
+        :param on_detached: function to be called when a device is detached  **Callback definition:** *def callback(thread, device)*
+
         :type on_detached: function
         """
         cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
@@ -344,7 +345,7 @@ class USBDevice(Device):
                                  reader thread.
         :type no_reader_thread: bool
 
-        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
+        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`
         """
         # Set up defaults
         if baudrate is None:
@@ -398,7 +399,7 @@ class USBDevice(Device):
         :param data: data to write
         :type data: string
 
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         try:
             self._device.write_data(data)
@@ -413,7 +414,7 @@ class USBDevice(Device):
         Reads a single character from the device.
 
         :returns: character read from the device
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         ret = None
 
@@ -436,7 +437,7 @@ class USBDevice(Device):
         :type purge_buffer: bool
 
         :returns: line that was read
-        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -496,16 +497,16 @@ class USBDevice(Device):
         """
         Thread that handles detection of added/removed devices.
         """
-        on_attached = event.Event('This event is called when an `AD2USB`_ device has been detected.')
-        on_detached = event.Event('This event is called when an `AD2USB`_ device has been removed.')
+        on_attached = event.Event("This event is called when an `AD2USB`_ device has been detected.\n\n**Callback definition:** def callback(thread, device*")
+        on_detached = event.Event("This event is called when an `AD2USB`_ device has been removed.\n\n**Callback definition:** def callback(thread, device*")
 
         def __init__(self, on_attached=None, on_detached=None):
             """
             Constructor
 
-            :param on_attached: Function to call when a device is attached
+            :param on_attached: Function to call when a device is attached  **Callback definition:** *def callback(thread, device)*
             :type on_attached: function
-            :param on_detached: Function to call when a device is detached
+            :param on_detached: Function to call when a device is detached  **Callback definition:** *def callback(thread, device)*
             :type on_detached: function
             """
             threading.Thread.__init__(self)
@@ -568,7 +569,7 @@ class SerialDevice(Device):
         :type pattern: string
 
         :returns: list of devices
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         devices = []
 
@@ -626,7 +627,7 @@ class SerialDevice(Device):
                                  reader thread.
         :type no_reader_thread: bool
 
-        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
+        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`
         """
         # Set up the defaults
         if baudrate is None:
@@ -676,7 +677,7 @@ class SerialDevice(Device):
         :param data: data to write
         :type data: string
 
-        :raises: py:class:`alarmdecoder.util.CommError`
+        :raises: py:class:`~alarmdecoder.util.CommError`
         """
         try:
             self._device.write(data)
@@ -695,7 +696,7 @@ class SerialDevice(Device):
         Reads a single character from the device.
 
         :returns: character read from the device
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         ret = None
 
@@ -718,7 +719,7 @@ class SerialDevice(Device):
         :type purge_buffer: bool
 
         :returns: line that was read
-        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -895,7 +896,7 @@ class SocketDevice(Device):
                                  thread.
         :type no_reader_thread: bool
 
-        :raises: :py:class:`alarmdecoder.util.NoDeviceError`, :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`, :py:class:`~alarmdecoder.util.CommError`
         """
 
         try:
@@ -949,7 +950,7 @@ class SocketDevice(Device):
         :type data: string
 
         :returns: number of bytes sent
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         data_sent = None
 
@@ -971,7 +972,7 @@ class SocketDevice(Device):
         Reads a single character from the device.
 
         :returns: character read from the device
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
         data = None
 
@@ -994,7 +995,7 @@ class SocketDevice(Device):
         :type purge_buffer: bool
 
         :returns: line that was read
-        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -1046,7 +1047,7 @@ class SocketDevice(Device):
         """
         Initializes our device as an SSL connection.
 
-        :raises: :py:class:`alarmdecoder.util.CommError`
+        :raises: :py:class:`~alarmdecoder.util.CommError`
         """
 
         try:

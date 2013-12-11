@@ -115,7 +115,7 @@ class Message(BaseMessage):
         :param data: message data
         :type data: string
 
-        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
+        :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         match = self._regex.match(data)
 
@@ -196,7 +196,7 @@ class ExpanderMessage(BaseMessage):
         :param data: message data
         :type data: string
 
-        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
+        :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         try:
             header, values = data.split(':')
@@ -259,7 +259,7 @@ class RFMessage(BaseMessage):
         :param data: message data
         :type data: string
 
-        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
+        :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         try:
             self.raw = data
@@ -320,7 +320,7 @@ class LRRMessage(BaseMessage):
         :param data: message data to parse
         :type data: string
 
-        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
+        :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         try:
             self.raw = data

@@ -72,8 +72,8 @@ class Zonetracker(object):
     Handles tracking of zones and their statuses.
     """
 
-    on_fault = event.Event('This event is called when the device detects a zone fault.')
-    on_restore = event.Event('This event is called when the device detects that a fault is restored.')
+    on_fault = event.Event("This event is called when the device detects a zone fault.\n\n**Callback definition:** *def callback(device, zone)*")
+    on_restore = event.Event("This event is called when the device detects that a fault is restored.\n\n**Callback definition:** *def callback(device, zone)*")
 
     EXPIRE = 30
     """Zone expiration timeout."""
@@ -129,7 +129,7 @@ class Zonetracker(object):
         Update zone statuses based on the current message.
 
         :param message: message to use to update the zone tracking
-        :type message: :py:class:`alarmdecoder.messages.Message` or :py:class:`alarmdecoder.messages.ExpanderMessage`
+        :type message: :py:class:`~alarmdecoder.messages.Message` or :py:class:`~alarmdecoder.messages.ExpanderMessage`
         """
         if isinstance(message, ExpanderMessage):
             if message.type == ExpanderMessage.ZONE:
