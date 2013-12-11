@@ -14,10 +14,7 @@ AlarmDecoder can be installed through pip:
     ```pip install alarmdecoder```
 
 or from source:
-    ```
-    git clone http://github.com/nutechsoftware/alarmdecoder
-    python setup.py install
-    ```
+    ```python setup.py install```
 
 Requirements
 ------------
