@@ -21,7 +21,7 @@ or from source:
 
 Requirements
 ------------
-* An [Alarm Decoder](http://www.alarmdecoder.com) device: AD2USB, AD2SERIAL or AD2PI.
+* An [Alarm Decoder](http://www.alarmdecoder.com) device
 * Python 2.7
 * [pyftdi](https://github.com/eblot/pyftdi) >= 0.9.0
 * [pyusb](http://sourceforge.net/apps/trac/pyusb/) >= 1.0.0b1

@@ -1,7 +1,7 @@
 alarmdecoder Package
 ====================
 
-:mod:`alarmdecoder` Module
+:mod:`decoder` Module
 --------------------------
 
 .. automodule:: alarmdecoder.decoder
