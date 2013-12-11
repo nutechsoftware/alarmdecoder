@@ -7,12 +7,9 @@ Welcome to Alarm Decoder's documentation!
 ========================================
 
 .. _Alarm Decoder: http://www.alarmdecoder.com
-.. _AD2USB: http://www.alarmdecoder.com
-.. _AD2SERIAL: http://www.alarmdecoder.com
-.. _AD2PI: http://www.alarmdecoder.com
 .. _examples: http://github.com/nutechsoftware/alarmdecoder/tree/master/examples
 
-This is the API documentation for the `Alarm Decoder`_ Python library.  It provides support for interacting with the `Alarm Decoder`_ (AD2) family of security alarm devices, including the `AD2USB`_, `AD2SERIAL`_ and `AD2PI`_.
+This is the API documentation for the `Alarm Decoder`_ Python library.  It provides support for interacting with the `Alarm Decoder`_ (AD2) family of security alarm devices, including the AD2USB, AD2SERIAL and AD2PI.
 
 The source code, requirements and examples for this project may be found `here <http://github.com/nutechsoftware/alarmdecoder>`_.
 
