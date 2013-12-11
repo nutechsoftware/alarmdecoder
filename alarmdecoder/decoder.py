@@ -566,21 +566,22 @@ class AlarmDecoder(object):
         """
         self.get_config()
 
-        self.on_open(args, kwargs)
+        self.on_open()
 
     def _on_close(self, sender, *args, **kwargs):
         """
         Internal handler for closing the device.
         """
-        self.on_close(args, kwargs)
+        self.on_close()
 
     def _on_read(self, sender, *args, **kwargs):
         """
         Internal handler for reading from the device.
         """
-        self.on_read(args, kwargs)
+        data = kwargs.get('data', None)
+        self.on_read(data=data)
 
-        msg = self._handle_message(kwargs.get('data', None))
+        msg = self._handle_message(data)
         if msg:
             self.on_message(message=msg)
 
@@ -588,7 +589,7 @@ class AlarmDecoder(object):
         """
         Internal handler for writing to the device.
         """
-        self.on_write(args, kwargs)
+        self.on_write(data=kwargs.get('data', None))
 
     def _on_zone_fault(self, sender, *args, **kwargs):
         """
