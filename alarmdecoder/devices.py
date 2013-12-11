@@ -1,5 +1,16 @@
 """
-Contains different types of devices belonging to the Alarm Decoder (AD2) family.
+This module contains different types of devices belonging to the `Alarm Decoder`_ (AD2) family.
+
+* :py:class:`USBDevice`: Interfaces with the `AD2USB`_ device.
+* :py:class:`SerialDevice`: Interfaces with the `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_.
+* :py:class:`SocketDevice`: Interfaces with devices exposed through `ser2sock`_ or another IP to Serial solution.
+  Also supports SSL if using `ser2sock`_.
+
+.. _ser2sock: http://github.com/nutechsoftware/ser2sock
+.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AD2USB: http://www.alarmdecoder.com
+.. _AD2SERIAL: http://www.alarmdecoder.com
+.. _AD2PI: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -20,14 +31,14 @@ from .event import event
 
 class Device(object):
     """
-    Generic parent device to all Alarm Decoder (AD2) products.
+    Base class for all `Alarm Decoder`_ (AD2) device types.
     """
 
     # Generic device events
-    on_open = event.Event('Called when the device has been opened')
-    on_close = event.Event('Called when the device has been closed')
-    on_read = event.Event('Called when a line has been read from the device')
-    on_write = event.Event('Called when data has been written to the device')
+    on_open = event.Event('This event is called when the device has been opened.')
+    on_close = event.Event('This event is called when the device has been closed.')
+    on_read = event.Event('This event is called when a line has been read from the device.')
+    on_write = event.Event('This event is called when data has been written to the device.')
 
     def __init__(self):
         """
@@ -58,7 +69,7 @@ class Device(object):
         """
         Retrieve the device ID.
 
-        :returns: The identification string for the device.
+        :returns: identification string for the device
         """
         return self._id
 
@@ -67,8 +78,8 @@ class Device(object):
         """
         Sets the device ID.
 
-        :param value: The device identification.
-        :type value: str
+        :param value: device identification string
+        :type value: string
         """
         self._id = value
 
@@ -76,7 +87,7 @@ class Device(object):
         """
         Indicates whether or not the reader thread is alive.
 
-        :returns: Whether or not the reader thread is alive.
+        :returns: whether or not the reader thread is alive
         """
         return self._read_thread.is_alive()
 
@@ -112,8 +123,8 @@ class Device(object):
             """
             Constructor
 
-            :param device: The device used by the reader thread.
-            :type device: devices.Device
+            :param device: device used by the reader thread
+            :type device: :py:class:`alarmdecoder.devices.Device`
             """
             threading.Thread.__init__(self)
             self._device = device
@@ -146,16 +157,16 @@ class Device(object):
 
 class USBDevice(Device):
     """
-    AD2USB device exposed with PyFTDI's interface.
+    `AD2USB`_ device utilizing PyFTDI's interface.
     """
 
     # Constants
     FTDI_VENDOR_ID = 0x0403
-    """Vendor ID used to recognize AD2USB devices."""
+    """Vendor ID used to recognize `AD2USB`_ devices."""
     FTDI_PRODUCT_ID = 0x6001
-    """Product ID used to recognize AD2USB devices."""
+    """Product ID used to recognize `AD2USB`_ devices."""
     BAUDRATE = 115200
-    """Default baudrate for AD2USB devices."""
+    """Default baudrate for `AD2USB`_ devices."""
 
     __devices = []
     __detect_thread = None
@@ -166,7 +177,7 @@ class USBDevice(Device):
         Returns all FTDI devices matching our vendor and product IDs.
 
         :returns: list of devices
-        :raises: CommError
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         cls.__devices = []
 
@@ -181,24 +192,24 @@ class USBDevice(Device):
     @classmethod
     def devices(cls):
         """
-        Returns a cached list of AD2USB devices located on the system.
+        Returns a cached list of `AD2USB`_ devices located on the system.
 
-        :returns: cached list of devices found.
+        :returns: cached list of devices found
         """
         return cls.__devices
 
     @classmethod
     def find(cls, device=None):
         """
-        Factory method that returns the requested USBDevice device, or the
+        Factory method that returns the requested :py:class:`USBDevice` device, or the
         first device.
 
         :param device: Tuple describing the USB device to open, as returned
                        by find_all().
         :type device: tuple
 
-        :returns: USBDevice object utilizing the specified device.
-        :raises: NoDeviceError
+        :returns: :py:class:`USBDevice` object utilizing the specified device
+        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
         """
         cls.find_all()
 
@@ -217,9 +228,9 @@ class USBDevice(Device):
         """
         Starts the device detection thread.
 
-        :param on_attached: function to be called when a device is attached.
+        :param on_attached: function to be called when a device is attached
         :type on_attached: function
-        :param on_detached: function to be called when a device is detached.
+        :param on_detached: function to be called when a device is detached
         :type on_detached: function
         """
         cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
@@ -244,7 +255,7 @@ class USBDevice(Device):
         """
         Retrieves the interface used to connect to the device.
 
-        :returns: the interface used to connect to the device.
+        :returns: the interface used to connect to the device
         """
         return self._interface
 
@@ -253,8 +264,8 @@ class USBDevice(Device):
         """
         Sets the interface used to connect to the device.
 
-        :param value: May specify either the serial number or the device index.
-        :type value: str or int
+        :param value: may specify either the serial number or the device index
+        :type value: string or int
         """
         self._interface = value
         if isinstance(value, int):
@@ -267,7 +278,7 @@ class USBDevice(Device):
         """
         Retrieves the serial number of the device.
 
-        :returns: The serial number of the device.
+        :returns: serial number of the device
         """
 
         return self._serial_number
@@ -277,7 +288,7 @@ class USBDevice(Device):
         """
         Sets the serial number of the device.
 
-        :param value: The serial number of the device.
+        :param value: serial number of the device
         :type value: string
         """
         self._serial_number = value
@@ -287,7 +298,7 @@ class USBDevice(Device):
         """
         Retrieves the description of the device.
 
-        :returns: The description of the device.
+        :returns: description of the device
         """
         return self._description
 
@@ -296,7 +307,7 @@ class USBDevice(Device):
         """
         Sets the description of the device.
 
-        :param value: The description of the device.
+        :param value: description of the device
         :type value: string
         """
         self._description = value
@@ -307,7 +318,7 @@ class USBDevice(Device):
 
         :param interface: May specify either the serial number or the device
                           index.
-        :type interface: str or int
+        :type interface: string or int
         """
         Device.__init__(self)
 
@@ -327,13 +338,13 @@ class USBDevice(Device):
         """
         Opens the device.
 
-        :param baudrate: The baudrate to use.
+        :param baudrate: baudrate to use
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically start the
+        :param no_reader_thread: whether or not to automatically start the
                                  reader thread.
         :type no_reader_thread: bool
 
-        :raises: NoDeviceError
+        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
         """
         # Set up defaults
         if baudrate is None:
@@ -384,10 +395,10 @@ class USBDevice(Device):
         """
         Writes data to the device.
 
-        :param data: Data to write
-        :type data: str
+        :param data: data to write
+        :type data: string
 
-        :raises: CommError
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         try:
             self._device.write_data(data)
@@ -401,8 +412,8 @@ class USBDevice(Device):
         """
         Reads a single character from the device.
 
-        :returns: The character read from the device.
-        :raises: CommError
+        :returns: character read from the device
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         ret = None
 
@@ -418,14 +429,14 @@ class USBDevice(Device):
         """
         Reads a line from the device.
 
-        :param timeout: The read timeout.
+        :param timeout: read timeout
         :type timeout: float
         :param purge_buffer: Indicates whether to purge the buffer prior to
                              reading.
         :type purge_buffer: bool
 
-        :returns: The line that was read.
-        :raises: CommError, TimeoutError
+        :returns: line that was read
+        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -477,7 +488,7 @@ class USBDevice(Device):
         """
         Retrieves the FTDI device serial number.
 
-        :returns: string containing the device serial number.
+        :returns: string containing the device serial number
         """
         return usb.util.get_string(self._device.usb_dev, 64, self._device.usb_dev.iSerialNumber)
 
@@ -485,16 +496,16 @@ class USBDevice(Device):
         """
         Thread that handles detection of added/removed devices.
         """
-        on_attached = event.Event('Called when an AD2USB device has been detected.')
-        on_detached = event.Event('Called when an AD2USB device has been removed.')
+        on_attached = event.Event('This event is called when an `AD2USB`_ device has been detected.')
+        on_detached = event.Event('This event is called when an `AD2USB`_ device has been removed.')
 
         def __init__(self, on_attached=None, on_detached=None):
             """
             Constructor
 
-            :param on_attached: Function to call when a device is attached.
+            :param on_attached: Function to call when a device is attached
             :type on_attached: function
-            :param on_detached: Function to call when a device is detached.
+            :param on_detached: Function to call when a device is detached
             :type on_detached: function
             """
             threading.Thread.__init__(self)
@@ -541,7 +552,7 @@ class USBDevice(Device):
 
 class SerialDevice(Device):
     """
-    AD2USB or AD2SERIAL device exposed with the pyserial interface.
+    `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_ device utilizing the PySerial interface.
     """
 
     # Constants
@@ -553,11 +564,11 @@ class SerialDevice(Device):
         """
         Returns all serial ports present.
 
-        :param pattern: Pattern to search for when retrieving serial ports.
-        :type pattern: str
+        :param pattern: pattern to search for when retrieving serial ports
+        :type pattern: string
 
         :returns: list of devices
-        :raises: CommError
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         devices = []
 
@@ -577,7 +588,7 @@ class SerialDevice(Device):
         """
         Retrieves the interface used to connect to the device.
 
-        :returns: the interface used to connect to the device.
+        :returns: interface used to connect to the device
         """
         return self._port
 
@@ -586,7 +597,7 @@ class SerialDevice(Device):
         """
         Sets the interface used to connect to the device.
 
-        :param value: The name of the serial device.
+        :param value: name of the serial device
         :type value: string
         """
         self._port = value
@@ -595,8 +606,8 @@ class SerialDevice(Device):
         """
         Constructor
 
-        :param interface: The device to open.
-        :type interface: str
+        :param interface: device to open
+        :type interface: string
         """
         Device.__init__(self)
 
@@ -609,13 +620,13 @@ class SerialDevice(Device):
         """
         Opens the device.
 
-        :param baudrate: The baudrate to use with the device.
+        :param baudrate: baudrate to use with the device
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically start the
+        :param no_reader_thread: whether or not to automatically start the
                                  reader thread.
         :type no_reader_thread: bool
 
-        :raises: NoDeviceError
+        :raises: :py:class:`alarmdecoder.util.NoDeviceError`
         """
         # Set up the defaults
         if baudrate is None:
@@ -662,10 +673,10 @@ class SerialDevice(Device):
         """
         Writes data to the device.
 
-        :param data: The data to write.
-        :type data: str
+        :param data: data to write
+        :type data: string
 
-        :raises: CommError
+        :raises: py:class:`alarmdecoder.util.CommError`
         """
         try:
             self._device.write(data)
@@ -683,8 +694,8 @@ class SerialDevice(Device):
         """
         Reads a single character from the device.
 
-        :returns: The character read from the device.
-        :raises: CommError
+        :returns: character read from the device
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         ret = None
 
@@ -700,14 +711,14 @@ class SerialDevice(Device):
         """
         Reads a line from the device.
 
-        :param timeout: The read timeout.
+        :param timeout: read timeout
         :type timeout: float
         :param purge_buffer: Indicates whether to purge the buffer prior to
                              reading.
         :type purge_buffer: bool
 
-        :returns: The line that was read.
-        :raises: CommError, TimeoutError
+        :returns: line that was read
+        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -759,8 +770,8 @@ class SerialDevice(Device):
 
 class SocketDevice(Device):
     """
-    Device that supports communication with an Alarm Decoder (AD2) that is
-    exposed via ser2sock or another Serial to IP interface.
+    Device that supports communication with an `Alarm Decoder`_ (AD2) that is
+    exposed via `ser2sock`_ or another Serial to IP interface.
     """
 
     @property
@@ -768,7 +779,7 @@ class SocketDevice(Device):
         """
         Retrieves the interface used to connect to the device.
 
-        :returns: the interface used to connect to the device.
+        :returns: interface used to connect to the device
         """
         return (self._host, self._port)
 
@@ -777,7 +788,7 @@ class SocketDevice(Device):
         """
         Sets the interface used to connect to the device.
 
-        :param value: Tuple containing the host and port to use.
+        :param value: Tuple containing the host and port to use
         :type value: tuple
         """
         self._host, self._port = value
@@ -787,7 +798,7 @@ class SocketDevice(Device):
         """
         Retrieves whether or not the device is using SSL.
 
-        :returns: Whether or not the device is using SSL.
+        :returns: whether or not the device is using SSL
         """
         return self._use_ssl
 
@@ -796,7 +807,7 @@ class SocketDevice(Device):
         """
         Sets whether or not SSL communication is in use.
 
-        :param value: Whether or not SSL communication is in use.
+        :param value: Whether or not SSL communication is in use
         :type value: bool
         """
         self._use_ssl = value
@@ -806,7 +817,7 @@ class SocketDevice(Device):
         """
         Retrieves the SSL client certificate path used for authentication.
 
-        :returns: The certificate path
+        :returns: path to the certificate path or :py:class:`OpenSSL.crypto.X509`
         """
         return self._ssl_certificate
 
@@ -815,8 +826,8 @@ class SocketDevice(Device):
         """
         Sets the SSL client certificate to use for authentication.
 
-        :param value: The path to the SSL certificate.
-        :type value: str
+        :param value: path to the SSL certificate or :py:class:`OpenSSL.crypto.X509`
+        :type value: string or :py:class:`OpenSSL.crypto.X509`
         """
         self._ssl_certificate = value
 
@@ -825,7 +836,7 @@ class SocketDevice(Device):
         """
         Retrieves the SSL client certificate key used for authentication.
 
-        :returns: The key path
+        :returns: jpath to the SSL key or :py:class:`OpenSSL.crypto.PKey`
         """
         return self._ssl_key
 
@@ -834,8 +845,8 @@ class SocketDevice(Device):
         """
         Sets the SSL client certificate key to use for authentication.
 
-        :param value: The path to the SSL key.
-        :type value: str
+        :param value: path to the SSL key or :py:class:`OpenSSL.crypto.PKey`
+        :type value: string or :py:class:`OpenSSL.crypto.PKey`
         """
         self._ssl_key = value
 
@@ -845,7 +856,7 @@ class SocketDevice(Device):
         Retrieves the SSL Certificate Authority certificate used for
         authentication.
 
-        :returns: The CA path
+        :returns: path to the CA certificate or :py:class:`OpenSSL.crypto.X509`
         """
         return self._ssl_ca
 
@@ -854,8 +865,8 @@ class SocketDevice(Device):
         """
         Sets the SSL Certificate Authority certificate used for authentication.
 
-        :param value: The path to the SSL CA certificate.
-        :type value: str
+        :param value: path to the SSL CA certificate or :py:class:`OpenSSL.crypto.X509`
+        :type value: string or :py:class:`OpenSSL.crypto.X509`
         """
         self._ssl_ca = value
 
@@ -863,7 +874,7 @@ class SocketDevice(Device):
         """
         Constructor
 
-        :param interface: Tuple containing the hostname and port of our target.
+        :param interface: Tuple containing the hostname and port of our target
         :type interface: tuple
         """
         Device.__init__(self)
@@ -878,13 +889,13 @@ class SocketDevice(Device):
         """
         Opens the device.
 
-        :param baudrate: The baudrate to use
+        :param baudrate: baudrate to use
         :type baudrate: int
-        :param no_reader_thread: Whether or not to automatically open the reader
+        :param no_reader_thread: whether or not to automatically open the reader
                                  thread.
         :type no_reader_thread: bool
 
-        :raises: NoDeviceError, CommError
+        :raises: :py:class:`alarmdecoder.util.NoDeviceError`, :py:class:`alarmdecoder.util.CommError`
         """
 
         try:
@@ -934,11 +945,11 @@ class SocketDevice(Device):
         """
         Writes data to the device.
 
-        :param data: The data to write.
-        :type data: str
+        :param data: data to write
+        :type data: string
 
-        :returns: The number of bytes sent.
-        :raises: CommError
+        :returns: number of bytes sent
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         data_sent = None
 
@@ -959,8 +970,8 @@ class SocketDevice(Device):
         """
         Reads a single character from the device.
 
-        :returns: The character read from the device.
-        :raises: CommError
+        :returns: character read from the device
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
         data = None
 
@@ -976,14 +987,14 @@ class SocketDevice(Device):
         """
         Reads a line from the device.
 
-        :param timeout: The read timeout.
+        :param timeout: read timeout
         :type timeout: float
         :param purge_buffer: Indicates whether to purge the buffer prior to
                              reading.
         :type purge_buffer: bool
 
-        :returns: The line that was read.:
-        :raises: CommError, TimeoutError
+        :returns: line that was read
+        :raises: :py:class:`alarmdecoder.util.CommError`, :py:class:`alarmdecoder.util.TimeoutError`
         """
 
         def timeout_event():
@@ -1034,6 +1045,8 @@ class SocketDevice(Device):
     def _init_ssl(self):
         """
         Initializes our device as an SSL connection.
+
+        :raises: :py:class:`alarmdecoder.util.CommError`
         """
 
         try:

@@ -1,10 +1,10 @@
 alarmdecoder Package
-================
+====================
 
 :mod:`alarmdecoder` Module
---------------------
+--------------------------
 
-.. automodule:: alarmdecoder.alarmdecoder
+.. automodule:: alarmdecoder.decoder
     :members:
     :undoc-members:
     :show-inheritance:
@@ -17,10 +17,10 @@ alarmdecoder Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`util` Module
-------------------
+:mod:`messages` Module
+----------------------
 
-.. automodule:: alarmdecoder.util
+.. automodule:: alarmdecoder.messages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -33,6 +33,14 @@ alarmdecoder Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`util` Module
+------------------
+
+.. automodule:: alarmdecoder.util
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`panels` Module
 --------------------
 
@@ -41,18 +49,11 @@ alarmdecoder Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`messages` Module
-----------------------
+..
+  Subpackages
+  -----------
 
-.. automodule:: alarmdecoder.messages
-    :members:
-    :undoc-members:
-    :show-inheritance:
+  .. toctree::
 
-Subpackages
------------
-
-.. toctree::
-
-    alarmdecoder.event
+      alarmdecoder.event
 

@@ -24,7 +24,6 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="alarmdecoder  documentation" href="index.html" />
-    <link rel="next" title="event Package" href="alarmdecoder.event.html" />
     <link rel="prev" title="Welcome to alarmdecoder’s documentation!" href="index.html" /> 
   </head>
   <body>
@@ -37,9 +36,6 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="alarmdecoder.event.html" title="event Package"
-             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to alarmdecoder’s documentation!"
              accesskey="P">previous</a> |</li>
@@ -54,39 +50,382 @@
             
   <div class="section" id="alarmdecoder-package">
 <h1>alarmdecoder Package<a class="headerlink" href="#alarmdecoder-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="alarmdecoder-module">
-<h2><tt class="xref py py-mod docutils literal"><span class="pre">alarmdecoder</span></tt> Module<a class="headerlink" href="#alarmdecoder-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-alarmdecoder.decoder">
+<span id="alarmdecoder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">alarmdecoder</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.decoder" title="Permalink to this headline">¶</a></h2>
+<p>Provides the main AlarmDecoder class.</p>
+<dl class="class">
+<dt id="alarmdecoder.decoder.AlarmDecoder">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.decoder.</tt><tt class="descname">AlarmDecoder</tt><big>(</big><em>device</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>High-level wrapper around <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) devices.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_arm">
+<tt class="descname">on_arm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_arm" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the panel is armed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_disarm">
+<tt class="descname">on_disarm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_disarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the panel is disarmed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_power_changed">
+<tt class="descname">on_power_changed</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_power_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when panel power switches between AC and DC.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_alarm">
+<tt class="descname">on_alarm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the alarm is triggered.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_fire">
+<tt class="descname">on_fire</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_fire" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when a fire is detected.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_bypass">
+<tt class="descname">on_bypass</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_bypass" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when a zone is bypassed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_boot">
+<tt class="descname">on_boot</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_boot" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device finishes booting.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_config_received">
+<tt class="descname">on_config_received</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_config_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device receives its configuration.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_zone_fault">
+<tt class="descname">on_zone_fault</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_zone_fault" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.zonetracking.Zonetracker</span></tt></a> detects a zone fault.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_zone_restore">
+<tt class="descname">on_zone_restore</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_zone_restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when <a class="reference internal" href="#alarmdecoder.zonetracking.Zonetracker" title="alarmdecoder.zonetracking.Zonetracker"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.zonetracking.Zonetracker</span></tt></a> detects that a fault is restored.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_low_battery">
+<tt class="descname">on_low_battery</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_low_battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device detects a low battery.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_panic">
+<tt class="descname">on_panic</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_panic" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device detects a panic.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_relay_changed">
+<tt class="descname">on_relay_changed</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_relay_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when a relay is opened or closed on an expander board.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_message">
+<tt class="descname">on_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when any message is received.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_lrr_message">
+<tt class="descname">on_lrr_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_lrr_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.LRRMessage" title="alarmdecoder.messages.LRRMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.LRRMessage</span></tt></a> is received.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_rfx_message">
+<tt class="descname">on_rfx_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_rfx_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.RFMessage" title="alarmdecoder.messages.RFMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.RFMessage</span></tt></a> is received.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_open">
+<tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device has been opened.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_close">
+<tt class="descname">on_close</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device has been closed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_read">
+<tt class="descname">on_read</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_read" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when a line has been read from the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_write">
+<tt class="descname">on_write</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_write" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when data has been written to the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.KEY_F1">
+<tt class="descname">KEY_F1</tt><em class="property"> = u'\x01\x01\x01'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.KEY_F1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents panel function key #1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.KEY_F2">
+<tt class="descname">KEY_F2</tt><em class="property"> = u'\x02\x02\x02'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.KEY_F2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents panel function key #2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.KEY_F3">
+<tt class="descname">KEY_F3</tt><em class="property"> = u'\x03\x03\x03'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.KEY_F3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents panel function key #3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.KEY_F4">
+<tt class="descname">KEY_F4</tt><em class="property"> = u'\x04\x04\x04'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.KEY_F4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents panel function key #4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.BATTERY_TIMEOUT">
+<tt class="descname">BATTERY_TIMEOUT</tt><em class="property"> = 30</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.BATTERY_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default timeout (in seconds) before the battery status reverts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.FIRE_TIMEOUT">
+<tt class="descname">FIRE_TIMEOUT</tt><em class="property"> = 30</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.FIRE_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default tTimeout (in seconds) before the fire status reverts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.address">
+<tt class="descname">address</tt><em class="property"> = 18</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>The keypad address in use by the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.configbits">
+<tt class="descname">configbits</tt><em class="property"> = 65280</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.configbits" title="Permalink to this definition">¶</a></dt>
+<dd><p>The configuration bits set on the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.address_mask">
+<tt class="descname">address_mask</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.address_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>The address mask configured on the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.emulate_zone">
+<tt class="descname">emulate_zone</tt><em class="property"> = [False, False, False, False, False]</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.emulate_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>List containing the devices zone emulation status.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.emulate_relay">
+<tt class="descname">emulate_relay</tt><em class="property"> = [False, False, False, False]</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.emulate_relay" title="Permalink to this definition">¶</a></dt>
+<dd><p>List containing the devices relay emulation status.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.emulate_lrr">
+<tt class="descname">emulate_lrr</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.emulate_lrr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The status of the devices LRR emulation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.deduplicate">
+<tt class="descname">deduplicate</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.deduplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The status of message deduplication as configured on the device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.id">
+<tt class="descname">id</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ID of the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">identification string for the device</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.battery_timeout">
+<tt class="descname">battery_timeout</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.battery_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.battery_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the timeout for restoring the battery status, in seconds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">battery status timeout</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.fire_timeout">
+<tt class="descname">fire_timeout</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.fire_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.fire_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the timeout for restoring the fire status, in seconds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">fire status timeout</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.open">
+<tt class="descname">open</tt><big>(</big><em>baudrate=None</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens the device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>baudrate</strong> (<em>int</em>) &#8211; baudrate used for the device.  Defaults to the lower-level device default.</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Specifies whether or not the automatic reader
+thread should be started.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.send">
+<tt class="descname">send</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends data to the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to send</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.get_config">
+<tt class="descname">get_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.get_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the configuration from the device.  Called automatically by <tt class="xref py py-meth docutils literal"><span class="pre">_on_open()</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.save_config">
+<tt class="descname">save_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.save_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.save_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets configuration entries on the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.reboot">
+<tt class="descname">reboot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.reboot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.reboot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reboots the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.fault_zone">
+<tt class="descname">fault_zone</tt><big>(</big><em>zone</em>, <em>simulate_wire_problem=False</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.fault_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.fault_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Faults a zone if we are emulating a zone expander.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>zone</strong> (<em>int</em>) &#8211; zone to fault</li>
+<li><strong>simulate_wire_problem</strong> (<em>bool</em>) &#8211; Whether or not to simulate a wire fault</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.clear_zone">
+<tt class="descname">clear_zone</tt><big>(</big><em>zone</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.clear_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.clear_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clears a zone if we are emulating a zone expander.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>zone</strong> (<em>int</em>) &#8211; zone to clear</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="module-alarmdecoder.devices">
 <span id="devices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">devices</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.devices" title="Permalink to this headline">¶</a></h2>
-<p>Contains different types of devices belonging to the Alarm Decoder (AD2) family.</p>
+<p>This module contains different types of devices belonging to the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) family.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a>: Interfaces with the <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device.</li>
+<li><a class="reference internal" href="#alarmdecoder.devices.SerialDevice" title="alarmdecoder.devices.SerialDevice"><tt class="xref py py-class docutils literal"><span class="pre">SerialDevice</span></tt></a>: Interfaces with the <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a>, <a class="reference external" href="http://www.alarmdecoder.com">AD2SERIAL</a> or <a class="reference external" href="http://www.alarmdecoder.com">AD2PI</a>.</li>
+<li><a class="reference internal" href="#alarmdecoder.devices.SocketDevice" title="alarmdecoder.devices.SocketDevice"><tt class="xref py py-class docutils literal"><span class="pre">SocketDevice</span></tt></a>: Interfaces with devices exposed through <a class="reference external" href="http://github.com/nutechsoftware/ser2sock">ser2sock</a> or another IP to Serial solution.
+Also supports SSL if using <a class="reference external" href="http://github.com/nutechsoftware/ser2sock">ser2sock</a>.</li>
+</ul>
 <dl class="class">
 <dt id="alarmdecoder.devices.Device">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">Device</tt><a class="reference internal" href="_modules/alarmdecoder/devices.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.Device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Generic parent device to all Alarm Decoder (AD2) products.</p>
+<p>Base class for all <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) device types.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_open" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when the device has been opened</p>
+<dd><p>This event is called when the device has been opened.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_close">
 <tt class="descname">on_close</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when the device has been closed</p>
+<dd><p>This event is called when the device has been closed.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_read">
 <tt class="descname">on_read</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_read" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when a line has been read from the device</p>
+<dd><p>This event is called when a line has been read from the device.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_write">
 <tt class="descname">on_write</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when data has been written to the device</p>
+<dd><p>This event is called when data has been written to the device.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -97,7 +436,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The identification string for the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">identification string for the device</td>
 </tr>
 </tbody>
 </table>
@@ -111,7 +450,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the reader thread is alive.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">whether or not the reader thread is alive</td>
 </tr>
 </tbody>
 </table>
@@ -160,23 +499,23 @@
 <dt id="alarmdecoder.devices.USBDevice">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">USBDevice</tt><big>(</big><em>interface=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#alarmdecoder.devices.Device" title="alarmdecoder.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.devices.Device</span></tt></a></p>
-<p>AD2USB device exposed with PyFTDI&#8217;s interface.</p>
+<p><a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device utilizing PyFTDI&#8217;s interface.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.FTDI_VENDOR_ID">
 <tt class="descname">FTDI_VENDOR_ID</tt><em class="property"> = 1027</em><a class="headerlink" href="#alarmdecoder.devices.USBDevice.FTDI_VENDOR_ID" title="Permalink to this definition">¶</a></dt>
-<dd><p>Vendor ID used to recognize AD2USB devices.</p>
+<dd><p>Vendor ID used to recognize <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> devices.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.FTDI_PRODUCT_ID">
 <tt class="descname">FTDI_PRODUCT_ID</tt><em class="property"> = 24577</em><a class="headerlink" href="#alarmdecoder.devices.USBDevice.FTDI_PRODUCT_ID" title="Permalink to this definition">¶</a></dt>
-<dd><p>Product ID used to recognize AD2USB devices.</p>
+<dd><p>Product ID used to recognize <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> devices.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.BAUDRATE">
 <tt class="descname">BAUDRATE</tt><em class="property"> = 115200</em><a class="headerlink" href="#alarmdecoder.devices.USBDevice.BAUDRATE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Default baudrate for AD2USB devices.</p>
+<dd><p>Default baudrate for <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> devices.</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -189,7 +528,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -198,12 +537,12 @@
 <dl class="classmethod">
 <dt id="alarmdecoder.devices.USBDevice.devices">
 <em class="property">classmethod </em><tt class="descname">devices</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.devices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.devices" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a cached list of AD2USB devices located on the system.</p>
+<dd><p>Returns a cached list of <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> devices located on the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">cached list of devices found.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">cached list of devices found</td>
 </tr>
 </tbody>
 </table>
@@ -212,7 +551,7 @@
 <dl class="classmethod">
 <dt id="alarmdecoder.devices.USBDevice.find">
 <em class="property">classmethod </em><tt class="descname">find</tt><big>(</big><em>device=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.find" title="Permalink to this definition">¶</a></dt>
-<dd><p>Factory method that returns the requested USBDevice device, or the
+<dd><p>Factory method that returns the requested <a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a> device, or the
 first device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -221,9 +560,9 @@ first device.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>device</strong> (<em>tuple</em>) &#8211; Tuple describing the USB device to open, as returned
 by find_all().</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">USBDevice object utilizing the specified device.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a> object utilizing the specified device</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">NoDeviceError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -238,8 +577,8 @@ by find_all().</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>on_attached</strong> (<em>function</em>) &#8211; function to be called when a device is attached.</li>
-<li><strong>on_detached</strong> (<em>function</em>) &#8211; function to be called when a device is detached.</li>
+<li><strong>on_attached</strong> (<em>function</em>) &#8211; function to be called when a device is attached</li>
+<li><strong>on_detached</strong> (<em>function</em>) &#8211; function to be called when a device is detached</li>
 </ul>
 </td>
 </tr>
@@ -261,7 +600,7 @@ by find_all().</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The serial number of the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">serial number of the device</td>
 </tr>
 </tbody>
 </table>
@@ -275,7 +614,7 @@ by find_all().</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The description of the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">description of the device</td>
 </tr>
 </tbody>
 </table>
@@ -289,7 +628,7 @@ by find_all().</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the interface used to connect to the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the interface used to connect to the device</td>
 </tr>
 </tbody>
 </table>
@@ -304,13 +643,13 @@ by find_all().</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use.</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the
+<li><strong>baudrate</strong> (<em>int</em>) &#8211; baudrate to use</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; whether or not to automatically start the
 reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -331,9 +670,9 @@ reader thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; Data to write</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -347,9 +686,9 @@ reader thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -364,16 +703,16 @@ reader thread.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
+<li><strong>timeout</strong> (<em>float</em>) &#8211; read timeout</li>
 <li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
 reading.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -388,13 +727,13 @@ reading.</li>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.DetectThread.on_attached">
 <tt class="descname">on_attached</tt><a class="headerlink" href="#alarmdecoder.devices.USBDevice.DetectThread.on_attached" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when an AD2USB device has been detected.</p>
+<dd><p>This event is called when an <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device has been detected.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="alarmdecoder.devices.USBDevice.DetectThread.on_detached">
 <tt class="descname">on_detached</tt><a class="headerlink" href="#alarmdecoder.devices.USBDevice.DetectThread.on_detached" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when an AD2USB device has been removed.</p>
+<dd><p>This event is called when an <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device has been removed.</p>
 </dd></dl>
 
 <dl class="method">
@@ -417,7 +756,7 @@ reading.</li>
 <dt id="alarmdecoder.devices.SerialDevice">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">SerialDevice</tt><big>(</big><em>interface=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SerialDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SerialDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#alarmdecoder.devices.Device" title="alarmdecoder.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.devices.Device</span></tt></a></p>
-<p>AD2USB or AD2SERIAL device exposed with the pyserial interface.</p>
+<p><a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a>, <a class="reference external" href="http://www.alarmdecoder.com">AD2SERIAL</a> or <a class="reference external" href="http://www.alarmdecoder.com">AD2PI</a> device utilizing the PySerial interface.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.SerialDevice.BAUDRATE">
 <tt class="descname">BAUDRATE</tt><em class="property"> = 19200</em><a class="headerlink" href="#alarmdecoder.devices.SerialDevice.BAUDRATE" title="Permalink to this definition">¶</a></dt>
@@ -432,11 +771,11 @@ reading.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<em>str</em>) &#8211; Pattern to search for when retrieving serial ports.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pattern</strong> (<em>string</em>) &#8211; pattern to search for when retrieving serial ports</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -450,7 +789,7 @@ reading.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the interface used to connect to the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">interface used to connect to the device</td>
 </tr>
 </tbody>
 </table>
@@ -465,13 +804,13 @@ reading.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use with the device.</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically start the
+<li><strong>baudrate</strong> (<em>int</em>) &#8211; baudrate to use with the device</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; whether or not to automatically start the
 reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -492,9 +831,9 @@ reader thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; The data to write.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">py:class:<cite>alarmdecoder.util.CommError</cite></td>
 </tr>
 </tbody>
 </table>
@@ -508,9 +847,9 @@ reader thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -525,16 +864,16 @@ reader thread.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
+<li><strong>timeout</strong> (<em>float</em>) &#8211; read timeout</li>
 <li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
 reading.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -547,8 +886,8 @@ reading.</li>
 <dt id="alarmdecoder.devices.SocketDevice">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">SocketDevice</tt><big>(</big><em>interface=('localhost'</em>, <em>10000)</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#alarmdecoder.devices.Device" title="alarmdecoder.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.devices.Device</span></tt></a></p>
-<p>Device that supports communication with an Alarm Decoder (AD2) that is
-exposed via ser2sock or another Serial to IP interface.</p>
+<p>Device that supports communication with an <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) that is
+exposed via <a class="reference external" href="http://github.com/nutechsoftware/ser2sock">ser2sock</a> or another Serial to IP interface.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.SocketDevice.interface">
 <tt class="descname">interface</tt><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice.interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice.interface" title="Permalink to this definition">¶</a></dt>
@@ -557,7 +896,7 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">the interface used to connect to the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">interface used to connect to the device</td>
 </tr>
 </tbody>
 </table>
@@ -571,7 +910,7 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Whether or not the device is using SSL.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">whether or not the device is using SSL</td>
 </tr>
 </tbody>
 </table>
@@ -585,7 +924,7 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The certificate path</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path to the certificate path or <tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -599,7 +938,7 @@ exposed via ser2sock or another Serial to IP interface.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The key path</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">jpath to the SSL key or <tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.PKey</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -614,7 +953,7 @@ authentication.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The CA path</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">path to the CA certificate or <tt class="xref py py-class docutils literal"><span class="pre">OpenSSL.crypto.X509</span></tt></td>
 </tr>
 </tbody>
 </table>
@@ -629,13 +968,13 @@ authentication.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>baudrate</strong> (<em>int</em>) &#8211; The baudrate to use</li>
-<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; Whether or not to automatically open the reader
+<li><strong>baudrate</strong> (<em>int</em>) &#8211; baudrate to use</li>
+<li><strong>no_reader_thread</strong> (<em>bool</em>) &#8211; whether or not to automatically open the reader
 thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError, CommError</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -656,11 +995,11 @@ thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>str</em>) &#8211; The data to write.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The number of bytes sent.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of bytes sent</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -674,9 +1013,9 @@ thread.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The character read from the device.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">CommError</td>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -691,16 +1030,430 @@ thread.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeout</strong> (<em>float</em>) &#8211; The read timeout.</li>
+<li><strong>timeout</strong> (<em>float</em>) &#8211; read timeout</li>
 <li><strong>purge_buffer</strong> (<em>bool</em>) &#8211; Indicates whether to purge the buffer prior to
 reading.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The line that was read.:</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">CommError, TimeoutError</p>
+<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-alarmdecoder.messages">
+<span id="messages-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">messages</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.messages" title="Permalink to this headline">¶</a></h2>
+<p>Message representations received from the panel through the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2)
+devices.</p>
+<ul class="simple">
+<li><a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>: The standard and most common message received from a panel.</li>
+<li><a class="reference internal" href="#alarmdecoder.messages.ExpanderMessage" title="alarmdecoder.messages.ExpanderMessage"><tt class="xref py py-class docutils literal"><span class="pre">ExpanderMessage</span></tt></a>: Messages received from Relay or Zone expander modules.</li>
+<li><a class="reference internal" href="#alarmdecoder.messages.RFMessage" title="alarmdecoder.messages.RFMessage"><tt class="xref py py-class docutils literal"><span class="pre">RFMessage</span></tt></a>: Message received from an RF receiver module.</li>
+<li><a class="reference internal" href="#alarmdecoder.messages.LRRMessage" title="alarmdecoder.messages.LRRMessage"><tt class="xref py py-class docutils literal"><span class="pre">LRRMessage</span></tt></a>: Message received from a long-range radio module.</li>
+</ul>
+<dl class="class">
+<dt id="alarmdecoder.messages.BaseMessage">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">BaseMessage</tt><a class="reference internal" href="_modules/alarmdecoder/messages.html#BaseMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.BaseMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base class for messages.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.messages.BaseMessage.raw">
+<tt class="descname">raw</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.BaseMessage.raw" title="Permalink to this definition">¶</a></dt>
+<dd><p>The raw message text</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="alarmdecoder.messages.Message">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">Message</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.Message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
+<p>Represents a message from the alarm panel.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.ready">
+<tt class="descname">ready</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.ready" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is in a ready state.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.armed_away">
+<tt class="descname">armed_away</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.armed_away" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is armed away.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.armed_home">
+<tt class="descname">armed_home</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.armed_home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is armed home.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.backlight_on">
+<tt class="descname">backlight_on</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.backlight_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the keypad backlight is on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.programming_mode">
+<tt class="descname">programming_mode</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.programming_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not we&#8217;re in programming mode.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.beeps">
+<tt class="descname">beeps</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.Message.beeps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of beeps associated with a message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.zone_bypassed">
+<tt class="descname">zone_bypassed</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.zone_bypassed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not a zone is bypassed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.ac_power">
+<tt class="descname">ac_power</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.ac_power" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the panel is on AC power.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.chime_on">
+<tt class="descname">chime_on</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.chime_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the chime is enabled.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.alarm_event_occurred">
+<tt class="descname">alarm_event_occurred</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.alarm_event_occurred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not an alarm event has occurred.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.alarm_sounding">
+<tt class="descname">alarm_sounding</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.alarm_sounding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not an alarm is sounding.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.battery_low">
+<tt class="descname">battery_low</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.battery_low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not there is a low battery.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.entry_delay_off">
+<tt class="descname">entry_delay_off</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.entry_delay_off" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the entry delay is enabled.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.fire_alarm">
+<tt class="descname">fire_alarm</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.fire_alarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not a fire alarm is sounding.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.check_zone">
+<tt class="descname">check_zone</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.check_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not there are zones that require attention.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.perimeter_only">
+<tt class="descname">perimeter_only</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.perimeter_only" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether or not the perimeter is armed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.numeric_code">
+<tt class="descname">numeric_code</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.numeric_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>The numeric code associated with the message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.text">
+<tt class="descname">text</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>The human-readable text to be displayed on the panel LCD.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.cursor_location">
+<tt class="descname">cursor_location</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.Message.cursor_location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Current cursor location on the keypad.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.mask">
+<tt class="descname">mask</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address mask this message is intended for.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.bitfield">
+<tt class="descname">bitfield</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.bitfield" title="Permalink to this definition">¶</a></dt>
+<dd><p>The bitfield associated with this message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.Message.panel_data">
+<tt class="descname">panel_data</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.panel_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The panel data field associated with this message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="alarmdecoder.messages.ExpanderMessage">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">ExpanderMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#ExpanderMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
+<p>Represents a message from a zone or relay expansion module.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.ZONE">
+<tt class="descname">ZONE</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.ZONE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating that the expander message relates to a Zone Expander.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.RELAY">
+<tt class="descname">RELAY</tt><em class="property"> = 1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.RELAY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag indicating that the expander message relates to a Relay Expander.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.type">
+<tt class="descname">type</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Expander message type: ExpanderMessage.ZONE or ExpanderMessage.RELAY</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.address">
+<tt class="descname">address</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Address of expander</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.channel">
+<tt class="descname">channel</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel on the expander</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.ExpanderMessage.value">
+<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value associated with the message</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="alarmdecoder.messages.RFMessage">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">RFMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#RFMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.RFMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
+<p>Represents a message from an RF receiver.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.messages.RFMessage.serial_number">
+<tt class="descname">serial_number</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.serial_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serial number of the RF device.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.RFMessage.value">
+<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Value associated with this message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.RFMessage.battery">
+<tt class="descname">battery</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.battery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Low battery indication</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.RFMessage.supervision">
+<tt class="descname">supervision</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.supervision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supervision required indication</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.RFMessage.loop">
+<tt class="descname">loop</tt><em class="property"> = [False, False, False, False]</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop indicators</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="alarmdecoder.messages.LRRMessage">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">LRRMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#LRRMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.LRRMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
+<p>Represent a message from a Long Range Radio.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.messages.LRRMessage.event_data">
+<tt class="descname">event_data</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.event_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data associated with the LRR message.  Usually user ID or zone.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.LRRMessage.partition">
+<tt class="descname">partition</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partition that this message applies to.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.LRRMessage.event_type">
+<tt class="descname">event_type</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.event_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The type of the event that occurred.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-alarmdecoder.zonetracking">
+<span id="zonetracking-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">zonetracking</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.zonetracking" title="Permalink to this headline">¶</a></h2>
+<p>Provides zone tracking functionality for the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) device family.</p>
+<dl class="class">
+<dt id="alarmdecoder.zonetracking.Zone">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Representation of a panel zone.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.CLEAR">
+<tt class="descname">CLEAR</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.CLEAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status indicating that the zone is cleared.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.FAULT">
+<tt class="descname">FAULT</tt><em class="property"> = 1</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.FAULT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status indicating that the zone is faulted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.CHECK">
+<tt class="descname">CHECK</tt><em class="property"> = 2</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.CHECK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Status indicating that there is a wiring issue with the zone.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.STATUS">
+<tt class="descname">STATUS</tt><em class="property"> = {0: 'CLEAR', 1: 'FAULT', 2: 'CHECK'}</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.STATUS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.zone">
+<tt class="descname">zone</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zone ID</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.name">
+<tt class="descname">name</tt><em class="property"> = ''</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zone name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.status">
+<tt class="descname">status</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zone status</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.timestamp">
+<tt class="descname">timestamp</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestamp of last update</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="alarmdecoder.zonetracking.Zonetracker">
+<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zonetracker</tt><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Handles tracking of zones and their statuses.</p>
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zonetracker.on_fault">
+<tt class="descname">on_fault</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_fault" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device detects a zone fault.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zonetracker.on_restore">
+<tt class="descname">on_restore</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when the device detects that a fault is restored.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zonetracker.EXPIRE">
+<tt class="descname">EXPIRE</tt><em class="property"> = 30</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.EXPIRE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Zone expiration timeout.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zonetracker.zones">
+<tt class="descname">zones</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.zones" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current list of zones being tracked.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dictionary of <a class="reference internal" href="#alarmdecoder.zonetracking.Zone" title="alarmdecoder.zonetracking.Zone"><tt class="xref py py-class docutils literal"><span class="pre">Zone</span></tt></a> being tracked</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zonetracker.faulted">
+<tt class="descname">faulted</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.faulted" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the current list of faulted zones.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of faulted zones</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.zonetracking.Zonetracker.update">
+<tt class="descname">update</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update zone statuses based on the current message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.Message</span></tt></a> or <a class="reference internal" href="#alarmdecoder.messages.ExpanderMessage" title="alarmdecoder.messages.ExpanderMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.ExpanderMessage</span></tt></a>) &#8211; message to use to update the zone tracking</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.zonetracking.Zonetracker.expander_to_zone">
+<tt class="descname">expander_to_zone</tt><big>(</big><em>address</em>, <em>channel</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.expander_to_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.expander_to_zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an address and channel into a zone number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>address</strong> (<em>int</em>) &#8211; expander address</li>
+<li><strong>channel</strong> (<em>int</em>) &#8211; channel</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">zone number associated with an address and channel</p>
 </td>
 </tr>
 </tbody>
@@ -712,7 +1465,7 @@ reading.</li>
 </div>
 <div class="section" id="module-alarmdecoder.util">
 <span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.util" title="Permalink to this headline">¶</a></h2>
-<p>Provides utility classes for the Alarm Decoder (AD2) devices.</p>
+<p>Provides utility classes for the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) devices.</p>
 <dl class="exception">
 <dt id="alarmdecoder.util.NoDeviceError">
 <em class="property">exception </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">NoDeviceError</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#NoDeviceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.NoDeviceError" title="Permalink to this definition">¶</a></dt>
@@ -779,112 +1532,18 @@ reading.</li>
 <dl class="staticmethod">
 <dt id="alarmdecoder.util.Firmware.upload">
 <em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads firmware to an Alarm Decoder device.</p>
+<dd><p>Uploads firmware to an <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<em>str</em>) &#8211; The firmware filename</li>
-<li><strong>progress_callback</strong> (<em>function</em>) &#8211; Callback function used to report progress.</li>
+<li><strong>filename</strong> (<em>string</em>) &#8211; firmware filename</li>
+<li><strong>progress_callback</strong> (<em>function</em>) &#8211; callback function used to report progress</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last">NoDeviceError, TimeoutError</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-alarmdecoder.zonetracking">
-<span id="zonetracking-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">zonetracking</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.zonetracking" title="Permalink to this headline">¶</a></h2>
-<p>Provides zone tracking functionality for the Alarm Decoder (AD2) device family.</p>
-<dl class="class">
-<dt id="alarmdecoder.zonetracking.Zone">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Representation of a panel zone.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zone.CLEAR">
-<tt class="descname">CLEAR</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.CLEAR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Status indicating that the zone is cleared.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zone.FAULT">
-<tt class="descname">FAULT</tt><em class="property"> = 1</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.FAULT" title="Permalink to this definition">¶</a></dt>
-<dd><p>Status indicating that the zone is faulted.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zone.CHECK">
-<tt class="descname">CHECK</tt><em class="property"> = 2</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.CHECK" title="Permalink to this definition">¶</a></dt>
-<dd><p>Status indicating that there is a wiring issue with the zone.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zone.STATUS">
-<tt class="descname">STATUS</tt><em class="property"> = {0: 'CLEAR', 1: 'FAULT', 2: 'CHECK'}</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.STATUS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="alarmdecoder.zonetracking.Zonetracker">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zonetracker</tt><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Handles tracking of zone and their statuses.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zonetracker.on_fault">
-<tt class="descname">on_fault</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_fault" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when the device detects a zone fault.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zonetracker.on_restore">
-<tt class="descname">on_restore</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.on_restore" title="Permalink to this definition">¶</a></dt>
-<dd><p>Called when the device detects that a fault is restored.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.zonetracking.Zonetracker.EXPIRE">
-<tt class="descname">EXPIRE</tt><em class="property"> = 30</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.EXPIRE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Zone expiration timeout.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="alarmdecoder.zonetracking.Zonetracker.update">
-<tt class="descname">update</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update zone statuses based on the current message.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> (<em>Message or ExpanderMessage</em>) &#8211; Message to use to update the zone tracking.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="alarmdecoder.zonetracking.Zonetracker.expander_to_zone">
-<tt class="descname">expander_to_zone</tt><big>(</big><em>address</em>, <em>channel</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.expander_to_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.expander_to_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert an address and channel into a zone number.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>address</strong> (<em>int</em>) &#8211; The expander address</li>
-<li><strong>channel</strong> (<em>int</em>) &#8211; The channel</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The zone number associated with an address and channel.</p>
+<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -898,285 +1557,6 @@ reading.</li>
 <span id="panels-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">panels</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.panels" title="Permalink to this headline">¶</a></h2>
 <p>Representations of Panels and their templates.</p>
 </div>
-<div class="section" id="module-alarmdecoder.messages">
-<span id="messages-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">messages</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.messages" title="Permalink to this headline">¶</a></h2>
-<p>Message representations received from the panel through the Alarm Decoder (AD2)
-devices.</p>
-<dl class="class">
-<dt id="alarmdecoder.messages.BaseMessage">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">BaseMessage</tt><a class="reference internal" href="_modules/alarmdecoder/messages.html#BaseMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.BaseMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Base class for messages.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.messages.BaseMessage.raw">
-<tt class="descname">raw</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.BaseMessage.raw" title="Permalink to this definition">¶</a></dt>
-<dd><p>The raw message text</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="alarmdecoder.messages.Message">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">Message</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.Message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
-<p>Represents a message from the alarm panel.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.ready">
-<tt class="descname">ready</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.ready" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the panel is in a ready state</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.armed_away">
-<tt class="descname">armed_away</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.armed_away" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the panel is armed away</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.armed_home">
-<tt class="descname">armed_home</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.armed_home" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the panel is armed home</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.backlight_on">
-<tt class="descname">backlight_on</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.backlight_on" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the keypad backlight is on</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.programming_mode">
-<tt class="descname">programming_mode</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.programming_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not we&#8217;re in programming mode</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.beeps">
-<tt class="descname">beeps</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.Message.beeps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of beeps associated with a message</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.zone_bypassed">
-<tt class="descname">zone_bypassed</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.zone_bypassed" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not a zone is bypassed</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.ac_power">
-<tt class="descname">ac_power</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.ac_power" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the panel is on AC power</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.chime_on">
-<tt class="descname">chime_on</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.chime_on" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the chime is enabled</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.alarm_event_occurred">
-<tt class="descname">alarm_event_occurred</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.alarm_event_occurred" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not an alarm event has occurred</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.alarm_sounding">
-<tt class="descname">alarm_sounding</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.alarm_sounding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not an alarm is sounding</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.battery_low">
-<tt class="descname">battery_low</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.battery_low" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not there is a low battery</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.entry_delay_off">
-<tt class="descname">entry_delay_off</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.entry_delay_off" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the entry delay is enabled</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.fire_alarm">
-<tt class="descname">fire_alarm</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.fire_alarm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not a fire alarm is sounding</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.check_zone">
-<tt class="descname">check_zone</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.check_zone" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not there are zones that require attention.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.perimeter_only">
-<tt class="descname">perimeter_only</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.Message.perimeter_only" title="Permalink to this definition">¶</a></dt>
-<dd><p>Indicates whether or not the perimeter is armed</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.numeric_code">
-<tt class="descname">numeric_code</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.numeric_code" title="Permalink to this definition">¶</a></dt>
-<dd><p>The numeric code associated with the message</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.text">
-<tt class="descname">text</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.text" title="Permalink to this definition">¶</a></dt>
-<dd><p>The human-readable text to be displayed on the panel LCD</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.cursor_location">
-<tt class="descname">cursor_location</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.Message.cursor_location" title="Permalink to this definition">¶</a></dt>
-<dd><p>Current cursor location on the keypad</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.mask">
-<tt class="descname">mask</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.mask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Address mask this message is intended for</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.bitfield">
-<tt class="descname">bitfield</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.bitfield" title="Permalink to this definition">¶</a></dt>
-<dd><p>The bitfield associated with this message</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.Message.panel_data">
-<tt class="descname">panel_data</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.Message.panel_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>The panel data field associated with this message</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="alarmdecoder.messages.ExpanderMessage">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">ExpanderMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#ExpanderMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
-<p>Represents a message from a zone or relay expansion module.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.ZONE">
-<tt class="descname">ZONE</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.ZONE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag indicating that the expander message relates to a Zone Expander.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.RELAY">
-<tt class="descname">RELAY</tt><em class="property"> = 1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.RELAY" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag indicating that the expander message relates to a Relay Expander.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.type">
-<tt class="descname">type</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Expander message type: ExpanderMessage.ZONE or ExpanderMessage.RELAY</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.address">
-<tt class="descname">address</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.address" title="Permalink to this definition">¶</a></dt>
-<dd><p>Address of expander</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.channel">
-<tt class="descname">channel</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Channel on the expander</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.ExpanderMessage.value">
-<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Value associated with the message</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="alarmdecoder.messages.RFMessage">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">RFMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#RFMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.RFMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
-<p>Represents a message from an RF receiver.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.x">
-<tt class="descname">x</tt><em class="property"> = 3</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.x" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.serial_number">
-<tt class="descname">serial_number</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.serial_number" title="Permalink to this definition">¶</a></dt>
-<dd><p>Serial number of the RF device</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.value">
-<tt class="descname">value</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Value associated with this message</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.battery">
-<tt class="descname">battery</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.battery" title="Permalink to this definition">¶</a></dt>
-<dd><p>Battery low indication</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.supervision">
-<tt class="descname">supervision</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.supervision" title="Permalink to this definition">¶</a></dt>
-<dd><p>Supervision required indication</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.RFMessage.loop">
-<tt class="descname">loop</tt><em class="property"> = [False, False, False, False]</em><a class="headerlink" href="#alarmdecoder.messages.RFMessage.loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Loop indicators</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="alarmdecoder.messages.LRRMessage">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.messages.</tt><tt class="descname">LRRMessage</tt><big>(</big><em>data=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#LRRMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.LRRMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.messages.BaseMessage" title="alarmdecoder.messages.BaseMessage"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.messages.BaseMessage</span></tt></a></p>
-<p>Represent a message from a Long Range Radio.</p>
-<dl class="attribute">
-<dt id="alarmdecoder.messages.LRRMessage.event_data">
-<tt class="descname">event_data</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.event_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Data associated with the LRR message.  Usually user ID or zone.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.LRRMessage.partition">
-<tt class="descname">partition</tt><em class="property"> = -1</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.partition" title="Permalink to this definition">¶</a></dt>
-<dd><p>The partition that this message applies to</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="alarmdecoder.messages.LRRMessage.event_type">
-<tt class="descname">event_type</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.event_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>The type of the event that occurred</p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="alarmdecoder.event.html">event Package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="alarmdecoder.event.html#id1"><tt class="docutils literal"><span class="pre">event</span></tt> Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="alarmdecoder.event.html#module-alarmdecoder.event.event"><tt class="docutils literal"><span class="pre">event</span></tt> Module</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
 </div>
 
 
@@ -1188,15 +1568,12 @@ devices.</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">alarmdecoder Package</a><ul>
-<li><a class="reference internal" href="#alarmdecoder-module"><tt class="docutils literal"><span class="pre">alarmdecoder</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-alarmdecoder.decoder"><tt class="docutils literal"><span class="pre">alarmdecoder</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-alarmdecoder.devices"><tt class="docutils literal"><span class="pre">devices</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-alarmdecoder.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-alarmdecoder.zonetracking"><tt class="docutils literal"><span class="pre">zonetracking</span></tt> Module</a></li>
-<li><a class="reference internal" href="#module-alarmdecoder.panels"><tt class="docutils literal"><span class="pre">panels</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-alarmdecoder.messages"><tt class="docutils literal"><span class="pre">messages</span></tt> Module</a></li>
-<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-alarmdecoder.zonetracking"><tt class="docutils literal"><span class="pre">zonetracking</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-alarmdecoder.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-alarmdecoder.panels"><tt class="docutils literal"><span class="pre">panels</span></tt> Module</a></li>
 </ul>
 </li>
 </ul>
@@ -1204,9 +1581,6 @@ devices.</p>
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Welcome to alarmdecoder&#8217;s documentation!</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="alarmdecoder.event.html"
-                        title="next chapter">event Package</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/alarmdecoder.txt"
@@ -1238,9 +1612,6 @@ devices.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="alarmdecoder.event.html" title="event Package"
-             >next</a> |</li>
         <li class="right" >
           <a href="index.html" title="Welcome to alarmdecoder’s documentation!"
              >previous</a> |</li>

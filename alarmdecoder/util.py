@@ -1,5 +1,7 @@
 """
-Provides utility classes for the Alarm Decoder (AD2) devices.
+Provides utility classes for the `Alarm Decoder`_ (AD2) devices.
+
+.. _Alarm Decoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -53,14 +55,14 @@ class Firmware(object):
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
-        Uploads firmware to an Alarm Decoder device.
+        Uploads firmware to an `Alarm Decoder`_ device.
 
-        :param filename: The firmware filename
-        :type filename: str
-        :param progress_callback: Callback function used to report progress.
+        :param filename: firmware filename
+        :type filename: string
+        :param progress_callback: callback function used to report progress
         :type progress_callback: function
 
-        :raises: NoDeviceError, TimeoutError
+        :raises: :py:class:`alarmdecoder.util.NoDeviceError`, :py:class:`alarmdecoder.util.TimeoutError`
         """
 
         def do_upload():

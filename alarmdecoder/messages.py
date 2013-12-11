@@ -1,6 +1,13 @@
 """
-Message representations received from the panel through the Alarm Decoder (AD2)
+Message representations received from the panel through the `Alarm Decoder`_ (AD2)
 devices.
+
+* :py:class:`Message`: The standard and most common message received from a panel.
+* :py:class:`ExpanderMessage`: Messages received from Relay or Zone expander modules.
+* :py:class:`RFMessage`: Message received from an RF receiver module.
+* :py:class:`LRRMessage`: Message received from a long-range radio module.
+
+.. _Alarm Decoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -37,56 +44,56 @@ class Message(BaseMessage):
     """
 
     ready = False
-    """Indicates whether or not the panel is in a ready state"""
+    """Indicates whether or not the panel is in a ready state."""
     armed_away = False
-    """Indicates whether or not the panel is armed away"""
+    """Indicates whether or not the panel is armed away."""
     armed_home = False
-    """Indicates whether or not the panel is armed home"""
+    """Indicates whether or not the panel is armed home."""
     backlight_on = False
-    """Indicates whether or not the keypad backlight is on"""
+    """Indicates whether or not the keypad backlight is on."""
     programming_mode = False
-    """Indicates whether or not we're in programming mode"""
+    """Indicates whether or not we're in programming mode."""
     beeps = -1
-    """Number of beeps associated with a message"""
+    """Number of beeps associated with a message."""
     zone_bypassed = False
-    """Indicates whether or not a zone is bypassed"""
+    """Indicates whether or not a zone is bypassed."""
     ac_power = False
-    """Indicates whether or not the panel is on AC power"""
+    """Indicates whether or not the panel is on AC power."""
     chime_on = False
-    """Indicates whether or not the chime is enabled"""
+    """Indicates whether or not the chime is enabled."""
     alarm_event_occurred = False
-    """Indicates whether or not an alarm event has occurred"""
+    """Indicates whether or not an alarm event has occurred."""
     alarm_sounding = False
-    """Indicates whether or not an alarm is sounding"""
+    """Indicates whether or not an alarm is sounding."""
     battery_low = False
-    """Indicates whether or not there is a low battery"""
+    """Indicates whether or not there is a low battery."""
     entry_delay_off = False
-    """Indicates whether or not the entry delay is enabled"""
+    """Indicates whether or not the entry delay is enabled."""
     fire_alarm = False
-    """Indicates whether or not a fire alarm is sounding"""
+    """Indicates whether or not a fire alarm is sounding."""
     check_zone = False
     """Indicates whether or not there are zones that require attention."""
     perimeter_only = False
-    """Indicates whether or not the perimeter is armed"""
+    """Indicates whether or not the perimeter is armed."""
     numeric_code = None
-    """The numeric code associated with the message"""
+    """The numeric code associated with the message."""
     text = None
-    """The human-readable text to be displayed on the panel LCD"""
+    """The human-readable text to be displayed on the panel LCD."""
     cursor_location = -1
-    """Current cursor location on the keypad"""
+    """Current cursor location on the keypad."""
     mask = None
-    """Address mask this message is intended for"""
+    """Address mask this message is intended for."""
     bitfield = None
-    """The bitfield associated with this message"""
+    """The bitfield associated with this message."""
     panel_data = None
-    """The panel data field associated with this message"""
+    """The panel data field associated with this message."""
 
     def __init__(self, data=None):
         """
         Constructor
 
-        :param data: Message data to parse.
-        :type data: str
+        :param data: message data to parse
+        :type data: string
         """
         BaseMessage.__init__(self)
 
@@ -105,10 +112,10 @@ class Message(BaseMessage):
         """
         Parse the message from the device.
 
-        :param data: The message data.
-        :type data: str
+        :param data: message data
+        :type data: string
 
-        :raises: InvalidMessageError
+        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
         """
         match = self._regex.match(data)
 
@@ -168,8 +175,8 @@ class ExpanderMessage(BaseMessage):
         """
         Constructor
 
-        :param data: The message data to parse.
-        :type data: str
+        :param data: message data to parse
+        :type data: string
         """
         BaseMessage.__init__(self)
 
@@ -186,8 +193,10 @@ class ExpanderMessage(BaseMessage):
         """
         Parse the raw message from the device.
 
-        :param data: The message data
-        :type data: str
+        :param data: message data
+        :type data: string
+
+        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
         """
         try:
             header, values = data.split(':')
@@ -215,22 +224,22 @@ class RFMessage(BaseMessage):
     """
 
     serial_number = None
-    """Serial number of the RF device"""
+    """Serial number of the RF device."""
     value = -1
-    """Value associated with this message"""
+    """Value associated with this message."""
     battery = False
-    """Battery low indication"""
+    """Low battery indication"""
     supervision = False
     """Supervision required indication"""
-    loop = [False for x in range(4)]
+    loop = [False for _ in range(4)]
     """Loop indicators"""
 
     def __init__(self, data=None):
         """
         Constructor
 
-        :param data: The message data to parse
-        :type data: str
+        :param data: message data to parse
+        :type data: string
         """
         BaseMessage.__init__(self)
 
@@ -247,8 +256,10 @@ class RFMessage(BaseMessage):
         """
         Parses the raw message from the device.
 
-        :param data: The message data.
-        :type data: str
+        :param data: message data
+        :type data: string
+
+        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
         """
         try:
             self.raw = data
@@ -280,16 +291,16 @@ class LRRMessage(BaseMessage):
     event_data = None
     """Data associated with the LRR message.  Usually user ID or zone."""
     partition = -1
-    """The partition that this message applies to"""
+    """The partition that this message applies to."""
     event_type = None
-    """The type of the event that occurred"""
+    """The type of the event that occurred."""
 
     def __init__(self, data=None):
         """
         Constructor
 
-        :param data: The message data to parse.
-        :type data: str
+        :param data: message data to parse
+        :type data: string
         """
         BaseMessage.__init__(self)
 
@@ -306,8 +317,10 @@ class LRRMessage(BaseMessage):
         """
         Parses the raw message from the device.
 
-        :param data: The message data.
-        :type data: str
+        :param data: message data to parse
+        :type data: string
+
+        :raises: :py:class:`alarmdecoder.util.InvalidMessageError`
         """
         try:
             self.raw = data

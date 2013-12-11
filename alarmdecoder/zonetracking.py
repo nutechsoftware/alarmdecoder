@@ -1,5 +1,7 @@
 """
-Provides zone tracking functionality for the Alarm Decoder (AD2) device family.
+Provides zone tracking functionality for the `Alarm Decoder`_ (AD2) device family.
+
+.. _Alarm Decoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -16,6 +18,7 @@ class Zone(object):
     Representation of a panel zone.
     """
 
+    # Constants
     CLEAR = 0
     """Status indicating that the zone is cleared."""
     FAULT = 1
@@ -25,15 +28,25 @@ class Zone(object):
 
     STATUS = {CLEAR: 'CLEAR', FAULT: 'FAULT', CHECK: 'CHECK'}
 
+    # Attributes
+    zone = 0
+    """Zone ID"""
+    name = ''
+    """Zone name"""
+    status = CLEAR
+    """Zone status"""
+    timestamp = None
+    """Timestamp of last update"""
+
     def __init__(self, zone=0, name='', status=CLEAR):
         """
         Constructor
 
-        :param zone: The zone number.
+        :param zone: zone number
         :type zone: int
-        :param name: Human readable zone name.
-        :type name: str
-        :param status: Initial zone state.
+        :param name: Human readable zone name
+        :type name: string
+        :param status: Initial zone state
         :type status: int
         """
         self.zone = zone
@@ -56,14 +69,52 @@ class Zone(object):
 
 class Zonetracker(object):
     """
-    Handles tracking of zone and their statuses.
+    Handles tracking of zones and their statuses.
     """
 
-    on_fault = event.Event('Called when the device detects a zone fault.')
-    on_restore = event.Event('Called when the device detects that a fault is restored.')
+    on_fault = event.Event('This event is called when the device detects a zone fault.')
+    on_restore = event.Event('This event is called when the device detects that a fault is restored.')
 
     EXPIRE = 30
     """Zone expiration timeout."""
+
+    @property
+    def zones(self):
+        """
+        Returns the current list of zones being tracked.
+
+        :returns: dictionary of :py:class:`Zone` being tracked
+        """
+        return self._zones
+
+    @zones.setter
+    def zones(self, value):
+        """
+        Sets the current list of zones being tracked.
+
+        :param value: new list of zones being tracked
+        :type value: dictionary of :py:class:`Zone` being tracked
+        """
+        self._zones = value
+
+    @property
+    def faulted(self):
+        """
+        Retrieves the current list of faulted zones.
+
+        :returns: list of faulted zones
+        """
+        return self._zones_faulted
+
+    @faulted.setter
+    def faulted(self, value):
+        """
+        Sets the current list of faulted zones.
+
+        :param value: new list of faulted zones
+        :type value: list of integers
+        """
+        self._zones_faulted = value
 
     def __init__(self):
         """
@@ -77,8 +128,8 @@ class Zonetracker(object):
         """
         Update zone statuses based on the current message.
 
-        :param message: Message to use to update the zone tracking.
-        :type message: Message or ExpanderMessage
+        :param message: message to use to update the zone tracking
+        :type message: :py:class:`alarmdecoder.messages.Message` or :py:class:`alarmdecoder.messages.ExpanderMessage`
         """
         if isinstance(message, ExpanderMessage):
             if message.type == ExpanderMessage.ZONE:
@@ -159,12 +210,12 @@ class Zonetracker(object):
         """
         Convert an address and channel into a zone number.
 
-        :param address: The expander address
+        :param address: expander address
         :type address: int
-        :param channel: The channel
+        :param channel: channel
         :type channel: int
 
-        :returns: The zone number associated with an address and channel.
+        :returns: zone number associated with an address and channel
         """
 
         # TODO: This is going to need to be reworked to support the larger
@@ -178,7 +229,7 @@ class Zonetracker(object):
         """
         Clear all expired zones from our status list.
 
-        :param zone: current zone being processed.
+        :param zone: current zone being processed
         :type zone: int
         """
         cleared_zones = []
@@ -251,11 +302,11 @@ class Zonetracker(object):
         """
         Adds a zone to the internal zone list.
 
-        :param zone: The zone number.
+        :param zone: zone number
         :type zone: int
-        :param name: Human readable zone name.
-        :type name: str
-        :param status: The zone status.
+        :param name: human readable zone name
+        :type name: string
+        :param status: zone status
         :type status: int
         """
         if not zone in self._zones:
@@ -268,9 +319,9 @@ class Zonetracker(object):
         """
         Updates a zones status.
 
-        :param zone: The zone number.
+        :param zone: zone number
         :type zone: int
-        :param status: The zone status.
+        :param status: zone status
         :type status: int
 
         :raises: IndexError
@@ -293,9 +344,9 @@ class Zonetracker(object):
         """
         Determine if a zone is expired or not.
 
-        :param zone: The zone number.
+        :param zone: zone number
         :type zone: int
 
-        :returns: Whether or not the zone is expired.
+        :returns: whether or not the zone is expired
         """
         return time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE
