@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from ..messages import Message, ExpanderMessage, RFMessage, LRRMessage
-from ..util import InvalidMessageError
+from alarmdecoder.messages import Message, ExpanderMessage, RFMessage, LRRMessage
+from alarmdecoder.util import InvalidMessageError
 
 
 class TestMessages(TestCase):

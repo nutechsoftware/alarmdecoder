@@ -8,8 +8,8 @@ import time
 import tempfile
 import os
 from OpenSSL import SSL, crypto
-from ..devices import USBDevice, SerialDevice, SocketDevice
-from ..util import NoDeviceError, CommError, TimeoutError
+from alarmdecoder.devices import USBDevice, SerialDevice, SocketDevice
+from alarmdecoder.util import NoDeviceError, CommError, TimeoutError
 
 
 class TestUSBDevice(TestCase):

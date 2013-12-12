@@ -1,8 +1,8 @@
 from unittest import TestCase
 from mock import Mock, MagicMock
 
-from ..messages import Message, ExpanderMessage
-from ..zonetracking import Zonetracker, Zone
+from alarmdecoder.messages import Message, ExpanderMessage
+from alarmdecoder.zonetracking import Zonetracker, Zone
 
 
 class TestZonetracking(TestCase):

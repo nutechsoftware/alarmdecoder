@@ -3,11 +3,11 @@ import time
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
 
-from ..decoder import AlarmDecoder
-from ..devices import USBDevice
-from ..messages import Message, RFMessage, LRRMessage, ExpanderMessage
-from ..event.event import Event, EventHandler
-from ..zonetracking import Zonetracker
+from alarmdecoder.decoder import AlarmDecoder
+from alarmdecoder.devices import USBDevice
+from alarmdecoder.messages import Message, RFMessage, LRRMessage, ExpanderMessage
+from alarmdecoder.event.event import Event, EventHandler
+from alarmdecoder.zonetracking import Zonetracker
 
 
 class TestAlarmDecoder(TestCase):
