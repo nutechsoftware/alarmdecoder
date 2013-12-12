@@ -12,7 +12,7 @@ def main():
     restores it.
 
     This is an advanced feature that allows you to emulate a virtual zone.  When
-    the Alarm Decoder is configured to emulate a relay expander we can fault and
+    the Alarm Decoder is configured to emulate a zone expander we can fault and
     restore those zones programmatically at will. These events can also be seen by
     others, such as home automation platforms which allows you to connect other
     devices or services and monitor them as you would any pyhysical zone.
