@@ -152,7 +152,14 @@
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_message">
 <tt class="descname">on_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>This event is called when any message is received.</p>
+<dd><p>This event is called when standard panel <a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a> is received.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_expander_message">
+<tt class="descname">on_expander_message</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_expander_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when an <a class="reference internal" href="#alarmdecoder.messages.ExpanderMessage" title="alarmdecoder.messages.ExpanderMessage"><tt class="xref py py-class docutils literal"><span class="pre">ExpanderMessage</span></tt></a> is received.</p>
 <p><strong>Callback definition:</strong> <em>def callback(device, message)</em></p>
 </dd></dl>
 
