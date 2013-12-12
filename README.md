@@ -16,6 +16,8 @@ AlarmDecoder can be installed through pip:
 or from source:
     ```python setup.py install```
 
+* Note: python-setuptools is required for installation.
+
 Requirements
 ------------
 * An [Alarm Decoder](http://www.alarmdecoder.com) device
