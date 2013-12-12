@@ -35,7 +35,8 @@ class AlarmDecoder(object):
     on_relay_changed = event.Event("This event is called when a relay is opened or closed on an expander board.\n\n**Callback definition:** *def callback(device, message)*")
 
     # Mid-level Events
-    on_message = event.Event("This event is called when any message is received.\n\n**Callback definition:** *def callback(device, message)*")
+    on_message = event.Event("This event is called when standard panel :py:class:`~alarmdecoder.messages.Message` is received.\n\n**Callback definition:** *def callback(device, message)*")
+    on_expander_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.ExpanderMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_lrr_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_rfx_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
 
@@ -286,9 +287,9 @@ class AlarmDecoder(object):
 
     def _handle_message(self, data):
         """
-        Parses messages from the panel.
+        Parses keypad messages from the panel.
 
-        :param data: panel data to parse
+        :param data: keypad data to parse
         :type data: string
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
@@ -300,15 +301,10 @@ class AlarmDecoder(object):
         header = data[0:4]
 
         if header[0] != '!' or header == '!KPE':
-            msg = Message(data)
-
-            if self.address_mask & msg.mask > 0:
-                self._update_internal_states(msg)
+            msg = self._handle_keypad_message(data)
 
         elif header == '!EXP' or header == '!REL':
-            msg = ExpanderMessage(data)
-
-            self._update_internal_states(msg)
+            msg = self._handle_expander_message(data)
 
         elif header == '!RFX':
             msg = self._handle_rfx(data)
@@ -321,6 +317,40 @@ class AlarmDecoder(object):
 
         elif data.startswith('!CONFIG'):
             self._handle_config(data)
+
+        return msg
+
+    def _handle_keypad_message(self, data):
+        """
+        Handle keypad messages.
+
+        :param data: keypad message to parse
+        :type data: string
+
+        :returns: :py:class:`~alarmdecoder.messages.Message`
+        """
+        msg = Message(data)
+
+        if self.address_mask & msg.mask > 0:
+            self._update_internal_states(msg)
+
+        self.on_message(message=msg)
+
+        return msg
+
+    def _handle_expander_message(self, data):
+        """
+        Handle expander messages.
+
+        :param data: expander message to parse
+        :type data: string
+
+        :returns: :py:class:`~alarmdecoder.messages.ExpanderMessage`
+        """
+        msg = ExpanderMessage(data)
+
+        self._update_internal_states(msg)
+        self.on_expander_message(message=msg)
 
         return msg
 
@@ -581,9 +611,7 @@ class AlarmDecoder(object):
         data = kwargs.get('data', None)
         self.on_read(data=data)
 
-        msg = self._handle_message(data)
-        if msg:
-            self.on_message(message=msg)
+        self._handle_message(data)
 
     def _on_write(self, sender, *args, **kwargs):
         """
