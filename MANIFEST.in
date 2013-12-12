@@ -1,3 +1,4 @@
 include README.md
 include LICENSE
-include docs/_build/html/*
+recursive-include docs/build *.*
+recursive-include examples *.py
