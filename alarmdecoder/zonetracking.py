@@ -1,7 +1,7 @@
 """
-Provides zone tracking functionality for the `Alarm Decoder`_ (AD2) device family.
+Provides zone tracking functionality for the `AlarmDecoder`_ (AD2) device family.
 
-.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AlarmDecoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """

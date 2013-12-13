@@ -5,7 +5,7 @@ from alarmdecoder import AlarmDecoder
 from alarmdecoder.devices import USBDevice
 
 # Configuration values
-SUBJECT = "Alarm Decoder - ALARM"
+SUBJECT = "AlarmDecoder - ALARM"
 FROM_ADDRESS = "root@localhost"
 TO_ADDRESS = "root@localhost"       # NOTE: Sending an SMS is as easy as looking
                                     # up the email address format for your provider.

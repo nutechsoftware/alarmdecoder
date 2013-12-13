@@ -1,5 +1,5 @@
 """
-This module contains different types of devices belonging to the `Alarm Decoder`_ (AD2) family.
+This module contains different types of devices belonging to the `AlarmDecoder`_ (AD2) family.
 
 * :py:class:`USBDevice`: Interfaces with the `AD2USB`_ device.
 * :py:class:`SerialDevice`: Interfaces with the `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_.
@@ -7,7 +7,7 @@ This module contains different types of devices belonging to the `Alarm Decoder`
   Also supports SSL if using `ser2sock`_.
 
 .. _ser2sock: http://github.com/nutechsoftware/ser2sock
-.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AlarmDecoder: http://www.alarmdecoder.com
 .. _AD2USB: http://www.alarmdecoder.com
 .. _AD2SERIAL: http://www.alarmdecoder.com
 .. _AD2PI: http://www.alarmdecoder.com
@@ -31,7 +31,7 @@ from .event import event
 
 class Device(object):
     """
-    Base class for all `Alarm Decoder`_ (AD2) device types.
+    Base class for all `AlarmDecoder`_ (AD2) device types.
     """
 
     # Generic device events
@@ -771,7 +771,7 @@ class SerialDevice(Device):
 
 class SocketDevice(Device):
     """
-    Device that supports communication with an `Alarm Decoder`_ (AD2) that is
+    Device that supports communication with an `AlarmDecoder`_ (AD2) that is
     exposed via `ser2sock`_ or another Serial to IP interface.
     """
 

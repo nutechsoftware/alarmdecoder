@@ -1,6 +1,6 @@
-Alarm Decoder
+AlarmDecoder
 =============
-#### Interface for the [Alarm Decoder](http://www.alarmdecoder.com) (AD2) device family ####
+#### Interface for the [AlarmDecoder](http://www.alarmdecoder.com) (AD2) device family ####
 
 
 This Python library aims to provide a consistent interface for the entire [Alarm
@@ -20,7 +20,7 @@ or from source:
 
 Requirements
 ------------
-* An [Alarm Decoder](http://www.alarmdecoder.com) device
+* An [AlarmDecoder](http://www.alarmdecoder.com) device
 * Python 2.7
 * [pyftdi](https://github.com/eblot/pyftdi) >= 0.9.0
 * [pyusb](http://sourceforge.net/apps/trac/pyusb/) >= 1.0.0b1

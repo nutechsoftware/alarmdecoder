@@ -1,5 +1,5 @@
 """
-Message representations received from the panel through the `Alarm Decoder`_ (AD2)
+Message representations received from the panel through the `AlarmDecoder`_ (AD2)
 devices.
 
 * :py:class:`Message`: The standard and most common message received from a panel.
@@ -7,7 +7,7 @@ devices.
 * :py:class:`RFMessage`: Message received from an RF receiver module.
 * :py:class:`LRRMessage`: Message received from a long-range radio module.
 
-.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AlarmDecoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """

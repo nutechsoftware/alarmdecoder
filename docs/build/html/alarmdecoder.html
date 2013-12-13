@@ -57,7 +57,7 @@
 <dt id="alarmdecoder.decoder.AlarmDecoder">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.decoder.</tt><tt class="descname">AlarmDecoder</tt><big>(</big><em>device</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>High-level wrapper around <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) devices.</p>
+<p>High-level wrapper around <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) devices.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_arm">
 <tt class="descname">on_arm</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_arm" title="Permalink to this definition">¶</a></dt>
@@ -286,7 +286,7 @@
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.id">
 <tt class="descname">id</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.id" title="Permalink to this definition">¶</a></dt>
-<dd><p>The ID of the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
+<dd><p>The ID of the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -353,7 +353,7 @@ thread should be started.</li>
 <dl class="method">
 <dt id="alarmdecoder.decoder.AlarmDecoder.send">
 <tt class="descname">send</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends data to the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
+<dd><p>Sends data to the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -419,7 +419,7 @@ thread should be started.</li>
 </div>
 <div class="section" id="module-alarmdecoder.devices">
 <span id="devices-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">devices</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.devices" title="Permalink to this headline">¶</a></h2>
-<p>This module contains different types of devices belonging to the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) family.</p>
+<p>This module contains different types of devices belonging to the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) family.</p>
 <ul class="simple">
 <li><a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a>: Interfaces with the <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a> device.</li>
 <li><a class="reference internal" href="#alarmdecoder.devices.SerialDevice" title="alarmdecoder.devices.SerialDevice"><tt class="xref py py-class docutils literal"><span class="pre">SerialDevice</span></tt></a>: Interfaces with the <a class="reference external" href="http://www.alarmdecoder.com">AD2USB</a>, <a class="reference external" href="http://www.alarmdecoder.com">AD2SERIAL</a> or <a class="reference external" href="http://www.alarmdecoder.com">AD2PI</a>.</li>
@@ -430,7 +430,7 @@ Also supports SSL if using <a class="reference external" href="http://github.com
 <dt id="alarmdecoder.devices.Device">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">Device</tt><a class="reference internal" href="_modules/alarmdecoder/devices.html#Device"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.Device" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Base class for all <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) device types.</p>
+<p>Base class for all <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) device types.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.Device.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.devices.Device.on_open" title="Permalink to this definition">¶</a></dt>
@@ -919,7 +919,7 @@ reading.</li>
 <dt id="alarmdecoder.devices.SocketDevice">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.devices.</tt><tt class="descname">SocketDevice</tt><big>(</big><em>interface=('localhost'</em>, <em>10000)</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#alarmdecoder.devices.Device" title="alarmdecoder.devices.Device"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.devices.Device</span></tt></a></p>
-<p>Device that supports communication with an <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) that is
+<p>Device that supports communication with an <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) that is
 exposed via <a class="reference external" href="http://github.com/nutechsoftware/ser2sock">ser2sock</a> or another Serial to IP interface.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.devices.SocketDevice.interface">
@@ -1084,7 +1084,7 @@ reading.</li>
 </div>
 <div class="section" id="module-alarmdecoder.messages">
 <span id="messages-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">messages</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.messages" title="Permalink to this headline">¶</a></h2>
-<p>Message representations received from the panel through the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2)
+<p>Message representations received from the panel through the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2)
 devices.</p>
 <ul class="simple">
 <li><a class="reference internal" href="#alarmdecoder.messages.Message" title="alarmdecoder.messages.Message"><tt class="xref py py-class docutils literal"><span class="pre">Message</span></tt></a>: The standard and most common message received from a panel.</li>
@@ -1352,7 +1352,7 @@ devices.</p>
 </div>
 <div class="section" id="module-alarmdecoder.zonetracking">
 <span id="zonetracking-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">zonetracking</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.zonetracking" title="Permalink to this headline">¶</a></h2>
-<p>Provides zone tracking functionality for the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) device family.</p>
+<p>Provides zone tracking functionality for the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) device family.</p>
 <dl class="class">
 <dt id="alarmdecoder.zonetracking.Zone">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
@@ -1500,7 +1500,7 @@ devices.</p>
 </div>
 <div class="section" id="module-alarmdecoder.util">
 <span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-alarmdecoder.util" title="Permalink to this headline">¶</a></h2>
-<p>Provides utility classes for the <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> (AD2) devices.</p>
+<p>Provides utility classes for the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) devices.</p>
 <dl class="exception">
 <dt id="alarmdecoder.util.NoDeviceError">
 <em class="property">exception </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">NoDeviceError</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#NoDeviceError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.NoDeviceError" title="Permalink to this definition">¶</a></dt>
@@ -1533,7 +1533,7 @@ devices.</p>
 <dt id="alarmdecoder.util.Firmware">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">Firmware</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Represents firmware for the Alarm Decoder devices.</p>
+<p>Represents firmware for the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> devices.</p>
 <dl class="attribute">
 <dt id="alarmdecoder.util.Firmware.STAGE_START">
 <tt class="descname">STAGE_START</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.util.Firmware.STAGE_START" title="Permalink to this definition">¶</a></dt>
@@ -1567,7 +1567,7 @@ devices.</p>
 <dl class="staticmethod">
 <dt id="alarmdecoder.util.Firmware.upload">
 <em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uploads firmware to an <a class="reference external" href="http://www.alarmdecoder.com">Alarm Decoder</a> device.</p>
+<dd><p>Uploads firmware to an <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

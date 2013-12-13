@@ -1,7 +1,7 @@
 """
 Provides the main AlarmDecoder class.
 
-.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AlarmDecoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -16,7 +16,7 @@ from .zonetracking import Zonetracker
 
 class AlarmDecoder(object):
     """
-    High-level wrapper around `Alarm Decoder`_ (AD2) devices.
+    High-level wrapper around `AlarmDecoder`_ (AD2) devices.
     """
 
     # High-level Events
@@ -81,7 +81,7 @@ class AlarmDecoder(object):
         """
         Constructor
 
-        :param device: The low-level device used for this `Alarm Decoder`_
+        :param device: The low-level device used for this `AlarmDecoder`_
                        interface.
         :type device: Device
         """
@@ -124,7 +124,7 @@ class AlarmDecoder(object):
     @property
     def id(self):
         """
-        The ID of the `Alarm Decoder`_ device.
+        The ID of the `AlarmDecoder`_ device.
 
         :returns: identification string for the device
         """
@@ -195,7 +195,7 @@ class AlarmDecoder(object):
 
     def send(self, data):
         """
-        Sends data to the `Alarm Decoder`_ device.
+        Sends data to the `AlarmDecoder`_ device.
 
         :param data: data to send
         :type data: string

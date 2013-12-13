@@ -1,7 +1,7 @@
 """
-Provides utility classes for the `Alarm Decoder`_ (AD2) devices.
+Provides utility classes for the `AlarmDecoder`_ (AD2) devices.
 
-.. _Alarm Decoder: http://www.alarmdecoder.com
+.. _AlarmDecoder: http://www.alarmdecoder.com
 
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
@@ -40,7 +40,7 @@ class InvalidMessageError(Exception):
 
 class Firmware(object):
     """
-    Represents firmware for the Alarm Decoder devices.
+    Represents firmware for the `AlarmDecoder`_ devices.
     """
 
     # Constants
@@ -55,7 +55,7 @@ class Firmware(object):
     @staticmethod
     def upload(dev, filename, progress_callback=None):
         """
-        Uploads firmware to an `Alarm Decoder`_ device.
+        Uploads firmware to an `AlarmDecoder`_ device.
 
         :param filename: firmware filename
         :type filename: string

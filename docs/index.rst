@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Alarm Decoder's documentation!
-========================================
+=========================================
 
 .. _Alarm Decoder: http://www.alarmdecoder.com
 .. _examples: http://github.com/nutechsoftware/alarmdecoder/tree/master/examples

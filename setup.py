@@ -10,7 +10,7 @@ def readme():
 
 setup(name='alarmdecoder',
     version='0.5',
-    description='Python interface library for the Alarm Decoder (AD2) family '
+    description='Python interface library for the AlarmDecoder (AD2) family '
                 'of alarm devices, including: the AD2USB, AD2SERIAL and AD2PI.',
     long_description=readme(),
     classifiers=[
