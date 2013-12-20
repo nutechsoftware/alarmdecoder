@@ -10,8 +10,10 @@
 ============
 AlarmDecoder
 ============
-#### Interface for the `AlarmDecoder`_ (AD2) device family ####
 
+-------
+Summary
+-------
 
 This Python library aims to provide a consistent interface for the `AlarmDecoder`_ product line. (AD2USB, AD2SERIAL and AD2PI)
 This also includes devices that have been exposed via `ser2sock`_, which
