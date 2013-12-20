@@ -3,8 +3,8 @@ AlarmDecoder
 #### Interface for the [AlarmDecoder](http://www.alarmdecoder.com) (AD2) device family ####
 
 
-This Python library aims to provide a consistent interface for the entire [Alarm
-Decoder](http://www.alarmdecoder.com) product line, including the AD2USB, AD2SERIAL and AD2PI devices.
+This Python library aims to provide a consistent interface for the [Alarm
+Decoder](http://www.alarmdecoder.com) product line. (AD2USB, AD2SERIAL and AD2PI)
 This also includes devices that have been exposed via [ser2sock](http://github.com/nutechsoftware/ser2sock), which
 supports encryption via SSL/TLS.
 
@@ -29,7 +29,7 @@ Requirements
 
 Documentation
 -------------
-API documentation can be found [here](http://github.com/nutechsoftware/alarmdecoder/tree/master/docs/build/html).
+API documentation can be found [here](http://alarmdecoder.readthedocs.org).
 
 Examples
 --------
