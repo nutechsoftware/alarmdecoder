@@ -5,7 +5,7 @@ from setuptools import setup
 def readme():
     """Returns the contents of README.md"""
 
-    with open('README.md') as readme_file:
+    with open('README.rst') as readme_file:
         return readme_file.read()
 
 setup(name='alarmdecoder',
