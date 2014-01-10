@@ -300,7 +300,7 @@ class AlarmDecoder(object):
         msg = None
         header = data[0:4]
 
-        if header[0] != '!' or header == '!KPE':
+        if header[0] != '!' or header == '!KPM':
             msg = self._handle_keypad_message(data)
 
         elif header == '!EXP' or header == '!REL':

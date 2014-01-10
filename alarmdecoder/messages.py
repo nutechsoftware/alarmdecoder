@@ -97,7 +97,7 @@ class Message(BaseMessage):
         """
         BaseMessage.__init__(self)
 
-        self._regex = re.compile('^(!KPE:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
+        self._regex = re.compile('^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
 
         if data is not None:
             self._parse_message(data)
