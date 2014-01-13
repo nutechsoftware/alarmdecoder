@@ -142,7 +142,7 @@ class TestAlarmDecoder(TestCase):
         self.assertTrue(self._message_received)
 
     def test_message_kpe(self):
-        msg = self._decoder._handle_message('!KPE:[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        msg = self._decoder._handle_message('!KPM:[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertIsInstance(msg, Message)
 
         self._decoder._on_read(self, data='[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
