@@ -152,8 +152,6 @@ class Device(object):
                 except Exception:
                     self._running = False
 
-                time.sleep(0.01)
-
 
 class USBDevice(Device):
     """
@@ -467,6 +465,8 @@ class USBDevice(Device):
                         if len(self._buffer) > 0:
                             got_line = True
                             break
+                else:
+                    time.sleep(0.01)
 
         except (usb.core.USBError, FtdiError), err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
@@ -750,6 +750,8 @@ class SerialDevice(Device):
                         if len(self._buffer) > 0:
                             got_line = True
                             break
+                else:
+                    time.sleep(0.01)
 
         except (OSError, serial.SerialException), err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
@@ -1025,6 +1027,8 @@ class SocketDevice(Device):
                         if len(self._buffer) > 0:
                             got_line = True
                             break
+                else:
+                    time.sleep(0.01)
 
         except socket.error, err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
