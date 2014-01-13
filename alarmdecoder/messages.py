@@ -13,6 +13,7 @@ devices.
 """
 
 import re
+import datetime
 
 from .util import InvalidMessageError
 
@@ -25,11 +26,14 @@ class BaseMessage(object):
     raw = None
     """The raw message text"""
 
+    timestamp = None
+    """The timestamp of the message"""
+
     def __init__(self):
         """
         Constructor
         """
-        pass
+        self.timestamp = datetime.datetime.now()
 
     def __str__(self):
         """
