@@ -25,7 +25,7 @@ import socket
 
 from OpenSSL import SSL, crypto
 from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
-from .util import CommError, TimeoutError, NoDeviceError
+from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
 
 
@@ -149,7 +149,10 @@ class Device(object):
                 except TimeoutError:
                     pass
 
-                except Exception:
+                except InvalidMessageError:
+                    pass
+
+                except Exception, err:
                     self._running = False
 
 
@@ -234,7 +237,10 @@ class USBDevice(Device):
         """
         cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
 
-        cls.find_all()
+        try:
+            cls.find_all()
+        except CommError:
+            pass
 
         cls.__detect_thread.start()
 
@@ -389,6 +395,9 @@ class USBDevice(Device):
 
         except Exception:
             pass
+
+    def fileno(self):
+        raise NotImplementedError('USB devices do not support fileno()')
 
     def write(self, data):
         """
@@ -670,6 +679,9 @@ class SerialDevice(Device):
         except Exception:
             pass
 
+    def fileno(self):
+        return self._device.fileno()
+
     def write(self, data):
         """
         Writes data to the device.
@@ -943,6 +955,9 @@ class SocketDevice(Device):
 
         except Exception:
             pass
+
+    def fileno(self):
+        return self._device.fileno()
 
     def write(self, data):
         """

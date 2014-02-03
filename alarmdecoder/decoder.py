@@ -66,7 +66,7 @@ class AlarmDecoder(object):
     """The keypad address in use by the device."""
     configbits = 0xFF00
     """The configuration bits set on the device."""
-    address_mask = 0x00000000
+    address_mask = 0xFFFFFFFF
     """The address mask configured on the device."""
     emulate_zone = [False for _ in range(5)]
     """List containing the devices zone emulation status."""
