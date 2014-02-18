@@ -294,6 +294,8 @@ class AlarmDecoder(object):
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
+        data = data.lstrip('\0')
+
         if data is None:
             raise InvalidMessageError()
 
