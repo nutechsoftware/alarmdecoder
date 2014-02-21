@@ -152,8 +152,16 @@ class Device(object):
                 except InvalidMessageError:
                     pass
 
+                except SSL.WantReadError:
+                    pass
+
+                except CommError, err:
+                    self._device.close()
+
                 except Exception, err:
+                    self._device.close()
                     self._running = False
+                    raise
 
 
 class USBDevice(Device):
@@ -920,9 +928,15 @@ class SocketDevice(Device):
                 self._init_ssl()
 
             self._device.connect((self._host, self._port))
+            #self._device.setblocking(1)
 
             if self._use_ssl:
-                self._device.do_handshake()
+                while True:
+                    try:
+                        self._device.do_handshake()
+                        break
+                    except SSL.WantReadError:
+                        pass
 
             self._id = '{0}:{1}'.format(self._host, self._port)
 
@@ -951,10 +965,10 @@ class SocketDevice(Device):
                 # Make sure that it closes immediately.
                 self._device.shutdown(socket.SHUT_RDWR)
 
-            Device.close(self)
-
         except Exception:
             pass
+
+        Device.close(self)
 
     def fileno(self):
         return self._device.fileno()
@@ -1047,6 +1061,10 @@ class SocketDevice(Device):
 
         except socket.error, err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
+
+        except SSL.SysCallError, err:
+            errno, msg = err
+            raise CommError('SSL error while reading from device: {0} ({1})'.format(msg, errno))
 
         else:
             if got_line:
