@@ -665,8 +665,8 @@ class SerialDevice(Device):
             #       all issues with it.
             self._device.baudrate = baudrate
 
-        except (serial.SerialException, ValueError), err:
-            raise NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
+        except (serial.SerialException, ValueError, OSError), err:
+            raise NoDeviceError('Error opening device on {0}.'.format(self._port), err)
 
         else:
             self._running = True
