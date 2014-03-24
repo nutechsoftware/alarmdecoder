@@ -7,6 +7,7 @@ Provides the main AlarmDecoder class.
 """
 
 import time
+import re
 
 from .event import event
 from .util import InvalidMessageError
@@ -39,6 +40,7 @@ class AlarmDecoder(object):
     on_expander_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.ExpanderMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_lrr_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_rfx_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
+    on_sending_received = event.Event("This event is called when a !Sending.done message is received from the AlarmDecoder.\n\n**Callback definition:** *def callback(device, status, message)*")
 
     # Low-level Events
     on_open = event.Event("This event is called when the device has been opened.\n\n**Callback definition:** *def callback(device)*")
@@ -55,6 +57,8 @@ class AlarmDecoder(object):
     """Represents panel function key #3"""
     KEY_F4 = unichr(4) + unichr(4) + unichr(4)
     """Represents panel function key #4"""
+    KEY_PANIC = unichr(5) + unichr(5) + unichr(5)
+    """Represents a panic keypress"""
 
     BATTERY_TIMEOUT = 30
     """Default timeout (in seconds) before the battery status reverts."""
@@ -200,8 +204,9 @@ class AlarmDecoder(object):
         :param data: data to send
         :type data: string
         """
+
         if self._device:
-            self._device.write(data)
+            self._device.write(str(data))
 
     def get_config(self):
         """
@@ -294,9 +299,11 @@ class AlarmDecoder(object):
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
-        data = data.lstrip('\0')
 
-        if data is None:
+        if data is not None:
+            data = data.lstrip('\0')
+
+        if data is None or data == '':
             raise InvalidMessageError()
 
         msg = None
@@ -319,6 +326,9 @@ class AlarmDecoder(object):
 
         elif data.startswith('!CONFIG'):
             self._handle_config(data)
+
+        elif data.startswith('!Sending'):
+            self._handle_sending(data)
 
         return msg
 
@@ -422,6 +432,22 @@ class AlarmDecoder(object):
                 self.deduplicate = (val == 'Y')
 
         self.on_config_received()
+
+    def _handle_sending(self, data):
+        """
+        Handles results of a keypress send.
+
+        :param data: Sending string to parse
+        :type data: string
+        """
+
+        matches = re.match('^!Sending(\.{1,5})done.*', data)
+        if matches is not None:
+            good_send = False
+            if len(matches.group(1)) < 5:
+                good_send = True
+
+            self.on_sending_received(status=good_send, message=data)
 
     def _update_internal_states(self, message):
         """

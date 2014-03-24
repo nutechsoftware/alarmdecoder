@@ -1066,6 +1066,9 @@ class SocketDevice(Device):
             errno, msg = err
             raise CommError('SSL error while reading from device: {0} ({1})'.format(msg, errno))
 
+        except Exception:
+            raise
+
         else:
             if got_line:
                 ret, self._buffer = self._buffer, ''
