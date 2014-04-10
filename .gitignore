@@ -5,3 +5,4 @@ tmp
 *.pyo
 *.egg-info
 bin/ad2-test
+*~
