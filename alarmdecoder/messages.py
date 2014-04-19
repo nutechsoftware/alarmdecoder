@@ -41,6 +41,18 @@ class BaseMessage(object):
         """
         return self.raw
 
+    def dict(self, **kwargs):
+      """
+      Dictionary representation.
+      """
+      return dict(time=self.timestamp, mesg=self.raw, **kwargs)
+
+    def __repr__(self):
+        """
+        String representation.
+        """
+        return repr(self.dict())
+
 
 class Message(BaseMessage):
     """
@@ -106,12 +118,6 @@ class Message(BaseMessage):
         if data is not None:
             self._parse_message(data)
 
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return self.raw
-
     def _parse_message(self, data):
         """
         Parse the message from the device.
@@ -155,6 +161,37 @@ class Message(BaseMessage):
             # Current cursor location on the alpha display.
             self.cursor_location = int(self.bitfield[21:23], 16)
 
+    def dict(self, **kwargs):
+        """
+        Dictionary representation.
+        """
+        return dict(
+          time                  = self.timestamp,
+          bitfield              = self.bitfield,
+          numeric_code          = self.numeric_code,
+          panel_data            = self.panel_data,
+          mask                  = self.mask,
+          ready                 = self.ready,
+          armed_away            = self.armed_away,
+          armed_home            = self.armed_home,
+          backlight_on          = self.backlight_on,
+          programming_mode      = self.programming_mode,
+          beeps                 = self.beeps,
+          zone_bypassed         = self.zone_bypassed,
+          ac_power              = self.ac_power,
+          chime_on              = self.chime_on,
+          alarm_event_occurred  = self.alarm_event_occurred,
+          alarm_sounding        = self.alarm_sounding,
+          battery_low           = self.battery_low,
+          entry_delay_off       = self.entry_delay_off,
+          fire_alarm            = self.fire_alarm,
+          check_zone            = self.check_zone,
+          perimeter_only        = self.perimeter_only,
+          text                  = self.text,
+          cursor_location       = self.cursor_location,
+          **kwargs
+        )
+
 
 class ExpanderMessage(BaseMessage):
     """
@@ -187,12 +224,6 @@ class ExpanderMessage(BaseMessage):
         if data is not None:
             self._parse_message(data)
 
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return self.raw
-
     def _parse_message(self, data):
         """
         Parse the raw message from the device.
@@ -220,6 +251,18 @@ class ExpanderMessage(BaseMessage):
             self.type = ExpanderMessage.RELAY
         else:
             raise InvalidMessageError('Unknown expander message header: {0}'.format(data))
+
+    def dict(self, **kwargs):
+        """
+        Dictionary representation.
+        """
+        return dict(
+          time                  = self.timestamp,
+          address               = self.address,
+          channel               = self.channel,
+          value                 = self.value,
+          **kwargs
+        )
 
 
 class RFMessage(BaseMessage):
@@ -249,12 +292,6 @@ class RFMessage(BaseMessage):
 
         if data is not None:
             self._parse_message(data)
-
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return self.raw
 
     def _parse_message(self, data):
         """
@@ -286,6 +323,19 @@ class RFMessage(BaseMessage):
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
+    def dict(self, **kwargs):
+        """
+        Dictionary representation.
+        """
+        return dict(
+          time                  = self.timestamp,
+          serial_number         = self.serial_number,
+          value                 = self.value,
+          battery               = self.battery,
+          supervision           = self.supervision,
+          **kwargs
+        )
+
 
 class LRRMessage(BaseMessage):
     """
@@ -311,12 +361,6 @@ class LRRMessage(BaseMessage):
         if data is not None:
             self._parse_message(data)
 
-    def __str__(self):
-        """
-        String conversion operator.
-        """
-        return self.raw
-
     def _parse_message(self, data):
         """
         Parses the raw message from the device.
@@ -334,3 +378,15 @@ class LRRMessage(BaseMessage):
 
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
+
+    def dict(self, **kwargs):
+        """
+        Dictionary representation.
+        """
+        return dict(
+          time                  = self.timestamp,
+          event_data            = self.event_data,
+          event_type            = self.event_type,
+          partition             = self.partition,
+          **kwargs
+        )
