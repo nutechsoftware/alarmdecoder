@@ -2,5 +2,7 @@ build/
 dist
 tmp
 *.pyc
+*.pyo
 *.egg-info
 bin/ad2-test
+*~
