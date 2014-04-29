@@ -25,7 +25,7 @@ import socket
 
 from OpenSSL import SSL, crypto
 from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
-from .util import CommError, TimeoutError, NoDeviceError
+from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
 
 
@@ -149,8 +149,19 @@ class Device(object):
                 except TimeoutError:
                     pass
 
-                except Exception:
+                except InvalidMessageError:
+                    pass
+
+                except SSL.WantReadError:
+                    pass
+
+                except CommError, err:
+                    self._device.close()
+
+                except Exception, err:
+                    self._device.close()
                     self._running = False
+                    raise
 
 
 class USBDevice(Device):
@@ -234,7 +245,10 @@ class USBDevice(Device):
         """
         cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
 
-        cls.find_all()
+        try:
+            cls.find_all()
+        except CommError:
+            pass
 
         cls.__detect_thread.start()
 
@@ -389,6 +403,9 @@ class USBDevice(Device):
 
         except Exception:
             pass
+
+    def fileno(self):
+        raise NotImplementedError('USB devices do not support fileno()')
 
     def write(self, data):
         """
@@ -648,8 +665,8 @@ class SerialDevice(Device):
             #       all issues with it.
             self._device.baudrate = baudrate
 
-        except (serial.SerialException, ValueError), err:
-            raise NoDeviceError('Error opening device on port {0}.'.format(self._port), err)
+        except (serial.SerialException, ValueError, OSError), err:
+            raise NoDeviceError('Error opening device on {0}.'.format(self._port), err)
 
         else:
             self._running = True
@@ -669,6 +686,9 @@ class SerialDevice(Device):
 
         except Exception:
             pass
+
+    def fileno(self):
+        return self._device.fileno()
 
     def write(self, data):
         """
@@ -908,9 +928,15 @@ class SocketDevice(Device):
                 self._init_ssl()
 
             self._device.connect((self._host, self._port))
+            #self._device.setblocking(1)
 
             if self._use_ssl:
-                self._device.do_handshake()
+                while True:
+                    try:
+                        self._device.do_handshake()
+                        break
+                    except SSL.WantReadError:
+                        pass
 
             self._id = '{0}:{1}'.format(self._host, self._port)
 
@@ -939,10 +965,13 @@ class SocketDevice(Device):
                 # Make sure that it closes immediately.
                 self._device.shutdown(socket.SHUT_RDWR)
 
-            Device.close(self)
-
         except Exception:
             pass
+
+        Device.close(self)
+
+    def fileno(self):
+        return self._device.fileno()
 
     def write(self, data):
         """
@@ -1032,6 +1061,13 @@ class SocketDevice(Device):
 
         except socket.error, err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
+
+        except SSL.SysCallError, err:
+            errno, msg = err
+            raise CommError('SSL error while reading from device: {0} ({1})'.format(msg, errno))
+
+        except Exception:
+            raise
 
         else:
             if got_line:

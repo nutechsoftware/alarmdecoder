@@ -31,6 +31,9 @@ class EventHandler(object):
         self.event = event
         self.obj = obj
 
+    def __iter__(self):
+        return iter(self._getfunctionlist())
+
     def _getfunctionlist(self):
 
         """(internal use) """
