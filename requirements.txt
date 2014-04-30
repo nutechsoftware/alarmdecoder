@@ -1,7 +1,12 @@
+Jinja2==2.7.2
+MarkupSafe==0.21
+Pygments==1.6
+Sphinx==1.2.2
 argparse==1.2.1
 cffi==0.8.2
 cryptography==0.3
 distribute==0.6.24
+docutils==0.11
 pyOpenSSL==0.14
 pycparser==2.10
 pyftdi==0.9.0
