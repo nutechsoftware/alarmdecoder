@@ -1,0 +1,11 @@
+argparse==1.2.1
+cffi==0.8.2
+cryptography==0.3
+distribute==0.6.24
+pyOpenSSL==0.14
+pycparser==2.10
+pyftdi==0.9.0
+pyserial==2.7
+pyusb==1.0.0b1
+six==1.6.1
+wsgiref==0.1.2
