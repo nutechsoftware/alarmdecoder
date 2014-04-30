@@ -178,6 +178,13 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.on_sending_received">
+<tt class="descname">on_sending_received</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_sending_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>This event is called when a !Sending.done message is received from the AlarmDecoder.</p>
+<p><strong>Callback definition:</strong> <em>def callback(device, status, message)</em></p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.on_open">
 <tt class="descname">on_open</tt><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.on_open" title="Permalink to this definition">¶</a></dt>
 <dd><p>This event is called when the device has been opened.</p>
@@ -230,6 +237,12 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.KEY_PANIC">
+<tt class="descname">KEY_PANIC</tt><em class="property"> = u'\x05\x05\x05'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.KEY_PANIC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a panic keypress</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.BATTERY_TIMEOUT">
 <tt class="descname">BATTERY_TIMEOUT</tt><em class="property"> = 30</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.BATTERY_TIMEOUT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Default timeout (in seconds) before the battery status reverts.</p>
@@ -255,7 +268,7 @@
 
 <dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.address_mask">
-<tt class="descname">address_mask</tt><em class="property"> = 0</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.address_mask" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">address_mask</tt><em class="property"> = 4294967295</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.address_mask" title="Permalink to this definition">¶</a></dt>
 <dd><p>The address mask configured on the device.</p>
 </dd></dl>
 
@@ -694,6 +707,11 @@ reader thread.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="alarmdecoder.devices.USBDevice.fileno">
+<tt class="descname">fileno</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.fileno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.fileno" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="alarmdecoder.devices.USBDevice.write">
 <tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes data to the device.</p>
@@ -855,6 +873,11 @@ reader thread.</li>
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SerialDevice.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SerialDevice.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes the device.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.devices.SerialDevice.fileno">
+<tt class="descname">fileno</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SerialDevice.fileno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SerialDevice.fileno" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="alarmdecoder.devices.SerialDevice.write">
@@ -1021,6 +1044,11 @@ thread.</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="alarmdecoder.devices.SocketDevice.fileno">
+<tt class="descname">fileno</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice.fileno"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice.fileno" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="alarmdecoder.devices.SocketDevice.write">
 <tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Writes data to the device.</p>
@@ -1101,6 +1129,18 @@ devices.</p>
 <dt id="alarmdecoder.messages.BaseMessage.raw">
 <tt class="descname">raw</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.BaseMessage.raw" title="Permalink to this definition">¶</a></dt>
 <dd><p>The raw message text</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.messages.BaseMessage.timestamp">
+<tt class="descname">timestamp</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.BaseMessage.timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>The timestamp of the message</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.messages.BaseMessage.dict">
+<tt class="descname">dict</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#BaseMessage.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.BaseMessage.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1242,6 +1282,12 @@ devices.</p>
 <dd><p>The panel data field associated with this message.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="alarmdecoder.messages.Message.dict">
+<tt class="descname">dict</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#Message.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.Message.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1285,6 +1331,12 @@ devices.</p>
 <dd><p>Value associated with the message</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="alarmdecoder.messages.ExpanderMessage.dict">
+<tt class="descname">dict</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#ExpanderMessage.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.ExpanderMessage.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1322,6 +1374,12 @@ devices.</p>
 <dd><p>Loop indicators</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="alarmdecoder.messages.RFMessage.dict">
+<tt class="descname">dict</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#RFMessage.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.RFMessage.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1345,6 +1403,12 @@ devices.</p>
 <dt id="alarmdecoder.messages.LRRMessage.event_type">
 <tt class="descname">event_type</tt><em class="property"> = None</em><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.event_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The type of the event that occurred.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.messages.LRRMessage.dict">
+<tt class="descname">dict</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/messages.html#LRRMessage.dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.messages.LRRMessage.dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dictionary representation.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1434,7 +1498,7 @@ devices.</p>
 
 <dl class="attribute">
 <dt id="alarmdecoder.zonetracking.Zonetracker.zones">
-<tt class="descname">zones</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.zones" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">zones</tt><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.zones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.zones" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the current list of zones being tracked.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1448,7 +1512,7 @@ devices.</p>
 
 <dl class="attribute">
 <dt id="alarmdecoder.zonetracking.Zonetracker.faulted">
-<tt class="descname">faulted</tt><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.faulted" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">faulted</tt><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.faulted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.faulted" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieves the current list of faulted zones.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
