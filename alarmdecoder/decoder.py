@@ -13,6 +13,7 @@ from .event import event
 from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
+from .panels import MODES, ADEMCO, DSC
 
 
 class AlarmDecoder(object):
@@ -80,6 +81,8 @@ class AlarmDecoder(object):
     """The status of the devices LRR emulation."""
     deduplicate = False
     """The status of message deduplication as configured on the device."""
+    mode = ADEMCO
+    """The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC."""
 
     def __init__(self, device):
         """
@@ -110,6 +113,7 @@ class AlarmDecoder(object):
         self.emulate_relay = [False for x in range(4)]
         self.emulate_lrr = False
         self.deduplicate = False
+        self.mode = ADEMCO
 
     def __enter__(self):
         """
@@ -222,20 +226,16 @@ class AlarmDecoder(object):
         config_entries = []
 
         # HACK: This is ugly.. but I can't think of an elegant way of doing it.
-        config_entries.append(('ADDRESS',
-                               '{0}'.format(self.address)))
-        config_entries.append(('CONFIGBITS',
-                               '{0:x}'.format(self.configbits)))
-        config_entries.append(('MASK',
-                               '{0:x}'.format(self.address_mask)))
+        config_entries.append(('ADDRESS', '{0}'.format(self.address)))
+        config_entries.append(('CONFIGBITS', '{0:x}'.format(self.configbits)))
+        config_entries.append(('MASK', '{0:x}'.format(self.address_mask)))
         config_entries.append(('EXP',
                                ''.join(['Y' if z else 'N' for z in self.emulate_zone])))
         config_entries.append(('REL',
                                ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
-        config_entries.append(('LRR',
-                               'Y' if self.emulate_lrr else 'N'))
-        config_entries.append(('DEDUPLICATE',
-                               'Y' if self.deduplicate else 'N'))
+        config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
+        config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
+        config_entries.append(('MODE', MODES.keys()[MODES.values().index(self.mode)]))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -430,6 +430,8 @@ class AlarmDecoder(object):
                 self.emulate_lrr = (val == 'Y')
             elif key == 'DEDUPLICATE':
                 self.deduplicate = (val == 'Y')
+            elif key == 'MODE':
+                self.mode = MODES[val]
 
         self.on_config_received()
 
