@@ -164,7 +164,7 @@ class Message(BaseMessage):
         self.perimeter_only = is_bit_set(16)
         self.system_fault = is_bit_set(17)
         if self.bitfield[18] in MODES.keys():
-            self.panel_type = MODES.keys()[MODES.values().index(self.bitfield[18])])
+            self.panel_type = MODES[self.bitfield[18]]
         # pos 20-21 - Unused.
         self.text = alpha.strip('"')
 
