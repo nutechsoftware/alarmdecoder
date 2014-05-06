@@ -106,7 +106,7 @@ class Message(BaseMessage):
     """The human-readable text to be displayed on the panel LCD."""
     cursor_location = -1
     """Current cursor location on the keypad."""
-    mask = None
+    mask = 0xFFFFFFFF
     """Address mask this message is intended for."""
     bitfield = None
     """The bitfield associated with this message."""
@@ -142,7 +142,6 @@ class Message(BaseMessage):
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
 
         header, self.bitfield, self.numeric_code, self.panel_data, alpha = match.group(1, 2, 3, 4, 5)
-        self.mask = int(self.panel_data[3:3+8], 16)
 
         is_bit_set = lambda bit: not self.bitfield[bit] == "0"
 
@@ -169,9 +168,12 @@ class Message(BaseMessage):
         # pos 20-21 - Unused.
         self.text = alpha.strip('"')
 
-        if int(self.panel_data[19:21], 16) & 0x01 > 0:
-            # Current cursor location on the alpha display.
-            self.cursor_location = int(self.bitfield[21:23], 16)
+        if self.panel_type == ADEMCO:
+            self.mask = int(self.panel_data[3:3+8], 16)
+
+            if int(self.panel_data[19:21], 16) & 0x01 > 0:
+                # Current cursor location on the alpha display.
+                self.cursor_location = int(self.bitfield[21:23], 16)
 
     def dict(self, **kwargs):
         """
