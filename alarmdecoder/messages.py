@@ -16,7 +16,7 @@ import re
 import datetime
 
 from .util import InvalidMessageError
-from .panels import MODES, ADEMCO, DSC
+from .panels import PANEL_TYPES, ADEMCO, DSC
 
 
 class BaseMessage(object):
@@ -163,8 +163,8 @@ class Message(BaseMessage):
         self.check_zone = is_bit_set(15)
         self.perimeter_only = is_bit_set(16)
         self.system_fault = is_bit_set(17)
-        if self.bitfield[18] in MODES.keys():
-            self.panel_type = MODES[self.bitfield[18]]
+        if self.bitfield[18] in PANEL_TYPES.keys():
+            self.panel_type = PANEL_TYPES[self.bitfield[18]]
         # pos 20-21 - Unused.
         self.text = alpha.strip('"')
 

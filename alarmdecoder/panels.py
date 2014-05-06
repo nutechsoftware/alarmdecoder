@@ -7,7 +7,7 @@ Representations of Panels and their templates.
 ADEMCO = 0
 DSC = 1
 
-MODES = {
+PANEL_TYPES = {
     'A': ADEMCO,
     'D': DSC,
 }

@@ -13,7 +13,7 @@ from .event import event
 from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .zonetracking import Zonetracker
-from .panels import MODES, ADEMCO, DSC
+from .panels import PANEL_TYPES, ADEMCO, DSC
 
 
 class AlarmDecoder(object):
@@ -235,7 +235,7 @@ class AlarmDecoder(object):
                                ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
-        config_entries.append(('MODE', MODES.keys()[MODES.values().index(self.mode)]))
+        config_entries.append(('MODE', PANEL_TYPES.keys()[PANEL_TYPES.values().index(self.mode)]))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -431,7 +431,7 @@ class AlarmDecoder(object):
             elif key == 'DEDUPLICATE':
                 self.deduplicate = (val == 'Y')
             elif key == 'MODE':
-                self.mode = MODES[val]
+                self.mode = PANEL_TYPES[val]
 
         self.on_config_received()
 
