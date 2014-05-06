@@ -16,6 +16,7 @@ import re
 import datetime
 
 from .util import InvalidMessageError
+from .panels import MODES, ADEMCO, DSC
 
 
 class BaseMessage(object):
@@ -95,6 +96,10 @@ class Message(BaseMessage):
     """Indicates whether or not there are zones that require attention."""
     perimeter_only = False
     """Indicates whether or not the perimeter is armed."""
+    system_fault = False
+    """Indicates whether a system fault has occurred."""
+    panel_type = ADEMCO
+    """Indicates which panel type was the source of this message."""
     numeric_code = None
     """The numeric code associated with the message."""
     text = None
@@ -158,7 +163,10 @@ class Message(BaseMessage):
         self.fire_alarm = is_bit_set(14)
         self.check_zone = is_bit_set(15)
         self.perimeter_only = is_bit_set(16)
-        # bits 17-20 unused.
+        self.system_fault = is_bit_set(17)
+        if self.bitfield[18] in MODES.keys():
+            self.panel_type = MODES.keys()[MODES.values().index(self.bitfield[18])])
+        # pos 20-21 - Unused.
         self.text = alpha.strip('"')
 
         if int(self.panel_data[19:21], 16) & 0x01 > 0:
