@@ -62,6 +62,7 @@
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">InvalidMessageError</span>
 <span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">,</span> <span class="n">RFMessage</span><span class="p">,</span> <span class="n">LRRMessage</span>
 <span class="kn">from</span> <span class="nn">.zonetracking</span> <span class="kn">import</span> <span class="n">Zonetracker</span>
+<span class="kn">from</span> <span class="nn">.panels</span> <span class="kn">import</span> <span class="n">PANEL_TYPES</span><span class="p">,</span> <span class="n">ADEMCO</span><span class="p">,</span> <span class="n">DSC</span>
 
 
 <div class="viewcode-block" id="AlarmDecoder"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder">[docs]</a><span class="k">class</span> <span class="nc">AlarmDecoder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -129,6 +130,8 @@
     <span class="sd">&quot;&quot;&quot;The status of the devices LRR emulation.&quot;&quot;&quot;</span>
     <span class="n">deduplicate</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="sd">&quot;&quot;&quot;The status of message deduplication as configured on the device.&quot;&quot;&quot;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
+    <span class="sd">&quot;&quot;&quot;The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -159,6 +162,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -271,20 +275,16 @@
         <span class="n">config_entries</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c"># HACK: This is ugly.. but I can&#39;t think of an elegant way of doing it.</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;ADDRESS&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;CONFIGBITS&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configbits</span><span class="p">)))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MASK&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;ADDRESS&#39;</span><span class="p">,</span> <span class="s">&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;CONFIGBITS&#39;</span><span class="p">,</span> <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configbits</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MASK&#39;</span><span class="p">,</span> <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span><span class="p">)))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;EXP&#39;</span><span class="p">,</span>
                                <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="n">z</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span><span class="p">])))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;REL&#39;</span><span class="p">,</span>
                                <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="n">r</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span><span class="p">])))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;LRR&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;LRR&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MODE&#39;</span><span class="p">,</span> <span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)]))</span>
 
         <span class="n">config_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">config_entries</span><span class="p">])</span>
 
@@ -479,6 +479,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;MODE&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">PANEL_TYPES</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_config_received</span><span class="p">()</span>
 

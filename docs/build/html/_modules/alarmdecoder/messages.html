@@ -65,6 +65,7 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">InvalidMessageError</span>
+<span class="kn">from</span> <span class="nn">.panels</span> <span class="kn">import</span> <span class="n">PANEL_TYPES</span><span class="p">,</span> <span class="n">ADEMCO</span><span class="p">,</span> <span class="n">DSC</span>
 
 
 <div class="viewcode-block" id="BaseMessage"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.BaseMessage">[docs]</a><span class="k">class</span> <span class="nc">BaseMessage</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -144,13 +145,17 @@
     <span class="sd">&quot;&quot;&quot;Indicates whether or not there are zones that require attention.&quot;&quot;&quot;</span>
     <span class="n">perimeter_only</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="sd">&quot;&quot;&quot;Indicates whether or not the perimeter is armed.&quot;&quot;&quot;</span>
+    <span class="n">system_fault</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Indicates whether a system fault has occurred.&quot;&quot;&quot;</span>
+    <span class="n">panel_type</span> <span class="o">=</span> <span class="n">ADEMCO</span>
+    <span class="sd">&quot;&quot;&quot;Indicates which panel type was the source of this message.&quot;&quot;&quot;</span>
     <span class="n">numeric_code</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="sd">&quot;&quot;&quot;The numeric code associated with the message.&quot;&quot;&quot;</span>
     <span class="n">text</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="sd">&quot;&quot;&quot;The human-readable text to be displayed on the panel LCD.&quot;&quot;&quot;</span>
     <span class="n">cursor_location</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
     <span class="sd">&quot;&quot;&quot;Current cursor location on the keypad.&quot;&quot;&quot;</span>
-    <span class="n">mask</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
     <span class="sd">&quot;&quot;&quot;Address mask this message is intended for.&quot;&quot;&quot;</span>
     <span class="n">bitfield</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="sd">&quot;&quot;&quot;The bitfield associated with this message.&quot;&quot;&quot;</span>
@@ -186,7 +191,6 @@
             <span class="k">raise</span> <span class="n">InvalidMessageError</span><span class="p">(</span><span class="s">&#39;Received invalid message: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 
         <span class="n">header</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numeric_code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span><span class="o">+</span><span class="mi">8</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
 
         <span class="n">is_bit_set</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">bit</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="n">bit</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;0&quot;</span>
 
@@ -207,12 +211,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fire_alarm</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_zone</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">perimeter_only</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
-        <span class="c"># bits 17-20 unused.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_fault</span> <span class="o">=</span> <span class="n">is_bit_set</span><span class="p">(</span><span class="mi">17</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="ow">in</span> <span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel_type</span> <span class="o">=</span> <span class="n">PANEL_TYPES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="mi">18</span><span class="p">]]</span>
+        <span class="c"># pos 20-21 - Unused.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">alpha</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;&quot;&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">[</span><span class="mi">19</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x01</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c"># Current cursor location on the alpha display.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cursor_location</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="mi">21</span><span class="p">:</span><span class="mi">23</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel_type</span> <span class="o">==</span> <span class="n">ADEMCO</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span><span class="o">+</span><span class="mi">8</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_data</span><span class="p">[</span><span class="mi">19</span><span class="p">:</span><span class="mi">21</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x01</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># Current cursor location on the alpha display.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cursor_location</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bitfield</span><span class="p">[</span><span class="mi">21</span><span class="p">:</span><span class="mi">23</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Message.dict"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.messages.Message.dict">[docs]</a>    <span class="k">def</span> <span class="nf">dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
