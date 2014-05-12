@@ -158,14 +158,17 @@ class Zonetracker(object):
             #       multiple partitions.  In it's current state a ready on
             #       partition #1 will end up clearing all zones, even if they
             #       exist elsewhere and it shouldn't.
-            if message.ready:
+            #
+            # NOTE: SYSTEM messages provide inconsistent ready statuses.  This
+            #       may need to be extended later for other panels.
+            if message.ready and not message.text.startswith("SYSTEM"):
                 for zone in self._zones_faulted:
                     self._update_zone(zone, Zone.CLEAR)
 
                 self._last_zone_fault = 0
 
             # Process fault
-            elif "FAULT" in message.text or message.check_zone:
+            elif message.check_zone or message.text.startswith("FAULT"):
                 # Apparently this representation can be both base 10
                 # or base 16, depending on where the message came
                 # from.
