@@ -48,7 +48,7 @@ class Device(object):
         self._buffer = ''
         self._device = None
         self._running = False
-        self._read_thread = Device.ReadThread(self)
+        self._read_thread = None
 
     def __enter__(self):
         """
@@ -363,6 +363,8 @@ class USBDevice(Device):
         if baudrate is None:
             baudrate = USBDevice.BAUDRATE
 
+        self._read_thread = Device.ReadThread(self)
+
         # Open the device and start up the thread.
         try:
             self._device.open(self._vendor_id,
@@ -653,6 +655,8 @@ class SerialDevice(Device):
         if self._port is None:
             raise NoDeviceError('No device interface specified.')
 
+        self._read_thread = Device.ReadThread(self)
+
         # Open the device and start up the reader thread.
         try:
             self._device.port = self._port
@@ -922,6 +926,8 @@ class SocketDevice(Device):
         """
 
         try:
+            self._read_thread = Device.ReadThread(self)
+
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             if self._use_ssl:
