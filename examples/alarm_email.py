@@ -31,11 +31,13 @@ def main():
     except Exception, ex:
         print 'Exception:', ex
 
-def handle_alarm(sender, status):
+def handle_alarm(sender, **kwargs):
     """
     Handles alarm events from the AlarmDecoder.
     """
-    text = "Alarm status: {0}".format(status)
+    status = kwargs.pop('status', None)
+    zone = kwargs.pop('zone', None)
+    text = "Alarm status: {0} - Zone {1}".format(status, zone)
 
     # Build the email message
     msg = MIMEText(text)

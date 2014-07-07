@@ -502,7 +502,7 @@ class AlarmDecoder(object):
             self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
 
             if old_status is not None:
-                self.on_alarm(status=self._alarm_status)
+                self.on_alarm(status=self._alarm_status, zone=message.numeric_code)
 
         return self._alarm_status
 
