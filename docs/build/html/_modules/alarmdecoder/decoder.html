@@ -48,49 +48,55 @@
             
   <h1>Source code for alarmdecoder.decoder</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides the full AlarmDecoder class.</span>
+<span class="sd">Provides the main AlarmDecoder class.</span>
+
+<span class="sd">.. _AlarmDecoder: http://www.alarmdecoder.com</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">InvalidMessageError</span>
 <span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">,</span> <span class="n">RFMessage</span><span class="p">,</span> <span class="n">LRRMessage</span>
 <span class="kn">from</span> <span class="nn">.zonetracking</span> <span class="kn">import</span> <span class="n">Zonetracker</span>
+<span class="kn">from</span> <span class="nn">.panels</span> <span class="kn">import</span> <span class="n">PANEL_TYPES</span><span class="p">,</span> <span class="n">ADEMCO</span><span class="p">,</span> <span class="n">DSC</span>
 
 
 <div class="viewcode-block" id="AlarmDecoder"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder">[docs]</a><span class="k">class</span> <span class="nc">AlarmDecoder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High-level wrapper around Alarm Decoder (AD2) devices.</span>
+<span class="sd">    High-level wrapper around `AlarmDecoder`_ (AD2) devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># High-level Events</span>
-    <span class="n">on_arm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the panel is armed.&#39;</span><span class="p">)</span>
-    <span class="n">on_disarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the panel is disarmed.&#39;</span><span class="p">)</span>
-    <span class="n">on_power_changed</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when panel power switches between AC and DC.&#39;</span><span class="p">)</span>
-    <span class="n">on_alarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the alarm is triggered.&#39;</span><span class="p">)</span>
-    <span class="n">on_fire</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a fire is detected.&#39;</span><span class="p">)</span>
-    <span class="n">on_bypass</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a zone is bypassed.&#39;</span><span class="p">)</span>
-    <span class="n">on_boot</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device finishes bootings.&#39;</span><span class="p">)</span>
-    <span class="n">on_config_received</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device receives its configuration.&#39;</span><span class="p">)</span>
-    <span class="n">on_zone_fault</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects a zone fault.&#39;</span><span class="p">)</span>
-    <span class="n">on_zone_restore</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects that a fault is restored.&#39;</span><span class="p">)</span>
-    <span class="n">on_low_battery</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects a low battery.&#39;</span><span class="p">)</span>
-    <span class="n">on_panic</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects a panic.&#39;</span><span class="p">)</span>
-    <span class="n">on_relay_changed</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a relay is opened or closed on an expander board.&#39;</span><span class="p">)</span>
+    <span class="n">on_arm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the panel is armed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_disarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the panel is disarmed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_power_changed</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when panel power switches between AC and DC.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_alarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the alarm is triggered.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_fire</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a fire is detected.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_bypass</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a zone is bypassed.  </span><span class="se">\n\n\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_boot</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device finishes booting.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_config_received</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device receives its configuration. </span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_zone_fault</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when :py:class:`~alarmdecoder.zonetracking.Zonetracker` detects a zone fault.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
+    <span class="n">on_zone_restore</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when :py:class:`~alarmdecoder.zonetracking.Zonetracker` detects that a fault is restored.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
+    <span class="n">on_low_battery</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device detects a low battery.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_panic</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device detects a panic.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_relay_changed</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a relay is opened or closed on an expander board.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, message)*&quot;</span><span class="p">)</span>
 
     <span class="c"># Mid-level Events</span>
-    <span class="n">on_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a message has been received from the device.&#39;</span><span class="p">)</span>
-    <span class="n">on_lrr_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an LRR message is received.&#39;</span><span class="p">)</span>
-    <span class="n">on_rfx_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an RFX message is received.&#39;</span><span class="p">)</span>
+    <span class="n">on_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when standard panel :py:class:`~alarmdecoder.messages.Message` is received.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, message)*&quot;</span><span class="p">)</span>
+    <span class="n">on_expander_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when an :py:class:`~alarmdecoder.messages.ExpanderMessage` is received.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, message)*&quot;</span><span class="p">)</span>
+    <span class="n">on_lrr_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, message)*&quot;</span><span class="p">)</span>
+    <span class="n">on_rfx_message</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, message)*&quot;</span><span class="p">)</span>
+    <span class="n">on_sending_received</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a !Sending.done message is received from the AlarmDecoder.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status, message)*&quot;</span><span class="p">)</span>
 
     <span class="c"># Low-level Events</span>
-    <span class="n">on_open</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device has been opened.&#39;</span><span class="p">)</span>
-    <span class="n">on_close</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device has been closed.&#39;</span><span class="p">)</span>
-    <span class="n">on_read</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a line has been read from the device.&#39;</span><span class="p">)</span>
-    <span class="n">on_write</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when data has been written to the device.&#39;</span><span class="p">)</span>
+    <span class="n">on_open</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device has been opened.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_close</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device has been closed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_read</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a line has been read from the device.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, data)*&quot;</span><span class="p">)</span>
+    <span class="n">on_write</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when data has been written to the device.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, data)*&quot;</span><span class="p">)</span>
 
     <span class="c"># Constants</span>
     <span class="n">KEY_F1</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -101,17 +107,37 @@
     <span class="sd">&quot;&quot;&quot;Represents panel function key #3&quot;&quot;&quot;</span>
     <span class="n">KEY_F4</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents panel function key #4&quot;&quot;&quot;</span>
+    <span class="n">KEY_PANIC</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;Represents a panic keypress&quot;&quot;&quot;</span>
 
     <span class="n">BATTERY_TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="sd">&quot;&quot;&quot;Timeout before the battery status reverts.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Default timeout (in seconds) before the battery status reverts.&quot;&quot;&quot;</span>
     <span class="n">FIRE_TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
-    <span class="sd">&quot;&quot;&quot;Timeout before the fire status reverts.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Default tTimeout (in seconds) before the fire status reverts.&quot;&quot;&quot;</span>
+
+    <span class="c"># Attributes</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="mi">18</span>
+    <span class="sd">&quot;&quot;&quot;The keypad address in use by the device.&quot;&quot;&quot;</span>
+    <span class="n">configbits</span> <span class="o">=</span> <span class="mh">0xFF00</span>
+    <span class="sd">&quot;&quot;&quot;The configuration bits set on the device.&quot;&quot;&quot;</span>
+    <span class="n">address_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+    <span class="sd">&quot;&quot;&quot;The address mask configured on the device.&quot;&quot;&quot;</span>
+    <span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+    <span class="sd">&quot;&quot;&quot;List containing the devices zone emulation status.&quot;&quot;&quot;</span>
+    <span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="sd">&quot;&quot;&quot;List containing the devices relay emulation status.&quot;&quot;&quot;</span>
+    <span class="n">emulate_lrr</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;The status of the devices LRR emulation.&quot;&quot;&quot;</span>
+    <span class="n">deduplicate</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;The status of message deduplication as configured on the device.&quot;&quot;&quot;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
+    <span class="sd">&quot;&quot;&quot;The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param device: The low-level device used for this Alarm Decoder</span>
+<span class="sd">        :param device: The low-level device used for this `AlarmDecoder`_</span>
 <span class="sd">                       interface.</span>
 <span class="sd">        :type device: Device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -136,6 +162,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -154,9 +181,9 @@
     <span class="nd">@property</span>
 <div class="viewcode-block" id="AlarmDecoder.id"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.id">[docs]</a>    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The ID of the Alarm Decoder device.</span>
+<span class="sd">        The ID of the `AlarmDecoder`_ device.</span>
 
-<span class="sd">        :returns: The identification string for the device.</span>
+<span class="sd">        :returns: identification string for the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">id</span>
 </div>
@@ -165,7 +192,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the timeout for restoring the battery status, in seconds.</span>
 
-<span class="sd">        :returns: The battery status timeout</span>
+<span class="sd">        :returns: battery status timeout</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_battery_timeout</span>
 
@@ -174,7 +201,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the timeout for restoring the battery status, in seconds.</span>
 
-<span class="sd">        :param value: The timeout in seconds.</span>
+<span class="sd">        :param value: timeout in seconds</span>
 <span class="sd">        :type value: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_battery_timeout</span> <span class="o">=</span> <span class="n">value</span>
@@ -184,7 +211,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the timeout for restoring the fire status, in seconds.</span>
 
-<span class="sd">        :returns: The fire status timeout</span>
+<span class="sd">        :returns: fire status timeout</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fire_timeout</span>
 
@@ -193,7 +220,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the timeout for restoring the fire status, in seconds.</span>
 
-<span class="sd">        :param value: The timeout in seconds.</span>
+<span class="sd">        :param value: timeout in seconds</span>
 <span class="sd">        :type value: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fire_timeout</span> <span class="o">=</span> <span class="n">value</span>
@@ -202,10 +229,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
-<span class="sd">        :param baudrate: The baudrate used for the device.</span>
+<span class="sd">        :param baudrate: baudrate used for the device.  Defaults to the lower-level device default.</span>
 <span class="sd">        :type baudrate: int</span>
 <span class="sd">        :param no_reader_thread: Specifies whether or not the automatic reader</span>
-<span class="sd">                                 thread should be started or not</span>
+<span class="sd">                                 thread should be started.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_wire_events</span><span class="p">()</span>
@@ -225,17 +252,18 @@
 </div>
 <div class="viewcode-block" id="AlarmDecoder.send"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Sends data to the Alarm Decoder device.</span>
+<span class="sd">        Sends data to the `AlarmDecoder`_ device.</span>
 
-<span class="sd">        :param data: The data to send.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: data to send</span>
+<span class="sd">        :type data: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="AlarmDecoder.get_config"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieves the configuration from the device.</span>
+<span class="sd">        Retrieves the configuration from the device.  Called automatically by :py:meth:`_on_open`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;C</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
 </div>
@@ -247,20 +275,16 @@
         <span class="n">config_entries</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c"># HACK: This is ugly.. but I can&#39;t think of an elegant way of doing it.</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;ADDRESS&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;CONFIGBITS&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configbits</span><span class="p">)))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MASK&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;ADDRESS&#39;</span><span class="p">,</span> <span class="s">&#39;{0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;CONFIGBITS&#39;</span><span class="p">,</span> <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configbits</span><span class="p">)))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MASK&#39;</span><span class="p">,</span> <span class="s">&#39;{0:x}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span><span class="p">)))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;EXP&#39;</span><span class="p">,</span>
                                <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="n">z</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span><span class="p">])))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;REL&#39;</span><span class="p">,</span>
                                <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="n">r</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span><span class="p">])))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;LRR&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">,</span>
-                               <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;LRR&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MODE&#39;</span><span class="p">,</span> <span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)]))</span>
 
         <span class="n">config_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">config_entries</span><span class="p">])</span>
 
@@ -276,9 +300,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Faults a zone if we are emulating a zone expander.</span>
 
-<span class="sd">        :param zone: The zone to fault.</span>
+<span class="sd">        :param zone: zone to fault</span>
 <span class="sd">        :type zone: int</span>
-<span class="sd">        :param simulate_wire_problem: Whether or not to simulate a wire fault.</span>
+<span class="sd">        :param simulate_wire_problem: Whether or not to simulate a wire fault</span>
 <span class="sd">        :type simulate_wire_problem: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -299,7 +323,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clears a zone if we are emulating a zone expander.</span>
 
-<span class="sd">        :param zone: The zone to clear.</span>
+<span class="sd">        :param zone: zone to clear</span>
 <span class="sd">        :type zone: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;L{0:02}0</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">zone</span><span class="p">))</span>
@@ -317,29 +341,28 @@
 
     <span class="k">def</span> <span class="nf">_handle_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Parses messages from the panel.</span>
+<span class="sd">        Parses keypad messages from the panel.</span>
 
-<span class="sd">        :param data: Panel data to parse.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: keypad data to parse</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :returns: An object representing the message.</span>
+<span class="sd">        :returns: :py:class:`~alarmdecoder.messages.Message`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">data</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidMessageError</span><span class="p">()</span>
 
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">header</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;!&#39;</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!KPE&#39;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&#39;!&#39;</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!KPM&#39;</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_keypad_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!EXP&#39;</span> <span class="ow">or</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!REL&#39;</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="n">ExpanderMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_expander_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">header</span> <span class="o">==</span> <span class="s">&#39;!RFX&#39;</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_rfx</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -353,16 +376,53 @@
         <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;!CONFIG&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_config</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
+        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;!Sending&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_sending</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">_handle_keypad_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle keypad messages.</span>
+
+<span class="sd">        :param data: keypad message to parse</span>
+<span class="sd">        :type data: string</span>
+
+<span class="sd">        :returns: :py:class:`~alarmdecoder.messages.Message`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_message</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="k">def</span> <span class="nf">_handle_expander_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle expander messages.</span>
+
+<span class="sd">        :param data: expander message to parse</span>
+<span class="sd">        :type data: string</span>
+
+<span class="sd">        :returns: :py:class:`~alarmdecoder.messages.ExpanderMessage`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ExpanderMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_expander_message</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_handle_rfx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handle RF messages.</span>
 
-<span class="sd">        :param data: RF message to parse.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: RF message to parse</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :returns: An object representing the RF message.</span>
+<span class="sd">        :returns: :py:class:`~alarmdecoder.messages.RFMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">RFMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
@@ -374,10 +434,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handle Long Range Radio messages.</span>
 
-<span class="sd">        :param data: LRR message to parse.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: LRR message to parse</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :returns: An object representing the LRR message.</span>
+<span class="sd">        :returns: :py:class:`~alarmdecoder.messages.LRRMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">LRRMessage</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
@@ -398,8 +458,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handles received configuration data.</span>
 
-<span class="sd">        :param data: Configuration string to parse.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: Configuration string to parse</span>
+<span class="sd">        :type data: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">config_string</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&gt;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">setting</span> <span class="ow">in</span> <span class="n">config_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&amp;&#39;</span><span class="p">):</span>
@@ -419,15 +479,33 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;MODE&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">PANEL_TYPES</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_config_received</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_handle_sending</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles results of a keypress send.</span>
+
+<span class="sd">        :param data: Sending string to parse</span>
+<span class="sd">        :type data: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;^!Sending(\.{1,5})done.*&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">matches</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">good_send</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">good_send</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_sending_received</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">good_send</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_update_internal_states</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates internal device states.</span>
 
-<span class="sd">        :param message: Message to update internal states with.</span>
-<span class="sd">        :type message: Message, ExpanderMessage, LRRMessage, or RFMessage</span>
+<span class="sd">        :param message: :py:class:`~alarmdecoder.messages.Message` to update internal states with</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">Message</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_power_status</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
@@ -446,10 +524,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the AC power state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: bool indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ac_power</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span><span class="p">,</span> <span class="n">old_status</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">ac_power</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_power_status</span>
@@ -463,10 +541,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the alarm state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: bool indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">alarm_sounding</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span><span class="p">:</span>
@@ -481,10 +559,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the zone bypass state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: bool indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">zone_bypassed</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bypass_status</span><span class="p">:</span>
@@ -499,10 +577,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the armed state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: bool indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">message_status</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">armed_away</span> <span class="o">|</span> <span class="n">message</span><span class="o">.</span><span class="n">armed_home</span>
@@ -521,10 +599,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the battery state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: boolean indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">last_status</span><span class="p">,</span> <span class="n">last_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_battery_status</span>
@@ -541,10 +619,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the fire alarm state.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: Message</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: boolean indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">last_status</span><span class="p">,</span> <span class="n">last_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fire_status</span>
@@ -561,10 +639,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Uses the provided message to update the expander states.</span>
 
-<span class="sd">        :param message: The message to use to update.</span>
-<span class="sd">        :type message: ExpanderMessage</span>
+<span class="sd">        :param message: message to use to update</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.ExpanderMessage`</span>
 
-<span class="sd">        :returns: Boolean indicating the new status</span>
+<span class="sd">        :returns: boolean indicating the new status</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">RELAY</span><span class="p">:</span>
@@ -576,10 +654,10 @@
 
     <span class="k">def</span> <span class="nf">_update_zone_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Trigger an update of the zonetracker.</span>
+<span class="sd">        Trigger an update of the :py:class:`~alarmdecoder.messages.Zonetracker`.</span>
 
-<span class="sd">        :param message: The message to update the zonetracker with.</span>
-<span class="sd">        :type message: Message, ExpanderMessage, LRRMessage, or RFMessage</span>
+<span class="sd">        :param message: message to update the zonetracker with</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c"># Retrieve a list of faults.</span>
@@ -597,29 +675,28 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_on_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Internal handler for closing the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_on_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Internal handler for reading from the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_read</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_message</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">msg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_message</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_on_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Internal handler for writing to the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_write</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;data&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_on_zone_fault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -671,7 +748,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

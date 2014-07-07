@@ -48,7 +48,9 @@
             
   <h1>Source code for alarmdecoder.util</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides utility classes for the Alarm Decoder (AD2) devices.</span>
+<span class="sd">Provides utility classes for the `AlarmDecoder`_ (AD2) devices.</span>
+
+<span class="sd">.. _AlarmDecoder: http://www.alarmdecoder.com</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -87,7 +89,7 @@
 </div>
 <div class="viewcode-block" id="Firmware"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.Firmware">[docs]</a><span class="k">class</span> <span class="nc">Firmware</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represents firmware for the Alarm Decoder devices.</span>
+<span class="sd">    Represents firmware for the `AlarmDecoder`_ devices.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Constants</span>
@@ -102,14 +104,14 @@
     <span class="nd">@staticmethod</span>
 <div class="viewcode-block" id="Firmware.upload"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.util.Firmware.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">progress_callback</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Uploads firmware to an Alarm Decoder device.</span>
+<span class="sd">        Uploads firmware to an `AlarmDecoder`_ device.</span>
 
-<span class="sd">        :param filename: The firmware filename</span>
-<span class="sd">        :type filename: str</span>
-<span class="sd">        :param progress_callback: Callback function used to report progress.</span>
+<span class="sd">        :param filename: firmware filename</span>
+<span class="sd">        :type filename: string</span>
+<span class="sd">        :param progress_callback: callback function used to report progress</span>
 <span class="sd">        :type progress_callback: function</span>
 
-<span class="sd">        :raises: NoDeviceError, TimeoutError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`, :py:class:`~alarmdecoder.util.TimeoutError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">do_upload</span><span class="p">():</span>
@@ -241,7 +243,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

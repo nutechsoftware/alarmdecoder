@@ -48,7 +48,9 @@
             
   <h1>Source code for alarmdecoder.zonetracking</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Provides zone tracking functionality for the Alarm Decoder (AD2) device family.</span>
+<span class="sd">Provides zone tracking functionality for the `AlarmDecoder`_ (AD2) device family.</span>
+
+<span class="sd">.. _AlarmDecoder: http://www.alarmdecoder.com</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -65,6 +67,7 @@
 <span class="sd">    Representation of a panel zone.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c"># Constants</span>
     <span class="n">CLEAR</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="sd">&quot;&quot;&quot;Status indicating that the zone is cleared.&quot;&quot;&quot;</span>
     <span class="n">FAULT</span> <span class="o">=</span> <span class="mi">1</span>
@@ -74,15 +77,25 @@
 
     <span class="n">STATUS</span> <span class="o">=</span> <span class="p">{</span><span class="n">CLEAR</span><span class="p">:</span> <span class="s">&#39;CLEAR&#39;</span><span class="p">,</span> <span class="n">FAULT</span><span class="p">:</span> <span class="s">&#39;FAULT&#39;</span><span class="p">,</span> <span class="n">CHECK</span><span class="p">:</span> <span class="s">&#39;CHECK&#39;</span><span class="p">}</span>
 
+    <span class="c"># Attributes</span>
+    <span class="n">zone</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="sd">&quot;&quot;&quot;Zone ID&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;Zone name&quot;&quot;&quot;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">CLEAR</span>
+    <span class="sd">&quot;&quot;&quot;Zone status&quot;&quot;&quot;</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="sd">&quot;&quot;&quot;Timestamp of last update&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">CLEAR</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param zone: The zone number.</span>
+<span class="sd">        :param zone: zone number</span>
 <span class="sd">        :type zone: int</span>
-<span class="sd">        :param name: Human readable zone name.</span>
-<span class="sd">        :type name: str</span>
-<span class="sd">        :param status: Initial zone state.</span>
+<span class="sd">        :param name: Human readable zone name</span>
+<span class="sd">        :type name: string</span>
+<span class="sd">        :param status: Initial zone state</span>
 <span class="sd">        :type status: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">zone</span> <span class="o">=</span> <span class="n">zone</span>
@@ -105,15 +118,53 @@
 </div>
 <div class="viewcode-block" id="Zonetracker"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker">[docs]</a><span class="k">class</span> <span class="nc">Zonetracker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Handles tracking of zone and their statuses.</span>
+<span class="sd">    Handles tracking of zones and their statuses.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">on_fault</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects a zone fault.&#39;</span><span class="p">)</span>
-    <span class="n">on_restore</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device detects that a fault is restored.&#39;</span><span class="p">)</span>
+    <span class="n">on_fault</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device detects a zone fault.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
+    <span class="n">on_restore</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device detects that a fault is restored.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
 
     <span class="n">EXPIRE</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="sd">&quot;&quot;&quot;Zone expiration timeout.&quot;&quot;&quot;</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">zones</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current list of zones being tracked.</span>
+
+<span class="sd">        :returns: dictionary of :py:class:`Zone` being tracked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span>
+
+    <span class="nd">@zones.setter</span>
+<div class="viewcode-block" id="Zonetracker.zones"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.zones">[docs]</a>    <span class="k">def</span> <span class="nf">zones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the current list of zones being tracked.</span>
+
+<span class="sd">        :param value: new list of zones being tracked</span>
+<span class="sd">        :type value: dictionary of :py:class:`Zone` being tracked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">faulted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the current list of faulted zones.</span>
+
+<span class="sd">        :returns: list of faulted zones</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span>
+
+    <span class="nd">@faulted.setter</span>
+<div class="viewcode-block" id="Zonetracker.faulted"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.faulted">[docs]</a>    <span class="k">def</span> <span class="nf">faulted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the current list of faulted zones.</span>
+
+<span class="sd">        :param value: new list of faulted zones</span>
+<span class="sd">        :type value: list of integers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span> <span class="o">=</span> <span class="n">value</span>
+</div>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
@@ -126,8 +177,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update zone statuses based on the current message.</span>
 
-<span class="sd">        :param message: Message to use to update the zone tracking.</span>
-<span class="sd">        :type message: Message or ExpanderMessage</span>
+<span class="sd">        :param message: message to use to update the zone tracking</span>
+<span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message` or :py:class:`~alarmdecoder.messages.ExpanderMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
@@ -208,12 +259,12 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert an address and channel into a zone number.</span>
 
-<span class="sd">        :param address: The expander address</span>
+<span class="sd">        :param address: expander address</span>
 <span class="sd">        :type address: int</span>
-<span class="sd">        :param channel: The channel</span>
+<span class="sd">        :param channel: channel</span>
 <span class="sd">        :type channel: int</span>
 
-<span class="sd">        :returns: The zone number associated with an address and channel.</span>
+<span class="sd">        :returns: zone number associated with an address and channel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c"># TODO: This is going to need to be reworked to support the larger</span>
@@ -227,7 +278,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Clear all expired zones from our status list.</span>
 
-<span class="sd">        :param zone: current zone being processed.</span>
+<span class="sd">        :param zone: current zone being processed</span>
 <span class="sd">        :type zone: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cleared_zones</span> <span class="o">=</span> <span class="p">[]</span>
@@ -300,11 +351,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a zone to the internal zone list.</span>
 
-<span class="sd">        :param zone: The zone number.</span>
+<span class="sd">        :param zone: zone number</span>
 <span class="sd">        :type zone: int</span>
-<span class="sd">        :param name: Human readable zone name.</span>
-<span class="sd">        :type name: str</span>
-<span class="sd">        :param status: The zone status.</span>
+<span class="sd">        :param name: human readable zone name</span>
+<span class="sd">        :type name: string</span>
+<span class="sd">        :param status: zone status</span>
 <span class="sd">        :type status: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">:</span>
@@ -317,9 +368,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates a zones status.</span>
 
-<span class="sd">        :param zone: The zone number.</span>
+<span class="sd">        :param zone: zone number</span>
 <span class="sd">        :type zone: int</span>
-<span class="sd">        :param status: The zone status.</span>
+<span class="sd">        :param status: zone status</span>
 <span class="sd">        :type status: int</span>
 
 <span class="sd">        :raises: IndexError</span>
@@ -342,10 +393,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine if a zone is expired or not.</span>
 
-<span class="sd">        :param zone: The zone number.</span>
+<span class="sd">        :param zone: zone number</span>
 <span class="sd">        :type zone: int</span>
 
-<span class="sd">        :returns: Whether or not the zone is expired.</span>
+<span class="sd">        :returns: whether or not the zone is expired</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">Zonetracker</span><span class="o">.</span><span class="n">EXPIRE</span></div>
 </pre></div>
@@ -387,7 +438,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

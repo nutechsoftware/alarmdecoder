@@ -48,7 +48,18 @@
             
   <h1>Source code for alarmdecoder.devices</h1><div class="highlight"><pre>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Contains different types of devices belonging to the Alarm Decoder (AD2) family.</span>
+<span class="sd">This module contains different types of devices belonging to the `AlarmDecoder`_ (AD2) family.</span>
+
+<span class="sd">* :py:class:`USBDevice`: Interfaces with the `AD2USB`_ device.</span>
+<span class="sd">* :py:class:`SerialDevice`: Interfaces with the `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_.</span>
+<span class="sd">* :py:class:`SocketDevice`: Interfaces with devices exposed through `ser2sock`_ or another IP to Serial solution.</span>
+<span class="sd">  Also supports SSL if using `ser2sock`_.</span>
+
+<span class="sd">.. _ser2sock: http://github.com/nutechsoftware/ser2sock</span>
+<span class="sd">.. _AlarmDecoder: http://www.alarmdecoder.com</span>
+<span class="sd">.. _AD2USB: http://www.alarmdecoder.com</span>
+<span class="sd">.. _AD2SERIAL: http://www.alarmdecoder.com</span>
+<span class="sd">.. _AD2PI: http://www.alarmdecoder.com</span>
 
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -63,20 +74,20 @@
 
 <span class="kn">from</span> <span class="nn">OpenSSL</span> <span class="kn">import</span> <span class="n">SSL</span><span class="p">,</span> <span class="n">crypto</span>
 <span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="n">Ftdi</span><span class="p">,</span> <span class="n">FtdiError</span>
-<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span><span class="p">,</span> <span class="n">InvalidMessageError</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 
 
 <div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generic parent device to all Alarm Decoder (AD2) products.</span>
+<span class="sd">    Base class for all `AlarmDecoder`_ (AD2) device types.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Generic device events</span>
-    <span class="n">on_open</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device has been opened&#39;</span><span class="p">)</span>
-    <span class="n">on_close</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when the device has been closed&#39;</span><span class="p">)</span>
-    <span class="n">on_read</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when a line has been read from the device&#39;</span><span class="p">)</span>
-    <span class="n">on_write</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when data has been written to the device&#39;</span><span class="p">)</span>
+    <span class="n">on_open</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device has been opened.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_close</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device has been closed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** def callback(device)*&quot;</span><span class="p">)</span>
+    <span class="n">on_read</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a line has been read from the device.</span><span class="se">\n\n</span><span class="s">**Callback definition:** def callback(device, data)*&quot;</span><span class="p">)</span>
+    <span class="n">on_write</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when data has been written to the device.</span><span class="se">\n\n</span><span class="s">**Callback definition:** def callback(device, data)*&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -107,7 +118,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve the device ID.</span>
 
-<span class="sd">        :returns: The identification string for the device.</span>
+<span class="sd">        :returns: identification string for the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
 
@@ -116,8 +127,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the device ID.</span>
 
-<span class="sd">        :param value: The device identification.</span>
-<span class="sd">        :type value: str</span>
+<span class="sd">        :param value: device identification string</span>
+<span class="sd">        :type value: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -125,7 +136,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Indicates whether or not the reader thread is alive.</span>
 
-<span class="sd">        :returns: Whether or not the reader thread is alive.</span>
+<span class="sd">        :returns: whether or not the reader thread is alive</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span>
 </div>
@@ -161,8 +172,8 @@
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Constructor</span>
 
-<span class="sd">            :param device: The device used by the reader thread.</span>
-<span class="sd">            :type device: devices.Device</span>
+<span class="sd">            :param device: device used by the reader thread</span>
+<span class="sd">            :type device: :py:class:`~alarmdecoder.devices.Device`</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
@@ -187,24 +198,33 @@
                 <span class="k">except</span> <span class="n">TimeoutError</span><span class="p">:</span>
                     <span class="k">pass</span>
 
-                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">except</span> <span class="n">InvalidMessageError</span><span class="p">:</span>
+                    <span class="k">pass</span>
 
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">SSL</span><span class="o">.</span><span class="n">WantReadError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="k">except</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">raise</span>
 
 </div></div></div>
 <div class="viewcode-block" id="USBDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice">[docs]</a><span class="k">class</span> <span class="nc">USBDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    AD2USB device exposed with PyFTDI&#39;s interface.</span>
+<span class="sd">    `AD2USB`_ device utilizing PyFTDI&#39;s interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Constants</span>
     <span class="n">FTDI_VENDOR_ID</span> <span class="o">=</span> <span class="mh">0x0403</span>
-    <span class="sd">&quot;&quot;&quot;Vendor ID used to recognize AD2USB devices.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Vendor ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
     <span class="n">FTDI_PRODUCT_ID</span> <span class="o">=</span> <span class="mh">0x6001</span>
-    <span class="sd">&quot;&quot;&quot;Product ID used to recognize AD2USB devices.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Product ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
     <span class="n">BAUDRATE</span> <span class="o">=</span> <span class="mi">115200</span>
-    <span class="sd">&quot;&quot;&quot;Default baudrate for AD2USB devices.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Default baudrate for `AD2USB`_ devices.&quot;&quot;&quot;</span>
 
     <span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">__detect_thread</span> <span class="o">=</span> <span class="bp">None</span>
@@ -215,7 +235,7 @@
 <span class="sd">        Returns all FTDI devices matching our vendor and product IDs.</span>
 
 <span class="sd">        :returns: list of devices</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -230,24 +250,24 @@
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="USBDevice.devices"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.devices">[docs]</a>    <span class="k">def</span> <span class="nf">devices</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a cached list of AD2USB devices located on the system.</span>
+<span class="sd">        Returns a cached list of `AD2USB`_ devices located on the system.</span>
 
-<span class="sd">        :returns: cached list of devices found.</span>
+<span class="sd">        :returns: cached list of devices found</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span>
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="USBDevice.find"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Factory method that returns the requested USBDevice device, or the</span>
+<span class="sd">        Factory method that returns the requested :py:class:`USBDevice` device, or the</span>
 <span class="sd">        first device.</span>
 
 <span class="sd">        :param device: Tuple describing the USB device to open, as returned</span>
 <span class="sd">                       by find_all().</span>
 <span class="sd">        :type device: tuple</span>
 
-<span class="sd">        :returns: USBDevice object utilizing the specified device.</span>
-<span class="sd">        :raises: NoDeviceError</span>
+<span class="sd">        :returns: :py:class:`USBDevice` object utilizing the specified device</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
@@ -266,14 +286,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Starts the device detection thread.</span>
 
-<span class="sd">        :param on_attached: function to be called when a device is attached.</span>
+<span class="sd">        :param on_attached: function to be called when a device is attached  **Callback definition:** *def callback(thread, device)*</span>
 <span class="sd">        :type on_attached: function</span>
-<span class="sd">        :param on_detached: function to be called when a device is detached.</span>
+<span class="sd">        :param on_detached: function to be called when a device is detached  **Callback definition:** *def callback(thread, device)*</span>
+
 <span class="sd">        :type on_detached: function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">DetectThread</span><span class="p">(</span><span class="n">on_attached</span><span class="p">,</span> <span class="n">on_detached</span><span class="p">)</span>
 
-        <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">CommError</span><span class="p">:</span>
+            <span class="k">pass</span>
 
         <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </div>
@@ -293,7 +317,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the interface used to connect to the device.</span>
 
-<span class="sd">        :returns: the interface used to connect to the device.</span>
+<span class="sd">        :returns: the interface used to connect to the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span>
 
@@ -302,8 +326,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
-<span class="sd">        :param value: May specify either the serial number or the device index.</span>
-<span class="sd">        :type value: str or int</span>
+<span class="sd">        :param value: may specify either the serial number or the device index</span>
+<span class="sd">        :type value: string or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
@@ -316,7 +340,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the serial number of the device.</span>
 
-<span class="sd">        :returns: The serial number of the device.</span>
+<span class="sd">        :returns: serial number of the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span>
@@ -326,7 +350,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the serial number of the device.</span>
 
-<span class="sd">        :param value: The serial number of the device.</span>
+<span class="sd">        :param value: serial number of the device</span>
 <span class="sd">        :type value: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="n">value</span>
@@ -336,7 +360,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the description of the device.</span>
 
-<span class="sd">        :returns: The description of the device.</span>
+<span class="sd">        :returns: description of the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
 
@@ -345,7 +369,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the description of the device.</span>
 
-<span class="sd">        :param value: The description of the device.</span>
+<span class="sd">        :param value: description of the device</span>
 <span class="sd">        :type value: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">value</span>
@@ -356,7 +380,7 @@
 
 <span class="sd">        :param interface: May specify either the serial number or the device</span>
 <span class="sd">                          index.</span>
-<span class="sd">        :type interface: str or int</span>
+<span class="sd">        :type interface: string or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -376,13 +400,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
-<span class="sd">        :param baudrate: The baudrate to use.</span>
+<span class="sd">        :param baudrate: baudrate to use</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically start the</span>
+<span class="sd">        :param no_reader_thread: whether or not to automatically start the</span>
 <span class="sd">                                 reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: NoDeviceError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Set up defaults</span>
         <span class="k">if</span> <span class="n">baudrate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -429,14 +453,17 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
+<div class="viewcode-block" id="USBDevice.fileno"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.fileno">[docs]</a>    <span class="k">def</span> <span class="nf">fileno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&#39;USB devices do not support fileno()&#39;</span><span class="p">)</span>
+</div>
 <div class="viewcode-block" id="USBDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
-<span class="sd">        :param data: Data to write</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: data to write</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -450,8 +477,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
-<span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :returns: character read from the device</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -467,14 +494,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
-<span class="sd">        :param timeout: The read timeout.</span>
+<span class="sd">        :param timeout: read timeout</span>
 <span class="sd">        :type timeout: float</span>
 <span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
 <span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
-<span class="sd">        :returns: The line that was read.</span>
-<span class="sd">        :raises: CommError, TimeoutError</span>
+<span class="sd">        :returns: line that was read</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
@@ -504,6 +531,8 @@
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
                             <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
@@ -526,7 +555,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the FTDI device serial number.</span>
 
-<span class="sd">        :returns: string containing the device serial number.</span>
+<span class="sd">        :returns: string containing the device serial number</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">usb</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">usb_dev</span><span class="o">.</span><span class="n">iSerialNumber</span><span class="p">)</span>
 
@@ -534,16 +563,16 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Thread that handles detection of added/removed devices.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">on_attached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an AD2USB device has been detected.&#39;</span><span class="p">)</span>
-        <span class="n">on_detached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&#39;Called when an AD2USB device has been removed.&#39;</span><span class="p">)</span>
+        <span class="n">on_attached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when an `AD2USB`_ device has been detected.</span><span class="se">\n\n</span><span class="s">**Callback definition:** def callback(thread, device*&quot;</span><span class="p">)</span>
+        <span class="n">on_detached</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when an `AD2USB`_ device has been removed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** def callback(thread, device*&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_attached</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">on_detached</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Constructor</span>
 
-<span class="sd">            :param on_attached: Function to call when a device is attached.</span>
+<span class="sd">            :param on_attached: Function to call when a device is attached  **Callback definition:** *def callback(thread, device)*</span>
 <span class="sd">            :type on_attached: function</span>
-<span class="sd">            :param on_detached: Function to call when a device is detached.</span>
+<span class="sd">            :param on_detached: Function to call when a device is detached  **Callback definition:** *def callback(thread, device)*</span>
 <span class="sd">            :type on_detached: function</span>
 <span class="sd">            &quot;&quot;&quot;</span>
             <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -590,7 +619,7 @@
 </div></div></div>
 <div class="viewcode-block" id="SerialDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice">[docs]</a><span class="k">class</span> <span class="nc">SerialDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    AD2USB or AD2SERIAL device exposed with the pyserial interface.</span>
+<span class="sd">    `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_ device utilizing the PySerial interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Constants</span>
@@ -602,11 +631,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns all serial ports present.</span>
 
-<span class="sd">        :param pattern: Pattern to search for when retrieving serial ports.</span>
-<span class="sd">        :type pattern: str</span>
+<span class="sd">        :param pattern: pattern to search for when retrieving serial ports</span>
+<span class="sd">        :type pattern: string</span>
 
 <span class="sd">        :returns: list of devices</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">devices</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -626,7 +655,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the interface used to connect to the device.</span>
 
-<span class="sd">        :returns: the interface used to connect to the device.</span>
+<span class="sd">        :returns: interface used to connect to the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
 
@@ -635,7 +664,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
-<span class="sd">        :param value: The name of the serial device.</span>
+<span class="sd">        :param value: name of the serial device</span>
 <span class="sd">        :type value: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">value</span>
@@ -644,8 +673,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param interface: The device to open.</span>
-<span class="sd">        :type interface: str</span>
+<span class="sd">        :param interface: device to open</span>
+<span class="sd">        :type interface: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -658,13 +687,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
-<span class="sd">        :param baudrate: The baudrate to use with the device.</span>
+<span class="sd">        :param baudrate: baudrate to use with the device</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically start the</span>
+<span class="sd">        :param no_reader_thread: whether or not to automatically start the</span>
 <span class="sd">                                 reader thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: NoDeviceError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># Set up the defaults</span>
         <span class="k">if</span> <span class="n">baudrate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
@@ -685,8 +714,8 @@
             <span class="c">#       all issues with it.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">baudrate</span> <span class="o">=</span> <span class="n">baudrate</span>
 
-        <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device on port {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device on {0}.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">),</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
@@ -707,14 +736,17 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
 </div>
+<div class="viewcode-block" id="SerialDevice.fileno"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.fileno">[docs]</a>    <span class="k">def</span> <span class="nf">fileno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+</div>
 <div class="viewcode-block" id="SerialDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SerialDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
-<span class="sd">        :param data: The data to write.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: data to write</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :raises: py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -732,8 +764,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
-<span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :returns: character read from the device</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -749,14 +781,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
-<span class="sd">        :param timeout: The read timeout.</span>
+<span class="sd">        :param timeout: read timeout</span>
 <span class="sd">        :type timeout: float</span>
 <span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
 <span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
-<span class="sd">        :returns: The line that was read.</span>
-<span class="sd">        :raises: CommError, TimeoutError</span>
+<span class="sd">        :returns: line that was read</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
@@ -787,6 +819,8 @@
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
                             <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">serial</span><span class="o">.</span><span class="n">SerialException</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
@@ -808,8 +842,8 @@
 </div></div>
 <div class="viewcode-block" id="SocketDevice"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice">[docs]</a><span class="k">class</span> <span class="nc">SocketDevice</span><span class="p">(</span><span class="n">Device</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Device that supports communication with an Alarm Decoder (AD2) that is</span>
-<span class="sd">    exposed via ser2sock or another Serial to IP interface.</span>
+<span class="sd">    Device that supports communication with an `AlarmDecoder`_ (AD2) that is</span>
+<span class="sd">    exposed via `ser2sock`_ or another Serial to IP interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
@@ -817,7 +851,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the interface used to connect to the device.</span>
 
-<span class="sd">        :returns: the interface used to connect to the device.</span>
+<span class="sd">        :returns: interface used to connect to the device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
 
@@ -826,7 +860,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the interface used to connect to the device.</span>
 
-<span class="sd">        :param value: Tuple containing the host and port to use.</span>
+<span class="sd">        :param value: Tuple containing the host and port to use</span>
 <span class="sd">        :type value: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="o">=</span> <span class="n">value</span>
@@ -836,7 +870,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves whether or not the device is using SSL.</span>
 
-<span class="sd">        :returns: Whether or not the device is using SSL.</span>
+<span class="sd">        :returns: whether or not the device is using SSL</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span>
 
@@ -845,7 +879,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets whether or not SSL communication is in use.</span>
 
-<span class="sd">        :param value: Whether or not SSL communication is in use.</span>
+<span class="sd">        :param value: Whether or not SSL communication is in use</span>
 <span class="sd">        :type value: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span> <span class="o">=</span> <span class="n">value</span>
@@ -855,7 +889,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the SSL client certificate path used for authentication.</span>
 
-<span class="sd">        :returns: The certificate path</span>
+<span class="sd">        :returns: path to the certificate path or :py:class:`OpenSSL.crypto.X509`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_certificate</span>
 
@@ -864,8 +898,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL client certificate to use for authentication.</span>
 
-<span class="sd">        :param value: The path to the SSL certificate.</span>
-<span class="sd">        :type value: str</span>
+<span class="sd">        :param value: path to the SSL certificate or :py:class:`OpenSSL.crypto.X509`</span>
+<span class="sd">        :type value: string or :py:class:`OpenSSL.crypto.X509`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_certificate</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -874,7 +908,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieves the SSL client certificate key used for authentication.</span>
 
-<span class="sd">        :returns: The key path</span>
+<span class="sd">        :returns: jpath to the SSL key or :py:class:`OpenSSL.crypto.PKey`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_key</span>
 
@@ -883,8 +917,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL client certificate key to use for authentication.</span>
 
-<span class="sd">        :param value: The path to the SSL key.</span>
-<span class="sd">        :type value: str</span>
+<span class="sd">        :param value: path to the SSL key or :py:class:`OpenSSL.crypto.PKey`</span>
+<span class="sd">        :type value: string or :py:class:`OpenSSL.crypto.PKey`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_key</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -894,7 +928,7 @@
 <span class="sd">        Retrieves the SSL Certificate Authority certificate used for</span>
 <span class="sd">        authentication.</span>
 
-<span class="sd">        :returns: The CA path</span>
+<span class="sd">        :returns: path to the CA certificate or :py:class:`OpenSSL.crypto.X509`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_ca</span>
 
@@ -903,8 +937,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the SSL Certificate Authority certificate used for authentication.</span>
 
-<span class="sd">        :param value: The path to the SSL CA certificate.</span>
-<span class="sd">        :type value: str</span>
+<span class="sd">        :param value: path to the SSL CA certificate or :py:class:`OpenSSL.crypto.X509`</span>
+<span class="sd">        :type value: string or :py:class:`OpenSSL.crypto.X509`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ssl_ca</span> <span class="o">=</span> <span class="n">value</span>
 </div>
@@ -912,7 +946,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
-<span class="sd">        :param interface: Tuple containing the hostname and port of our target.</span>
+<span class="sd">        :param interface: Tuple containing the hostname and port of our target</span>
 <span class="sd">        :type interface: tuple</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -927,13 +961,13 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Opens the device.</span>
 
-<span class="sd">        :param baudrate: The baudrate to use</span>
+<span class="sd">        :param baudrate: baudrate to use</span>
 <span class="sd">        :type baudrate: int</span>
-<span class="sd">        :param no_reader_thread: Whether or not to automatically open the reader</span>
+<span class="sd">        :param no_reader_thread: whether or not to automatically open the reader</span>
 <span class="sd">                                 thread.</span>
 <span class="sd">        :type no_reader_thread: bool</span>
 
-<span class="sd">        :raises: NoDeviceError, CommError</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`, :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -943,9 +977,15 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_init_ssl</span><span class="p">()</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">))</span>
+            <span class="c">#self._device.setblocking(1)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">do_handshake</span><span class="p">()</span>
+                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">do_handshake</span><span class="p">()</span>
+                        <span class="k">break</span>
+                    <span class="k">except</span> <span class="n">SSL</span><span class="o">.</span><span class="n">WantReadError</span><span class="p">:</span>
+                        <span class="k">pass</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="s">&#39;{0}:{1}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span><span class="p">)</span>
 
@@ -974,20 +1014,23 @@
                 <span class="c"># Make sure that it closes immediately.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SHUT_RDWR</span><span class="p">)</span>
 
-            <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
+
+        <span class="n">Device</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SocketDevice.fileno"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.fileno">[docs]</a>    <span class="k">def</span> <span class="nf">fileno</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="SocketDevice.write"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.SocketDevice.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data to the device.</span>
 
-<span class="sd">        :param data: The data to write.</span>
-<span class="sd">        :type data: str</span>
+<span class="sd">        :param data: data to write</span>
+<span class="sd">        :type data: string</span>
 
-<span class="sd">        :returns: The number of bytes sent.</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :returns: number of bytes sent</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data_sent</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -1008,8 +1051,8 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a single character from the device.</span>
 
-<span class="sd">        :returns: The character read from the device.</span>
-<span class="sd">        :raises: CommError</span>
+<span class="sd">        :returns: character read from the device</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -1025,14 +1068,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Reads a line from the device.</span>
 
-<span class="sd">        :param timeout: The read timeout.</span>
+<span class="sd">        :param timeout: read timeout</span>
 <span class="sd">        :type timeout: float</span>
 <span class="sd">        :param purge_buffer: Indicates whether to purge the buffer prior to</span>
 <span class="sd">                             reading.</span>
 <span class="sd">        :type purge_buffer: bool</span>
 
-<span class="sd">        :returns: The line that was read.:</span>
-<span class="sd">        :raises: CommError, TimeoutError</span>
+<span class="sd">        :returns: line that was read</span>
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`, :py:class:`~alarmdecoder.util.TimeoutError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">timeout_event</span><span class="p">():</span>
@@ -1062,9 +1105,18 @@
                         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                             <span class="n">got_line</span> <span class="o">=</span> <span class="bp">True</span>
                             <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error reading from device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">SSL</span><span class="o">.</span><span class="n">SysCallError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">errno</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">err</span>
+            <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;SSL error while reading from device: {0} ({1})&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">errno</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">got_line</span><span class="p">:</span>
@@ -1083,6 +1135,8 @@
     <span class="k">def</span> <span class="nf">_init_ssl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes our device as an SSL connection.</span>
+
+<span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -1155,7 +1209,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
