@@ -405,6 +405,9 @@ class USBDevice(Device):
         except (usb.core.USBError, FtdiError), err:
             raise NoDeviceError('Error opening device: {0}'.format(str(err)), err)
 
+        except KeyError, err:
+            raise NoDeviceError('Unsupported device. ({0:04x}:{1:04x})  You probably need a newer version of pyftdi.'.format(err[0][0], err[0][1]))
+
         else:
             self._running = True
             self.on_open()
