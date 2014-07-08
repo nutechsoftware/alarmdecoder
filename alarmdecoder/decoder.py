@@ -25,7 +25,8 @@ class AlarmDecoder(object):
     on_arm = event.Event("This event is called when the panel is armed.\n\n**Callback definition:** *def callback(device)*")
     on_disarm = event.Event("This event is called when the panel is disarmed.\n\n**Callback definition:** *def callback(device)*")
     on_power_changed = event.Event("This event is called when panel power switches between AC and DC.\n\n**Callback definition:** *def callback(device, status)*")
-    on_alarm = event.Event("This event is called when the alarm is triggered.\n\n**Callback definition:** *def callback(device, status, zone)*")
+    on_alarm = event.Event("This event is called when the alarm is triggered.\n\n**Callback definition:** *def callback(device, zone)*")
+    on_alarm_restored = event.Event("This event is called when the alarm stops sounding.\n\n**Callback definition:** *def callback(device, zone)*")
     on_fire = event.Event("This event is called when a fire is detected.\n\n**Callback definition:** *def callback(device, status)*")
     on_bypass = event.Event("This event is called when a zone is bypassed.  \n\n\n\n**Callback definition:** *def callback(device, status)*")
     on_boot = event.Event("This event is called when the device finishes booting.\n\n**Callback definition:** *def callback(device)*")
@@ -502,7 +503,10 @@ class AlarmDecoder(object):
             self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
 
             if old_status is not None:
-                self.on_alarm(status=self._alarm_status, zone=message.numeric_code)
+                if self._alarm_status:
+                    self.on_alarm(zone=message.numeric_code)
+                else:
+                    self.on_alarm_restored(zone=message.numeric_code)
 
         return self._alarm_status
 
