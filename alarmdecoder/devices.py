@@ -170,10 +170,20 @@ class USBDevice(Device):
     """
 
     # Constants
-    FTDI_VENDOR_ID = 0x0403
-    """Vendor ID used to recognize `AD2USB`_ devices."""
-    FTDI_PRODUCT_ID = 0x6001
-    """Product ID used to recognize `AD2USB`_ devices."""
+    PRODUCT_IDS = ((0x0403, 0x6001), (0x0403, 0x6015))
+    """List of Vendor and Product IDs used to recognize `AD2USB`_ devices."""
+    DEFAULT_VENDOR_ID = PRODUCT_IDS[0][0]
+    """Default Vendor ID used to recognize `AD2USB`_ devices."""
+    DEFAULT_PRODUCT_ID = PRODUCT_IDS[0][1]
+    """Default Product ID used to recognize `AD2USB`_ devices."""
+
+    # Deprecated constants
+    FTDI_VENDOR_ID = DEFAULT_VENDOR_ID
+    """DEPRECATED: Vendor ID used to recognize `AD2USB`_ devices."""
+    FTDI_PRODUCT_ID = DEFAULT_PRODUCT_ID
+    """DEPRECATED: Product ID used to recognize `AD2USB`_ devices."""
+
+
     BAUDRATE = 115200
     """Default baudrate for `AD2USB`_ devices."""
 
@@ -181,7 +191,7 @@ class USBDevice(Device):
     __detect_thread = None
 
     @classmethod
-    def find_all(cls, vid=FTDI_VENDOR_ID, pid=FTDI_PRODUCT_ID):
+    def find_all(cls, vid=None, pid=None):
         """
         Returns all FTDI devices matching our vendor and product IDs.
 
@@ -190,8 +200,12 @@ class USBDevice(Device):
         """
         cls.__devices = []
 
+        query = cls.PRODUCT_IDS
+        if vid and pid:
+            query = [(vid, pid)]
+
         try:
-            cls.__devices = Ftdi.find_all([(vid, pid)], nocache=True)
+            cls.__devices = Ftdi.find_all(query, nocache=True)
 
         except (usb.core.USBError, FtdiError), err:
             raise CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
@@ -230,7 +244,7 @@ class USBDevice(Device):
 
         vendor, product, sernum, ifcount, description = device
 
-        return USBDevice(interface=sernum)
+        return USBDevice(interface=sernum, vid=vendor, pid=product)
 
     @classmethod
     def start_detection(cls, on_attached=None, on_detached=None):
@@ -325,7 +339,7 @@ class USBDevice(Device):
         """
         self._description = value
 
-    def __init__(self, interface=0):
+    def __init__(self, interface=0, vid=None, pid=None):
         """
         Constructor
 
@@ -340,8 +354,15 @@ class USBDevice(Device):
         self._interface = 0
         self._device_number = 0
         self._serial_number = None
-        self._vendor_id = USBDevice.FTDI_VENDOR_ID
-        self._product_id = USBDevice.FTDI_PRODUCT_ID
+
+        self._vendor_id = USBDevice.DEFAULT_VENDOR_ID
+        if vid:
+            self._vendor_id = vid
+
+        self._product_id = USBDevice.DEFAULT_PRODUCT_ID
+        if pid:
+            self._product_id = pid
+
         self._endpoint = 0
         self._description = None
 
@@ -383,6 +404,9 @@ class USBDevice(Device):
 
         except (usb.core.USBError, FtdiError), err:
             raise NoDeviceError('Error opening device: {0}'.format(str(err)), err)
+
+        except KeyError, err:
+            raise NoDeviceError('Unsupported device. ({0:04x}:{1:04x})  You probably need a newer version of pyftdi.'.format(err[0][0], err[0][1]))
 
         else:
             self._running = True
