@@ -173,7 +173,7 @@ class Message(BaseMessage):
 
             if int(self.panel_data[19:21], 16) & 0x01 > 0:
                 # Current cursor location on the alpha display.
-                self.cursor_location = int(self.bitfield[21:23], 16)
+                self.cursor_location = int(self.panel_data[21:23], 16)
 
     def dict(self, **kwargs):
         """
