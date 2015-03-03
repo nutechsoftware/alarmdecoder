@@ -15,7 +15,7 @@ def main():
     the AlarmDecoder is configured to emulate a zone expander we can fault and
     restore those zones programmatically at will. These events can also be seen by
     others, such as home automation platforms which allows you to connect other
-    devices or services and monitor them as you would any pyhysical zone.
+    devices or services and monitor them as you would any physical zone.
 
     For example, you could connect a ZigBee device and receiver and fault or
     restore it's zone(s) based on the data received.
