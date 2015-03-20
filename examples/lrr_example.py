@@ -1,6 +1,9 @@
 import time
 from alarmdecoder import AlarmDecoder
-from alarmdecoder.devices import USBDevice
+from alarmdecoder.devices import SerialDevice
+
+SERIAL_DEVICE = '/dev/ttyUSB0'
+BAUDRATE = 115200
 
 def main():
     """
@@ -8,11 +11,11 @@ def main():
     """
     try:
         # Retrieve the first USB device
-        device = AlarmDecoder(USBDevice.find())
+        device = AlarmDecoder(SerialDevice(interface=SERIAL_DEVICE))
 
         # Set up an event handler and open the device
         device.on_lrr_message += handle_lrr_message
-        with device.open():
+        with device.open(baudrate=BAUDRATE):
             while True:
                 time.sleep(1)
 

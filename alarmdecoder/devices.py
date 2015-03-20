@@ -15,18 +15,34 @@ This module contains different types of devices belonging to the `AlarmDecoder`_
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-import usb.core
-import usb.util
 import time
 import threading
 import serial
 import serial.tools.list_ports
 import socket
 
-from OpenSSL import SSL, crypto
-from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
+
+try:
+    from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
+    import usb.core
+    import usb.util
+
+    have_pyftdi = True
+
+except ImportError:
+    have_pyftdi = False
+
+try:
+    from OpenSSL import SSL, crypto
+
+    have_openssl = True
+
+except ImportError:
+    from collections import namedtuple
+    SSL = namedtuple('SSL', ['Error', 'WantReadError', 'SysCallError'])
+    have_openssl = False
 
 
 class Device(object):
@@ -198,6 +214,9 @@ class USBDevice(Device):
         :returns: list of devices
         :raises: :py:class:`~alarmdecoder.util.CommError`
         """
+        if not have_pyftdi:
+            raise ImportError('The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.')
+
         cls.__devices = []
 
         query = cls.PRODUCT_IDS
@@ -234,6 +253,9 @@ class USBDevice(Device):
         :returns: :py:class:`USBDevice` object utilizing the specified device
         :raises: :py:class:`~alarmdecoder.util.NoDeviceError`
         """
+        if not have_pyftdi:
+            raise ImportError('The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.')
+
         cls.find_all()
 
         if len(cls.__devices) == 0:
@@ -257,6 +279,9 @@ class USBDevice(Device):
 
         :type on_detached: function
         """
+        if not have_pyftdi:
+            raise ImportError('The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.')
+
         cls.__detect_thread = USBDevice.DetectThread(on_attached, on_detached)
 
         try:
@@ -271,6 +296,9 @@ class USBDevice(Device):
         """
         Stops the device detection thread.
         """
+        if not have_pyftdi:
+            raise ImportError('The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.')
+
         try:
             cls.__detect_thread.stop()
 
@@ -347,6 +375,9 @@ class USBDevice(Device):
                           index.
         :type interface: string or int
         """
+        if not have_pyftdi:
+            raise ImportError('The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.')
+
         Device.__init__(self)
 
         self._device = Ftdi()
@@ -1119,6 +1150,9 @@ class SocketDevice(Device):
 
         :raises: :py:class:`~alarmdecoder.util.CommError`
         """
+
+        if not have_openssl:
+            raise ImportError('SSL sockets have been disabled due to missing requirement: pyopenssl.')
 
         try:
             ctx = SSL.Context(SSL.TLSv1_METHOD)
