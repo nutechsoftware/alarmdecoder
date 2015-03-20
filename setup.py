@@ -31,12 +31,7 @@ setup(name='alarmdecoder',
     packages=['alarmdecoder', 'alarmdecoder.event'],
     install_requires=[
         'pyopenssl',
-        'pyusb>=1.0.0b1',
         'pyserial>=2.7',
-        'pyftdi>=0.9.0',
-    ],
-    dependency_links=[
-        'https://github.com/eblot/pyftdi/archive/v0.9.0.tar.gz#egg=pyftdi-0.9.0'
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],

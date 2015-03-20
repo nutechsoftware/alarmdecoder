@@ -1,8 +1,11 @@
 import time
 from alarmdecoder import AlarmDecoder
-from alarmdecoder.devices import USBDevice
+from alarmdecoder.devices import SerialDevice
 
 RF_DEVICE_SERIAL_NUMBER = '0252254'
+
+SERIAL_DEVICE = '/dev/ttyUSB0'
+BAUDRATE = 115200
 
 def main():
     """
@@ -18,11 +21,11 @@ def main():
     """
     try:
         # Retrieve the first USB device
-        device = AlarmDecoder(USBDevice.find())
+        device = AlarmDecoder(SerialDevice(interface=SERIAL_DEVICE))
 
         # Set up an event handler and open the device
         device.on_rfx_message += handle_rfx
-        with device.open():
+        with device.open(baudrate=BAUDRATE):
             while True:
                 time.sleep(1)
 
