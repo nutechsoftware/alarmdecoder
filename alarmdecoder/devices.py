@@ -21,7 +21,6 @@ import serial
 import serial.tools.list_ports
 import socket
 
-from OpenSSL import SSL, crypto
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
 
@@ -34,6 +33,16 @@ try:
 
 except ImportError:
     have_pyftdi = False
+
+try:
+    from OpenSSL import SSL, crypto
+
+    have_openssl = True
+
+except ImportError:
+    from collections import namedtuple
+    SSL = namedtuple('SSL', ['Error', 'WantReadError', 'SysCallError'])
+    have_openssl = False
 
 
 class Device(object):
@@ -1141,6 +1150,9 @@ class SocketDevice(Device):
 
         :raises: :py:class:`~alarmdecoder.util.CommError`
         """
+
+        if not have_openssl:
+            raise ImportError('SSL sockets have been disabled due to missing requirement: pyopenssl.')
 
         try:
             ctx = SSL.Context(SSL.TLSv1_METHOD)

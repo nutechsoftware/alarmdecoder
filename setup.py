@@ -30,7 +30,6 @@ setup(name='alarmdecoder',
     license='MIT',
     packages=['alarmdecoder', 'alarmdecoder.event'],
     install_requires=[
-        'pyopenssl',
         'pyserial>=2.7',
     ],
     test_suite='nose.collector',
