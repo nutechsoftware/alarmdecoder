@@ -9,6 +9,8 @@ Provides the main AlarmDecoder class.
 import time
 import re
 
+from builtins import chr
+
 from .event import event
 from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
@@ -51,15 +53,15 @@ class AlarmDecoder(object):
     on_write = event.Event("This event is called when data has been written to the device.\n\n**Callback definition:** *def callback(device, data)*")
 
     # Constants
-    KEY_F1 = unichr(1) + unichr(1) + unichr(1)
+    KEY_F1 = chr(1) + chr(1) + chr(1)
     """Represents panel function key #1"""
-    KEY_F2 = unichr(2) + unichr(2) + unichr(2)
+    KEY_F2 = chr(2) + chr(2) + chr(2)
     """Represents panel function key #2"""
-    KEY_F3 = unichr(3) + unichr(3) + unichr(3)
+    KEY_F3 = chr(3) + chr(3) + chr(3)
     """Represents panel function key #3"""
-    KEY_F4 = unichr(4) + unichr(4) + unichr(4)
+    KEY_F4 = chr(4) + chr(4) + chr(4)
     """Represents panel function key #4"""
-    KEY_PANIC = unichr(5) + unichr(5) + unichr(5)
+    KEY_PANIC = chr(5) + chr(5) + chr(5)
     """Represents a panic keypress"""
 
     BATTERY_TIMEOUT = 30
@@ -74,9 +76,9 @@ class AlarmDecoder(object):
     """The configuration bits set on the device."""
     address_mask = 0xFFFFFFFF
     """The address mask configured on the device."""
-    emulate_zone = [False for _ in range(5)]
+    emulate_zone = [False for _ in list(range(5))]
     """List containing the devices zone emulation status."""
-    emulate_relay = [False for _ in range(4)]
+    emulate_relay = [False for _ in list(range(4))]
     """List containing the devices relay emulation status."""
     emulate_lrr = False
     """The status of the devices LRR emulation."""
@@ -87,7 +89,7 @@ class AlarmDecoder(object):
 
     def __init__(self, device):
         """
-        Constructor
+        Constructora
 
         :param device: The low-level device used for this `AlarmDecoder`_
                        interface.
@@ -110,8 +112,8 @@ class AlarmDecoder(object):
         self.address = 18
         self.configbits = 0xFF00
         self.address_mask = 0x00000000
-        self.emulate_zone = [False for x in range(5)]
-        self.emulate_relay = [False for x in range(4)]
+        self.emulate_zone = [False for x in list(range(5))]
+        self.emulate_relay = [False for x in list(range(4))]
         self.emulate_lrr = False
         self.deduplicate = False
         self.mode = ADEMCO
@@ -211,13 +213,13 @@ class AlarmDecoder(object):
         """
 
         if self._device:
-            self._device.write(str(data))
+            self._device.write(data)
 
     def get_config(self):
         """
         Retrieves the configuration from the device.  Called automatically by :py:meth:`_on_open`.
         """
-        self.send("C\r")
+        self.send(b"C\r")
 
     def save_config(self):
         """
@@ -236,7 +238,7 @@ class AlarmDecoder(object):
                                ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
-        config_entries.append(('MODE', PANEL_TYPES.keys()[PANEL_TYPES.values().index(self.mode)]))
+        config_entries.append(('MODE', list(PANEL_TYPES)[list(PANEL_TYPES.values()).index(self.mode)]))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -301,6 +303,8 @@ class AlarmDecoder(object):
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
 
+        data = str(data)
+
         if data is not None:
             data = data.lstrip('\0')
 
@@ -309,6 +313,8 @@ class AlarmDecoder(object):
 
         msg = None
         header = data[0:4]
+
+        #print('header', header, type(header), type(header[0]))
 
         if header[0] != '!' or header == '!KPM':
             msg = self._handle_keypad_message(data)
@@ -424,9 +430,9 @@ class AlarmDecoder(object):
             elif key == 'MASK':
                 self.address_mask = int(val, 16)
             elif key == 'EXP':
-                self.emulate_zone = [val[z] == 'Y' for z in range(5)]
+                self.emulate_zone = [val[z] == 'Y' for z in list(range(5))]
             elif key == 'REL':
-                self.emulate_relay = [val[r] == 'Y' for r in range(4)]
+                self.emulate_relay = [val[r] == 'Y' for r in list(range(4))]
             elif key == 'LRR':
                 self.emulate_lrr = (val == 'Y')
             elif key == 'DEDUPLICATE':

@@ -15,6 +15,8 @@ devices.
 import re
 import datetime
 
+from reprlib import repr
+
 from .util import InvalidMessageError
 from .panels import PANEL_TYPES, ADEMCO, DSC
 
@@ -136,7 +138,7 @@ class Message(BaseMessage):
 
         :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
-        match = self._regex.match(data)
+        match = self._regex.match(str(data))
 
         if match is None:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
@@ -163,7 +165,7 @@ class Message(BaseMessage):
         self.check_zone = is_bit_set(15)
         self.perimeter_only = is_bit_set(16)
         self.system_fault = is_bit_set(17)
-        if self.bitfield[18] in PANEL_TYPES.keys():
+        if self.bitfield[18] in list(PANEL_TYPES):
             self.panel_type = PANEL_TYPES[self.bitfield[18]]
         # pos 20-21 - Unused.
         self.text = alpha.strip('"')
@@ -292,7 +294,7 @@ class RFMessage(BaseMessage):
     """Low battery indication"""
     supervision = False
     """Supervision required indication"""
-    loop = [False for _ in range(4)]
+    loop = [False for _ in list(range(4))]
     """Loop indicators"""
 
     def __init__(self, data=None):

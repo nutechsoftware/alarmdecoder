@@ -294,7 +294,7 @@ class Zonetracker(object):
         """
         zones = []
 
-        for z in self._zones.keys():
+        for z in list(self._zones):
             zones += [z]
 
         for z in zones:
