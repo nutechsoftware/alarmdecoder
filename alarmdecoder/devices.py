@@ -40,8 +40,16 @@ try:
     have_openssl = True
 
 except ImportError:
-    from collections import namedtuple
-    SSL = namedtuple('SSL', ['Error', 'WantReadError', 'SysCallError'])
+    class SSL:
+        class Error(BaseException):
+            pass
+
+        class WantReadError(BaseException):
+            pass
+
+        class SysCallError(BaseException):
+            pass
+
     have_openssl = False
 
 
