@@ -30,7 +30,8 @@ setup(name='alarmdecoder',
     license='MIT',
     packages=['alarmdecoder', 'alarmdecoder.event'],
     install_requires=[
-        'pyserial>=2.7',
+        'future==0.14.3'
+        'pyserial==2.7',
     ],
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],

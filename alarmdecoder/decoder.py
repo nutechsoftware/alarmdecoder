@@ -303,7 +303,7 @@ class AlarmDecoder(object):
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
 
-        data = str(data)
+        data = data.decode('utf-8')
 
         if data is not None:
             data = data.lstrip('\0')
@@ -313,8 +313,6 @@ class AlarmDecoder(object):
 
         msg = None
         header = data[0:4]
-
-        #print('header', header, type(header), type(header[0]))
 
         if header[0] != '!' or header == '!KPM':
             msg = self._handle_keypad_message(data)
