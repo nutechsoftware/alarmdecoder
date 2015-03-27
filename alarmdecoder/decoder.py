@@ -213,13 +213,13 @@ class AlarmDecoder(object):
         """
 
         if self._device:
-            self._device.write(data)
+            self._device.write(str.encode(data))
 
     def get_config(self):
         """
         Retrieves the configuration from the device.  Called automatically by :py:meth:`_on_open`.
         """
-        self.send(b"C\r")
+        self.send("C\r")
 
     def save_config(self):
         """
