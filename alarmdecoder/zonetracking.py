@@ -242,7 +242,7 @@ class Zonetracker(object):
         it = iter(self._zones_faulted)
         try:
             while not found_last_faulted:
-                z = it.next()
+                z = next(it)
 
                 if z == self._last_zone_fault:
                     found_last_faulted = True
@@ -255,7 +255,7 @@ class Zonetracker(object):
         # between to our clear list.
         try:
             while not at_end and not found_current:
-                z = it.next()
+                z = next(it)
 
                 if z == zone:
                     found_current = True
@@ -273,7 +273,7 @@ class Zonetracker(object):
 
             try:
                 while not found_current:
-                    z = it.next()
+                    z = next(it)
 
                     if z == zone:
                         found_current = True

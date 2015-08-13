@@ -20,6 +20,7 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
+from builtins import bytes
 
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
@@ -825,7 +826,7 @@ class SerialDevice(Device):
 
         try:
             while timeout_event.reading:
-                buf = self._device.read(1)
+                buf = bytes(self._device.read(1), 'utf-8')
 
                 # NOTE: AD2SERIAL apparently sends down \xFF on boot.
                 if buf != b'' and buf != b"\xff":
@@ -1114,7 +1115,7 @@ class SocketDevice(Device):
 
         try:
             while timeout_event.reading:
-                buf = self._device.recv(1)
+                buf = bytes(self._device.recv(1), 'utf-8')
 
                 if buf != b'':
                     self._buffer += buf

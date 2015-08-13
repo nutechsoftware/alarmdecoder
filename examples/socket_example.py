@@ -21,14 +21,14 @@ def main():
             while True:
                 time.sleep(1)
 
-    except Exception, ex:
-        print 'Exception:', ex
+    except Exception as ex:
+        print('Exception:', ex)
 
 def handle_message(sender, message):
     """
     Handles message events from the AlarmDecoder.
     """
-    print sender, message.raw
+    print(sender, message.raw)
 
 if __name__ == '__main__':
     main()

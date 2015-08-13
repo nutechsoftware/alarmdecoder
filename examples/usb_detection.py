@@ -21,7 +21,7 @@ def main():
         while True:
             time.sleep(1)
 
-    except Exception, ex:
+    except Exception as ex:
         print 'Exception:', ex
 
     finally:
@@ -48,7 +48,7 @@ def handle_message(sender, message):
     """
     Handles message events from the AlarmDecoder.
     """
-    print sender, message.raw
+    print(sender, message.raw)
 
 def handle_attached(sender, device):
     """
@@ -58,7 +58,7 @@ def handle_attached(sender, device):
     dev = create_device(device)
     __devices[dev.id] = dev
 
-    print 'attached', dev.id
+    print('attached', dev.id)
 
 def handle_detached(sender, device):
     """
@@ -72,7 +72,7 @@ def handle_detached(sender, device):
 
         del __devices[sernum]
 
-    print 'detached', sernum
+    print('detached', sernum)
 
 if __name__ == '__main__':
     main()

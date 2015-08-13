@@ -1,5 +1,6 @@
 """Setup script"""
 
+import sys
 from setuptools import setup
 
 def readme():
@@ -7,6 +8,10 @@ def readme():
 
     with open('README.rst') as readme_file:
         return readme_file.read()
+
+extra_requirements = []
+if sys.version_info < (3,):
+    extra_requirements.append('future==0.14.3')
 
 setup(name='alarmdecoder',
     version='0.9.1',
@@ -30,9 +35,8 @@ setup(name='alarmdecoder',
     license='MIT',
     packages=['alarmdecoder', 'alarmdecoder.event'],
     install_requires=[
-        'future==0.14.3'
         'pyserial==2.7',
-    ],
+    ] + extra_requirements,
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],
     scripts=['bin/ad2-sslterm', 'bin/ad2-firmwareupload'],

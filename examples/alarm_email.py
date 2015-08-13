@@ -31,16 +31,15 @@ def main():
             while True:
                 time.sleep(1)
 
-    except Exception, ex:
-        print 'Exception:', ex
+    except Exception as ex:
+        print('Exception:', ex)
 
 def handle_alarm(sender, **kwargs):
     """
     Handles alarm events from the AlarmDecoder.
     """
-    status = kwargs.pop('status', None)
     zone = kwargs.pop('zone', None)
-    text = "Alarm status: {0} - Zone {1}".format(status, zone)
+    text = "Alarm: Zone {0}".format(zone)
 
     # Build the email message
     msg = MIMEText(text)
@@ -58,7 +57,7 @@ def handle_alarm(sender, **kwargs):
     s.sendmail(FROM_ADDRESS, TO_ADDRESS, msg.as_string())
     s.quit()
 
-    print 'sent alarm email:', text
+    print('sent alarm email:', text)
 
 if __name__ == '__main__':
     main()
