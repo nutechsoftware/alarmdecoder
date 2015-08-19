@@ -11,6 +11,7 @@ import time
 
 from .event import event
 from .messages import ExpanderMessage
+from .panels import ADEMCO, DSC
 
 
 class Zone(object):
@@ -37,8 +38,10 @@ class Zone(object):
     """Zone status"""
     timestamp = None
     """Timestamp of last update"""
+    expander = False
+    """Does this zone exist on an expander?"""
 
-    def __init__(self, zone=0, name='', status=CLEAR):
+    def __init__(self, zone=0, name='', status=CLEAR, expander=False):
         """
         Constructor
 
@@ -53,6 +56,7 @@ class Zone(object):
         self.name = name
         self.status = status
         self.timestamp = time.time()
+        self.expander = expander
 
     def __str__(self):
         """
@@ -116,13 +120,15 @@ class Zonetracker(object):
         """
         self._zones_faulted = value
 
-    def __init__(self):
+    def __init__(self, alarmdecoder_object):
         """
         Constructor
         """
         self._zones = {}
         self._zones_faulted = []
         self._last_zone_fault = 0
+
+        self.alarmdecoder_object = alarmdecoder_object
 
     def update(self, message):
         """
@@ -132,9 +138,12 @@ class Zonetracker(object):
         :type message: :py:class:`~alarmdecoder.messages.Message` or :py:class:`~alarmdecoder.messages.ExpanderMessage`
         """
         if isinstance(message, ExpanderMessage):
-            if message.type == ExpanderMessage.ZONE:
-                zone = self.expander_to_zone(message.address, message.channel)
+            zone = -1
 
+            if message.type == ExpanderMessage.ZONE:
+                zone = self.expander_to_zone(message.address, message.channel, self.alarmdecoder_object.mode)
+
+            if zone != -1:
                 status = Zone.CLEAR
                 if message.value == 1:
                     status = Zone.FAULT
@@ -149,7 +158,7 @@ class Zonetracker(object):
                     self._update_zone(zone, status=status)
 
                 except IndexError:
-                    self._add_zone(zone, status=status)
+                    self._add_zone(zone, status=status, expander=True)
 
         else:
             # Panel is ready, restore all zones.
@@ -209,7 +218,7 @@ class Zonetracker(object):
 
             self._clear_expired_zones()
 
-    def expander_to_zone(self, address, channel):
+    def expander_to_zone(self, address, channel, panel_type=ADEMCO):
         """
         Convert an address and channel into a zone number.
 
@@ -221,12 +230,19 @@ class Zonetracker(object):
         :returns: zone number associated with an address and channel
         """
 
-        # TODO: This is going to need to be reworked to support the larger
-        #       panels without fixed addressing on the expanders.
+        zone = -1
 
-        idx = address - 7   # Expanders start at address 7.
+        if panel_type == ADEMCO:
+            # TODO: This is going to need to be reworked to support the larger
+            #       panels without fixed addressing on the expanders.
 
-        return address + channel + (idx * 7) + 1
+            idx = address - 7   # Expanders start at address 7.
+            zone = address + channel + (idx * 7) + 1
+
+        elif panel_type == DSC:
+            zone = (address * 8) + channel
+
+        return zone
 
     def _clear_zones(self, zone):
         """
@@ -301,7 +317,7 @@ class Zonetracker(object):
             if self._zones[z].status != Zone.CLEAR and self._zone_expired(z):
                 self._update_zone(z, Zone.CLEAR)
 
-    def _add_zone(self, zone, name='', status=Zone.CLEAR):
+    def _add_zone(self, zone, name='', status=Zone.CLEAR, expander=False):
         """
         Adds a zone to the internal zone list.
 
@@ -313,10 +329,9 @@ class Zonetracker(object):
         :type status: int
         """
         if not zone in self._zones:
-            self._zones[zone] = Zone(zone=zone, name=name, status=status)
+            self._zones[zone] = Zone(zone=zone, name=name, status=None, expander=expander)
 
-        if status != Zone.CLEAR:
-            self.on_fault(zone=zone)
+        self._update_zone(zone, status=status)
 
     def _update_zone(self, zone, status=None):
         """
@@ -332,9 +347,11 @@ class Zonetracker(object):
         if not zone in self._zones:
             raise IndexError('Zone does not exist and cannot be updated: %d', zone)
 
-        if status is not None:
-            self._zones[zone].status = status
+        old_status = self._zones[zone].status
+        if status is None:
+            status = old_status
 
+        self._zones[zone].status = status
         self._zones[zone].timestamp = time.time()
 
         if status == Zone.CLEAR:
@@ -342,6 +359,9 @@ class Zonetracker(object):
                 self._zones_faulted.remove(zone)
 
             self.on_restore(zone=zone)
+        else:
+            if old_status != status and status is not None:
+                self.on_fault(zone=zone)
 
     def _zone_expired(self, zone):
         """
@@ -352,4 +372,4 @@ class Zonetracker(object):
 
         :returns: whether or not the zone is expired
         """
-        return time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE
+        return (time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE) and self._zones[zone].expander is False

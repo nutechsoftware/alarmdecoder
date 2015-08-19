@@ -94,7 +94,7 @@ class AlarmDecoder(object):
         :type device: Device
         """
         self._device = device
-        self._zonetracker = Zonetracker()
+        self._zonetracker = Zonetracker(self)
 
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
@@ -106,6 +106,7 @@ class AlarmDecoder(object):
         self._battery_status = (False, 0)
         self._panic_status = None
         self._relay_status = {}
+        self._internal_address_mask = 0xFFFFFFFF
 
         self.address = 18
         self.configbits = 0xFF00
@@ -176,6 +177,25 @@ class AlarmDecoder(object):
         :type value: int
         """
         self._fire_timeout = value
+
+    @property
+    def internal_address_mask(self):
+        """
+        Retrieves the address mask used for updating internal status.
+
+        :returns: address mask
+        """
+        return self._internal_address_mask
+
+    @internal_address_mask.setter
+    def internal_address_mask(self, value):
+        """
+        Sets the address mask used internally for updating status.
+
+        :param value: address mask
+        :type value: int
+        """
+        self._internal_address_mask = value
 
     def open(self, baudrate=None, no_reader_thread=False):
         """
@@ -344,7 +364,7 @@ class AlarmDecoder(object):
         """
         msg = Message(data)
 
-        if self.address_mask & msg.mask > 0:
+        if self._internal_address_mask & msg.mask > 0:
             self._update_internal_states(msg)
 
         self.on_message(message=msg)
