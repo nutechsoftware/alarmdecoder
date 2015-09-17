@@ -367,7 +367,7 @@ class AlarmDecoder(object):
         if self._internal_address_mask & msg.mask > 0:
             self._update_internal_states(msg)
 
-        self.on_message(message=msg)
+            self.on_message(message=msg)
 
         return msg
 
