@@ -2,7 +2,7 @@ import time
 import smtplib
 from email.mime.text import MIMEText
 from alarmdecoder import AlarmDecoder
-from alarmdecoder.devices import USBDevice
+from alarmdecoder.devices import SerialDevice
 
 # Configuration values
 SUBJECT = "AlarmDecoder - ALARM"
@@ -13,6 +13,9 @@ SMTP_SERVER = "localhost"
 SMTP_USERNAME = None
 SMTP_PASSWORD = None
 
+SERIAL_DEVICE = '/dev/ttyUSB0'
+BAUDRATE = 115200
+
 def main():
     """
     Example application that sends an email when an alarm event is
@@ -20,11 +23,11 @@ def main():
     """
     try:
         # Retrieve the first USB device
-        device = AlarmDecoder(USBDevice.find())
+        device = AlarmDecoder(SerialDevice(interface=SERIAL_DEVICE))
 
         # Set up an event handler and open the device
         device.on_alarm += handle_alarm
-        with device.open():
+        with device.open(baudrate=BAUDRATE):
             while True:
                 time.sleep(1)
 

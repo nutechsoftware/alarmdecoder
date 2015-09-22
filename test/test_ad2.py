@@ -24,6 +24,12 @@ class TestAlarmDecoder(TestCase):
         self._message_received = False
         self._rfx_message_received = False
         self._lrr_message_received = False
+        self._expander_message_received = False
+        self._sending_received_status = None
+        self._alarm_restored = False
+        self._on_boot_received = False
+        self._zone_faulted = None
+        self._zone_restored = None
 
         self._device = Mock(spec=USBDevice)
         self._device.on_open = EventHandler(Event(), self._device)
@@ -32,15 +38,11 @@ class TestAlarmDecoder(TestCase):
         self._device.on_write = EventHandler(Event(), self._device)
 
         self._decoder = AlarmDecoder(self._device)
-
-        self._decoder._zonetracker = Mock(spec=Zonetracker)
-        self._decoder._zonetracker.on_fault = EventHandler(Event(), self._decoder._zonetracker)
-        self._decoder._zonetracker.on_restore = EventHandler(Event(), self._decoder._zonetracker)
-
         self._decoder.on_panic += self.on_panic
         self._decoder.on_relay_changed += self.on_relay_changed
         self._decoder.on_power_changed += self.on_power_changed
         self._decoder.on_alarm += self.on_alarm
+        self._decoder.on_alarm_restored += self.on_alarm_restored
         self._decoder.on_bypass += self.on_bypass
         self._decoder.on_low_battery += self.on_battery
         self._decoder.on_fire += self.on_fire
@@ -50,6 +52,11 @@ class TestAlarmDecoder(TestCase):
         self._decoder.on_message += self.on_message
         self._decoder.on_rfx_message += self.on_rfx_message
         self._decoder.on_lrr_message += self.on_lrr_message
+        self._decoder.on_expander_message += self.on_expander_message
+        self._decoder.on_sending_received += self.on_sending_received
+        self._decoder.on_boot += self.on_boot
+        self._decoder.on_zone_fault += self.on_zone_fault
+        self._decoder.on_zone_restore += self.on_zone_restore
 
         self._decoder.address_mask = int('ffffffff', 16)
         self._decoder.open()
@@ -67,7 +74,10 @@ class TestAlarmDecoder(TestCase):
         self._power_changed = kwargs['status']
 
     def on_alarm(self, sender, *args, **kwargs):
-        self._alarmed = kwargs['status']
+        self._alarmed = True
+
+    def on_alarm_restored(self, sender, *args, **kwargs):
+        self._alarm_restored = True
 
     def on_bypass(self, sender, *args, **kwargs):
         self._bypassed = kwargs['status']
@@ -95,6 +105,21 @@ class TestAlarmDecoder(TestCase):
 
     def on_lrr_message(self, sender, *args, **kwargs):
         self._lrr_message_received = True
+
+    def on_expander_message(self, sender, *args, **kwargs):
+        self._expander_message_received = True
+
+    def on_sending_received(self, sender, *args, **kwargs):
+        self._sending_received_status = kwargs['status']
+
+    def on_boot(self, sender, *args, **kwargs):
+        self._on_boot_received = True
+
+    def on_zone_fault(self, sender, *args, **kwargs):
+        self._zone_faulted = kwargs['zone']
+
+    def on_zone_restore(self, sender, *args, **kwargs):
+        self._zone_restored = kwargs['zone']
 
     def test_open(self):
         self._decoder.open()
@@ -141,7 +166,7 @@ class TestAlarmDecoder(TestCase):
         self._decoder._on_read(self, data='[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertTrue(self._message_received)
 
-    def test_message_kpe(self):
+    def test_message_kpm(self):
         msg = self._decoder._handle_message('!KPM:[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertIsInstance(msg, Message)
 
@@ -151,6 +176,9 @@ class TestAlarmDecoder(TestCase):
     def test_expander_message(self):
         msg = self._decoder._handle_message('!EXP:07,01,01')
         self.assertIsInstance(msg, ExpanderMessage)
+
+        self._decoder._on_read(self, data='!EXP:07,01,01')
+        self.assertTrue(self._expander_message_received)
 
     def test_relay_message(self):
         self._decoder.open()
@@ -203,6 +231,7 @@ class TestAlarmDecoder(TestCase):
 
         msg = self._decoder._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertEquals(self._alarmed, False)
+        self.assertEquals(self._alarm_restored, True)
 
         msg = self._decoder._handle_message('[0000000000100000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertEquals(self._alarmed, True)
@@ -261,6 +290,26 @@ class TestAlarmDecoder(TestCase):
 
         self._decoder._device.write.assert_called_with('*')
 
-    def test_zonetracker_update(self):
-        msg = self._decoder._handle_message('[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-        self._decoder._zonetracker.update.assert_called_with(msg)
+    def test_sending_received(self):
+        self._decoder._on_read(self, data='!Sending.done')
+        self.assertTrue(self._sending_received_status)
+
+        self._decoder._on_read(self, data='!Sending.....done')
+        self.assertFalse(self._sending_received_status)
+
+    def test_boot(self):
+        self._decoder._on_read(self, data='!Ready')
+        self.assertTrue(self._on_boot_received)
+
+    def test_zone_fault_and_restore(self):
+        self._decoder._on_read(self, data='[00010001000000000A--],003,[f70000051003000008020000000000],"FAULT 03                        "')
+        self.assertEquals(self._zone_faulted, 3)
+
+        self._decoder._on_read(self, data='[00010001000000000A--],004,[f70000051003000008020000000000],"FAULT 04                        "')
+        self.assertEquals(self._zone_faulted, 4)
+
+        self._decoder._on_read(self, data='[00010001000000000A--],005,[f70000051003000008020000000000],"FAULT 05                        "')
+        self.assertEquals(self._zone_faulted, 5)
+
+        self._decoder._on_read(self, data='[00010001000000000A--],004,[f70000051003000008020000000000],"FAULT 04                        "')
+        self.assertEquals(self._zone_restored, 3)
