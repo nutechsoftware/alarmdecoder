@@ -74,7 +74,8 @@
     <span class="n">on_arm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the panel is armed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
     <span class="n">on_disarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the panel is disarmed.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
     <span class="n">on_power_changed</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when panel power switches between AC and DC.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
-    <span class="n">on_alarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the alarm is triggered.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
+    <span class="n">on_alarm</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the alarm is triggered.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
+    <span class="n">on_alarm_restored</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the alarm stops sounding.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, zone)*&quot;</span><span class="p">)</span>
     <span class="n">on_fire</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a fire is detected.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
     <span class="n">on_bypass</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when a zone is bypassed.  </span><span class="se">\n\n\n\n</span><span class="s">**Callback definition:** *def callback(device, status)*&quot;</span><span class="p">)</span>
     <span class="n">on_boot</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when the device finishes booting.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device)*&quot;</span><span class="p">)</span>
@@ -142,7 +143,7 @@
 <span class="sd">        :type device: Device</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zonetracker</span> <span class="o">=</span> <span class="n">Zonetracker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zonetracker</span> <span class="o">=</span> <span class="n">Zonetracker</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_battery_timeout</span> <span class="o">=</span> <span class="n">AlarmDecoder</span><span class="o">.</span><span class="n">BATTERY_TIMEOUT</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fire_timeout</span> <span class="o">=</span> <span class="n">AlarmDecoder</span><span class="o">.</span><span class="n">FIRE_TIMEOUT</span>
@@ -154,6 +155,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_battery_status</span> <span class="o">=</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_panic_status</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relay_status</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_address_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="mi">18</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configbits</span> <span class="o">=</span> <span class="mh">0xFF00</span>
@@ -224,6 +226,25 @@
 <span class="sd">        :type value: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fire_timeout</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">internal_address_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the address mask used for updating internal status.</span>
+
+<span class="sd">        :returns: address mask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_address_mask</span>
+
+    <span class="nd">@internal_address_mask.setter</span>
+<div class="viewcode-block" id="AlarmDecoder.internal_address_mask"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.internal_address_mask">[docs]</a>    <span class="k">def</span> <span class="nf">internal_address_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the address mask used internally for updating status.</span>
+
+<span class="sd">        :param value: address mask</span>
+<span class="sd">        :type value: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_internal_address_mask</span> <span class="o">=</span> <span class="n">value</span>
 </div>
 <div class="viewcode-block" id="AlarmDecoder.open"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">no_reader_thread</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -392,10 +413,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_internal_address_mask</span> <span class="o">&amp;</span> <span class="n">msg</span><span class="o">.</span><span class="n">mask</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_internal_states</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_message</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_message</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">msg</span>
 
@@ -551,7 +572,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span><span class="p">,</span> <span class="n">old_status</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">alarm_sounding</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span>
 
             <span class="k">if</span> <span class="n">old_status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">on_alarm</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">on_alarm</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">numeric_code</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">on_alarm_restored</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">numeric_code</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alarm_status</span>
 
@@ -748,7 +772,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

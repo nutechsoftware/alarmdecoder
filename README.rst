@@ -33,11 +33,14 @@ or from source:
 ------------
 Requirements
 ------------
+Required:
 * An `AlarmDecoder`_ device
 * Python 2.7
+* `pyserial`_ >= 2.7
+
+Optional:
 * `pyftdi`_ >= 0.9.0
 * `pyusb`_ >= 1.0.0b1
-* `pyserial`_ >= 2.7
 * `pyopenssl`_
 
 -------------
@@ -52,7 +55,7 @@ A basic example is included below.  Please see the `examples`_ directory for mor
 
     import time
     from alarmdecoder import AlarmDecoder
-    from alarmdecoder.devices import USBDevice
+    from alarmdecoder.devices import SerialDevice
 
     def main():
         """
@@ -60,11 +63,11 @@ A basic example is included below.  Please see the `examples`_ directory for mor
         """
         try:
             # Retrieve the first USB device
-            device = AlarmDecoder(USBDevice.find())
+            device = AlarmDecoder(SerialDevice(interface='/dev/ttyUSB0'))
 
             # Set up an event handler and open the device
             device.on_message += handle_message
-            with device.open():
+            with device.open(baudrate=115200):
                 while True:
                     time.sleep(1)
 

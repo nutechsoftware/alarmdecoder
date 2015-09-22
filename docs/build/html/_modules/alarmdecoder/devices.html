@@ -64,18 +64,34 @@
 <span class="sd">.. moduleauthor:: Scott Petersen &lt;scott@nutech.com&gt;</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">usb.core</span>
-<span class="kn">import</span> <span class="nn">usb.util</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">serial</span>
 <span class="kn">import</span> <span class="nn">serial.tools.list_ports</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 
-<span class="kn">from</span> <span class="nn">OpenSSL</span> <span class="kn">import</span> <span class="n">SSL</span><span class="p">,</span> <span class="n">crypto</span>
-<span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="n">Ftdi</span><span class="p">,</span> <span class="n">FtdiError</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">CommError</span><span class="p">,</span> <span class="n">TimeoutError</span><span class="p">,</span> <span class="n">NoDeviceError</span><span class="p">,</span> <span class="n">InvalidMessageError</span>
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pyftdi.pyftdi.ftdi</span> <span class="kn">import</span> <span class="n">Ftdi</span><span class="p">,</span> <span class="n">FtdiError</span>
+    <span class="kn">import</span> <span class="nn">usb.core</span>
+    <span class="kn">import</span> <span class="nn">usb.util</span>
+
+    <span class="n">have_pyftdi</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">have_pyftdi</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">OpenSSL</span> <span class="kn">import</span> <span class="n">SSL</span><span class="p">,</span> <span class="n">crypto</span>
+
+    <span class="n">have_openssl</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+    <span class="n">SSL</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s">&#39;SSL&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Error&#39;</span><span class="p">,</span> <span class="s">&#39;WantReadError&#39;</span><span class="p">,</span> <span class="s">&#39;SysCallError&#39;</span><span class="p">])</span>
+    <span class="n">have_openssl</span> <span class="o">=</span> <span class="bp">False</span>
 
 
 <div class="viewcode-block" id="Device"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.Device">[docs]</a><span class="k">class</span> <span class="nc">Device</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -97,7 +113,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">ReadThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -219,10 +235,20 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c"># Constants</span>
-    <span class="n">FTDI_VENDOR_ID</span> <span class="o">=</span> <span class="mh">0x0403</span>
-    <span class="sd">&quot;&quot;&quot;Vendor ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
-    <span class="n">FTDI_PRODUCT_ID</span> <span class="o">=</span> <span class="mh">0x6001</span>
-    <span class="sd">&quot;&quot;&quot;Product ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+    <span class="n">PRODUCT_IDS</span> <span class="o">=</span> <span class="p">((</span><span class="mh">0x0403</span><span class="p">,</span> <span class="mh">0x6001</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x0403</span><span class="p">,</span> <span class="mh">0x6015</span><span class="p">))</span>
+    <span class="sd">&quot;&quot;&quot;List of Vendor and Product IDs used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+    <span class="n">DEFAULT_VENDOR_ID</span> <span class="o">=</span> <span class="n">PRODUCT_IDS</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Default Vendor ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+    <span class="n">DEFAULT_PRODUCT_ID</span> <span class="o">=</span> <span class="n">PRODUCT_IDS</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;Default Product ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+
+    <span class="c"># Deprecated constants</span>
+    <span class="n">FTDI_VENDOR_ID</span> <span class="o">=</span> <span class="n">DEFAULT_VENDOR_ID</span>
+    <span class="sd">&quot;&quot;&quot;DEPRECATED: Vendor ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+    <span class="n">FTDI_PRODUCT_ID</span> <span class="o">=</span> <span class="n">DEFAULT_PRODUCT_ID</span>
+    <span class="sd">&quot;&quot;&quot;DEPRECATED: Product ID used to recognize `AD2USB`_ devices.&quot;&quot;&quot;</span>
+
+
     <span class="n">BAUDRATE</span> <span class="o">=</span> <span class="mi">115200</span>
     <span class="sd">&quot;&quot;&quot;Default baudrate for `AD2USB`_ devices.&quot;&quot;&quot;</span>
 
@@ -230,17 +256,24 @@
     <span class="n">__detect_thread</span> <span class="o">=</span> <span class="bp">None</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="USBDevice.find_all"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">FTDI_VENDOR_ID</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">FTDI_PRODUCT_ID</span><span class="p">):</span>
+<div class="viewcode-block" id="USBDevice.find_all"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.find_all">[docs]</a>    <span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns all FTDI devices matching our vendor and product IDs.</span>
 
 <span class="sd">        :returns: list of devices</span>
 <span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pyftdi</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.&#39;</span><span class="p">)</span>
+
         <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="n">query</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">PRODUCT_IDS</span>
+        <span class="k">if</span> <span class="n">vid</span> <span class="ow">and</span> <span class="n">pid</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="p">[(</span><span class="n">vid</span><span class="p">,</span> <span class="n">pid</span><span class="p">)]</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="o">.</span><span class="n">find_all</span><span class="p">([(</span><span class="n">vid</span><span class="p">,</span> <span class="n">pid</span><span class="p">)],</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">cls</span><span class="o">.</span><span class="n">__devices</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">nocache</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">CommError</span><span class="p">(</span><span class="s">&#39;Error enumerating AD2USB devices: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
@@ -269,6 +302,9 @@
 <span class="sd">        :returns: :py:class:`USBDevice` object utilizing the specified device</span>
 <span class="sd">        :raises: :py:class:`~alarmdecoder.util.NoDeviceError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pyftdi</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.&#39;</span><span class="p">)</span>
+
         <span class="n">cls</span><span class="o">.</span><span class="n">find_all</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__devices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -279,7 +315,7 @@
 
         <span class="n">vendor</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">sernum</span><span class="p">,</span> <span class="n">ifcount</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="n">device</span>
 
-        <span class="k">return</span> <span class="n">USBDevice</span><span class="p">(</span><span class="n">interface</span><span class="o">=</span><span class="n">sernum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">USBDevice</span><span class="p">(</span><span class="n">interface</span><span class="o">=</span><span class="n">sernum</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="n">vendor</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="n">product</span><span class="p">)</span>
 </div>
     <span class="nd">@classmethod</span>
 <div class="viewcode-block" id="USBDevice.start_detection"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.devices.USBDevice.start_detection">[docs]</a>    <span class="k">def</span> <span class="nf">start_detection</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">on_attached</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">on_detached</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -292,6 +328,9 @@
 
 <span class="sd">        :type on_detached: function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pyftdi</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.&#39;</span><span class="p">)</span>
+
         <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">DetectThread</span><span class="p">(</span><span class="n">on_attached</span><span class="p">,</span> <span class="n">on_detached</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
@@ -306,6 +345,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stops the device detection thread.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pyftdi</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.&#39;</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">cls</span><span class="o">.</span><span class="n">__detect_thread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
@@ -374,7 +416,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">value</span>
 </div>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vid</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">pid</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
@@ -382,6 +424,9 @@
 <span class="sd">                          index.</span>
 <span class="sd">        :type interface: string or int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_pyftdi</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;The USBDevice class has been disabled due to missing requirement: pyftdi or pyusb.&#39;</span><span class="p">)</span>
+
         <span class="n">Device</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">Ftdi</span><span class="p">()</span>
@@ -389,8 +434,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_device_number</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_serial_number</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_VENDOR_ID</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">FTDI_PRODUCT_ID</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">DEFAULT_VENDOR_ID</span>
+        <span class="k">if</span> <span class="n">vid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span> <span class="o">=</span> <span class="n">vid</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">DEFAULT_PRODUCT_ID</span>
+        <span class="k">if</span> <span class="n">pid</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_product_id</span> <span class="o">=</span> <span class="n">pid</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_endpoint</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="bp">None</span>
 
@@ -412,6 +464,8 @@
         <span class="k">if</span> <span class="n">baudrate</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">baudrate</span> <span class="o">=</span> <span class="n">USBDevice</span><span class="o">.</span><span class="n">BAUDRATE</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">ReadThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
         <span class="c"># Open the device and start up the thread.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vendor_id</span><span class="p">,</span>
@@ -430,6 +484,9 @@
 
         <span class="k">except</span> <span class="p">(</span><span class="n">usb</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">USBError</span><span class="p">,</span> <span class="n">FtdiError</span><span class="p">),</span> <span class="n">err</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Error opening device: {0}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)),</span> <span class="n">err</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;Unsupported device. ({0:04x}:{1:04x})  You probably need a newer version of pyftdi.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">err</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_running</span> <span class="o">=</span> <span class="bp">True</span>
@@ -702,6 +759,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NoDeviceError</span><span class="p">(</span><span class="s">&#39;No device interface specified.&#39;</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">ReadThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
         <span class="c"># Open the device and start up the reader thread.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_port</span>
@@ -971,6 +1030,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_read_thread</span> <span class="o">=</span> <span class="n">Device</span><span class="o">.</span><span class="n">ReadThread</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_ssl</span><span class="p">:</span>
@@ -1139,6 +1200,9 @@
 <span class="sd">        :raises: :py:class:`~alarmdecoder.util.CommError`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">have_openssl</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s">&#39;SSL sockets have been disabled due to missing requirement: pyopenssl.&#39;</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
             <span class="n">ctx</span> <span class="o">=</span> <span class="n">SSL</span><span class="o">.</span><span class="n">Context</span><span class="p">(</span><span class="n">SSL</span><span class="o">.</span><span class="n">TLSv1_METHOD</span><span class="p">)</span>
 
@@ -1209,7 +1273,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
