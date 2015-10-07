@@ -75,7 +75,7 @@ class Firmware(object):
 
                     if line[0] == ':':
                         dev.write(line + "\r")
-                        dev.read_line(timeout=10.0)
+                        dev.read_line(timeout=5.0, purge_buffer=True)
 
                         if progress_callback is not None:
                             progress_callback(Firmware.STAGE_UPLOADING)
@@ -137,20 +137,25 @@ class Firmware(object):
             dev.stop_reader()
             while dev._read_thread.is_alive():
                 stage_callback(Firmware.STAGE_WAITING)
-                time.sleep(1)
-
-        time.sleep(2)
+                time.sleep(0.5)
 
         # Reboot the device and wait for the boot loader.
-        stage_callback(Firmware.STAGE_BOOT)
-        dev.write("=")
-        read_until('......', timeout=15.0)
+        retry = 3
+        while retry > 0:
+            try:
+                stage_callback(Firmware.STAGE_BOOT)
+                dev.write("=")
+                read_until('......', timeout=15.0)
 
-        # Get ourselves into the boot loader and wait for indication
-        # that it's ready for the firmware upload.
-        stage_callback(Firmware.STAGE_LOAD)
-        dev.write("=")
-        read_until('!load', timeout=15.0)
+                # Get ourselves into the boot loader and wait for indication
+                # that it's ready for the firmware upload.
+                stage_callback(Firmware.STAGE_LOAD)
+                dev.write("=")
+                read_until('!load', timeout=15.0)
+            except TimeoutError, err:
+                retry -= 1
+            else:
+                retry = 0
 
         # And finally do the upload.
         do_upload()
