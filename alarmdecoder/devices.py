@@ -559,6 +559,12 @@ class USBDevice(Device):
 
         return ret
 
+    def purge(self):
+        """
+        Purges read/write buffers.
+        """
+        self._device.purge_buffers()
+
     def _get_serial_number(self):
         """
         Retrieves the FTDI device serial number.
@@ -848,6 +854,13 @@ class SerialDevice(Device):
             timer.cancel()
 
         return ret
+
+    def purge(self):
+        """
+        Purges read/write buffers.
+        """
+        self._device.flushInput()
+        self._device.flushOutput()
 
 
 class SocketDevice(Device):
@@ -1143,6 +1156,19 @@ class SocketDevice(Device):
             timer.cancel()
 
         return ret
+
+    def purge(self):
+        """
+        Purges read/write buffers.
+        """
+        try:
+            self._device.setblocking(0)
+            while(self._device.recv(1)):
+                pass
+        except socket.error, err:
+            pass
+        finally:
+            self._device.setblocking(1)
 
     def _init_ssl(self):
         """

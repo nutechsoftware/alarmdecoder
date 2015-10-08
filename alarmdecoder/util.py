@@ -38,6 +38,19 @@ class InvalidMessageError(Exception):
     pass
 
 
+class UploadError(Exception):
+    """
+    Generic firmware upload error.
+    """
+    pass
+
+class UploadChecksumError(UploadError):
+    """
+    The firmware upload failed due to a checksum error.
+    """
+    pass
+
+
 class Firmware(object):
     """
     Represents firmware for the `AlarmDecoder`_ devices.
@@ -50,10 +63,12 @@ class Firmware(object):
     STAGE_LOAD = 3
     STAGE_UPLOADING = 4
     STAGE_DONE = 5
+    STAGE_ERROR = 98
+    STAGE_DEBUG = 99
 
     # FIXME: Rewrite this monstrosity.
     @staticmethod
-    def upload(dev, filename, progress_callback=None):
+    def upload(dev, filename, progress_callback=None, debug=False):
         """
         Uploads firmware to an `AlarmDecoder`_ device.
 
@@ -70,15 +85,29 @@ class Firmware(object):
             Perform the actual firmware upload to the device.
             """
             with open(filename) as upload_file:
+                line_cnt = 0
                 for line in upload_file:
+                    line_cnt += 1
                     line = line.rstrip()
 
                     if line[0] == ':':
                         dev.write(line + "\r")
-                        dev.read_line(timeout=5.0, purge_buffer=True)
+                        response = dev.read_line(timeout=5.0, purge_buffer=True)
+                        if debug:
+                            stage_callback(Firmware.STAGE_DEBUG, data="line={0} - line={1} response={2}".format(line_cnt, line, response));
 
-                        if progress_callback is not None:
-                            progress_callback(Firmware.STAGE_UPLOADING)
+                        if '!ce' in response:
+                            raise UploadChecksumError("Checksum error on line " + str(line_cnt) + " of " + filename);
+
+                        elif '!no' in response:
+                            raise UploadError("Incorrect data sent to bootloader.")
+
+                        elif '!ok' in response:
+                            break
+
+                        else:
+                            if progress_callback is not None:
+                                progress_callback(Firmware.STAGE_UPLOADING)
 
                         time.sleep(0.0)
 
@@ -100,6 +129,8 @@ class Firmware(object):
 
             position = 0
 
+            dev.purge()
+
             while timeout_event.reading:
                 try:
                     char = dev.read()
@@ -112,7 +143,7 @@ class Firmware(object):
                         else:
                             position = 0
 
-                except Exception:
+                except Exception, err:
                     pass
 
             if timer:
@@ -121,10 +152,10 @@ class Firmware(object):
                 else:
                     raise TimeoutError('Timeout while waiting for line terminator.')
 
-        def stage_callback(stage):
+        def stage_callback(stage, **kwargs):
             """Callback to update progress for the specified stage."""
             if progress_callback is not None:
-                progress_callback(stage)
+                progress_callback(stage, **kwargs)
 
         if dev is None:
             raise NoDeviceError('No device specified for firmware upload.')
@@ -152,11 +183,16 @@ class Firmware(object):
                 stage_callback(Firmware.STAGE_LOAD)
                 dev.write("=")
                 read_until('!load', timeout=15.0)
+
             except TimeoutError, err:
                 retry -= 1
             else:
                 retry = 0
 
         # And finally do the upload.
-        do_upload()
-        stage_callback(Firmware.STAGE_DONE)
+        try:
+            do_upload()
+        except UploadError, err:
+            stage_callback(Firmware.STAGE_ERROR, error=err)
+        else:
+            stage_callback(Firmware.STAGE_DONE)
