@@ -44,6 +44,7 @@ class UploadError(Exception):
     """
     pass
 
+
 class UploadChecksumError(UploadError):
     """
     The firmware upload failed due to a checksum error.
@@ -172,11 +173,12 @@ class Firmware(object):
 
         # Reboot the device and wait for the boot loader.
         retry = 3
+        found_loader = False
         while retry > 0:
             try:
                 stage_callback(Firmware.STAGE_BOOT)
                 dev.write("=")
-                read_until('......', timeout=15.0)
+                read_until('!boot', timeout=15.0)
 
                 # Get ourselves into the boot loader and wait for indication
                 # that it's ready for the firmware upload.
@@ -188,11 +190,15 @@ class Firmware(object):
                 retry -= 1
             else:
                 retry = 0
+                found_loader = True
 
         # And finally do the upload.
-        try:
-            do_upload()
-        except UploadError, err:
-            stage_callback(Firmware.STAGE_ERROR, error=err)
+        if found_loader:
+            try:
+                do_upload()
+            except UploadError, err:
+                stage_callback(Firmware.STAGE_ERROR, error=str(err))
+            else:
+                stage_callback(Firmware.STAGE_DONE)
         else:
-            stage_callback(Firmware.STAGE_DONE)
+            stage_callback(Firmware.STAGE_ERROR, error="Error entering bootloader.")

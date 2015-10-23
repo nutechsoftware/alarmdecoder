@@ -243,7 +243,9 @@ class AlarmDecoder(object):
         """
         Sets configuration entries on the device.
         """
-        config_string = ''
+        self.send("C{0}\r".format(self.get_config_string()))
+
+    def get_config_string(self):
         config_entries = []
 
         # HACK: This is ugly.. but I can't think of an elegant way of doing it.
@@ -258,9 +260,7 @@ class AlarmDecoder(object):
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
         config_entries.append(('MODE', PANEL_TYPES.keys()[PANEL_TYPES.values().index(self.mode)]))
 
-        config_string = '&'.join(['='.join(t) for t in config_entries])
-
-        self.send("C{0}\r".format(config_string))
+        return '&'.join(['='.join(t) for t in config_entries])
 
     def reboot(self):
         """

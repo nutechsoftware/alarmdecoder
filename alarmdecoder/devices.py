@@ -20,6 +20,7 @@ import threading
 import serial
 import serial.tools.list_ports
 import socket
+import select
 
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
@@ -1002,7 +1003,6 @@ class SocketDevice(Device):
                 self._init_ssl()
 
             self._device.connect((self._host, self._port))
-            #self._device.setblocking(1)
 
             if self._use_ssl:
                 while True:
@@ -1082,7 +1082,10 @@ class SocketDevice(Device):
         data = None
 
         try:
-            data = self._device.recv(1)
+            read_ready, _, _ = select.select([self._device], [], [], 0)
+
+            if (len(read_ready) != 0):
+                data = self._device.recv(1)
 
         except socket.error, err:
             raise CommError('Error while reading from device: {0}'.format(str(err)), err)
@@ -1119,6 +1122,12 @@ class SocketDevice(Device):
 
         try:
             while timeout_event.reading:
+                read_ready, _, _ = select.select([self._device], [], [], 0)
+
+                if (len(read_ready) == 0):
+                    time.sleep(0.01)
+                    continue
+
                 buf = self._device.recv(1)
 
                 if buf != '':
@@ -1130,6 +1139,7 @@ class SocketDevice(Device):
                         if len(self._buffer) > 0:
                             got_line = True
                             break
+
                 else:
                     time.sleep(0.01)
 
