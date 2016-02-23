@@ -104,13 +104,13 @@ class AlarmDecoder(object):
         self._armed_status = None
         self._fire_status = (False, 0)
         self._battery_status = (False, 0)
-        self._panic_status = None
+        self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
 
         self.address = 18
         self.configbits = 0xFF00
-        self.address_mask = 0x00000000
+        self.address_mask = 0xFFFFFFF
         self.emulate_zone = [False for x in range(5)]
         self.emulate_relay = [False for x in range(4)]
         self.emulate_lrr = False
