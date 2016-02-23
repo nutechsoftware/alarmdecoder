@@ -1,13 +1,18 @@
 from unittest import TestCase
 from mock import Mock, MagicMock
 
+from alarmdecoder import AlarmDecoder
+from alarmdecoder.panels import ADEMCO
 from alarmdecoder.messages import Message, ExpanderMessage
 from alarmdecoder.zonetracking import Zonetracker, Zone
 
 
 class TestZonetracking(TestCase):
     def setUp(self):
-        self._zonetracker = Zonetracker()
+        self._alarmdecoder = Mock(spec=AlarmDecoder)
+
+        self._alarmdecoder.mode = ADEMCO
+        self._zonetracker = Zonetracker(self._alarmdecoder)
 
         self._zonetracker.on_fault += self.fault_event
         self._zonetracker.on_restore += self.restore_event

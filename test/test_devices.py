@@ -7,6 +7,7 @@ import socket
 import time
 import tempfile
 import os
+import select
 from OpenSSL import SSL, crypto
 from alarmdecoder.devices import USBDevice, SerialDevice, SocketDevice
 from alarmdecoder.util import NoDeviceError, CommError, TimeoutError
@@ -292,40 +293,50 @@ class TestSocketDevice(TestCase):
             with patch.object(socket.socket, 'connect', return_value=None):
                 self._device.open(no_reader_thread=True)
 
-            with patch.object(socket.socket, 'recv') as mock:
-                self._device.read()
+            with patch('socket.socket.fileno', return_value=1):
+                with patch.object(select, 'select', return_value=[[1], [], []]):
+                    with patch.object(socket.socket, 'recv') as mock:
+                        self._device.read()
 
             mock.assert_called_with(1)
 
     def test_read_exception(self):
-        with patch.object(self._device._device, 'recv', side_effect=socket.error):
-            with self.assertRaises(CommError):
-                self._device.read()
+        with patch('socket.socket.fileno', return_value=1):
+            with patch.object(select, 'select', return_value=[[1], [], []]):
+                with patch.object(self._device._device, 'recv', side_effect=socket.error):
+                    with self.assertRaises(CommError):
+                        self._device.read()
 
     def test_read_line(self):
-        with patch.object(self._device._device, 'recv', side_effect=list("testing\r\n")):
-            ret = None
-            try:
-                ret = self._device.read_line()
-            except StopIteration:
-                pass
+        with patch('socket.socket.fileno', return_value=1):
+            with patch.object(select, 'select', return_value=[[1], [], []]):
+                with patch.object(self._device._device, 'recv', side_effect=list("testing\r\n")):
+                    ret = None
+                    try:
+                        ret = self._device.read_line()
+                    except StopIteration:
+                        pass
 
-            self.assertEquals(ret, "testing")
+                    self.assertEquals(ret, "testing")
 
     def test_read_line_timeout(self):
-        with patch.object(self._device._device, 'recv', return_value='a') as mock:
-            with self.assertRaises(TimeoutError):
-                self._device.read_line(timeout=0.1)
+        with patch('socket.socket.fileno', return_value=1):
+            with patch.object(select, 'select', return_value=[[1], [], []]):
+                with patch.object(self._device._device, 'recv', return_value='a') as mock:
+                    with self.assertRaises(TimeoutError):
+                        self._device.read_line(timeout=0.1)
 
-        self.assertIn('a', self._device._buffer)
+                        self.assertIn('a', self._device._buffer)
 
     def test_read_line_exception(self):
-        with patch.object(self._device._device, 'recv', side_effect=socket.error):
-            with self.assertRaises(CommError):
-                self._device.read_line()
+        with patch('socket.socket.fileno', return_value=1):
+            with patch.object(select, 'select', return_value=[[1], [], []]):
+                with patch.object(self._device._device, 'recv', side_effect=socket.error):
+                    with self.assertRaises(CommError):
+                        self._device.read_line()
 
-            with self.assertRaises(CommError):
-                self._device.read_line()
+                    with self.assertRaises(CommError):
+                        self._device.read_line()
 
     def test_ssl(self):
         ssl_key = crypto.PKey()
