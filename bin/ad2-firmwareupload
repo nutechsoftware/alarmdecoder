@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
+import os
 import sys, time
 import alarmdecoder
 
-def handle_firmware(stage):
+def handle_firmware(stage, **kwargs):
     if stage == alarmdecoder.util.Firmware.STAGE_START:
         handle_firmware.wait_tick = 0
         handle_firmware.upload_tick = 0
@@ -30,6 +31,10 @@ def handle_firmware(stage):
             sys.stdout.flush()
     elif stage == alarmdecoder.util.Firmware.STAGE_DONE:
         print "\r\nDone!"
+    elif stage == alarmdecoder.util.Firmware.STAGE_ERROR:
+        print "\r\nError: {0}".format(kwargs.get("error", ""))
+    elif stage == alarmdecoder.util.Firmware.STAGE_DEBUG:
+        print "\r\nDBG: {0}".format(kwargs.get("data", ""))
 
 def main():
     device = '/dev/ttyUSB0'
@@ -47,20 +52,32 @@ def main():
     if len(sys.argv) > 3:
         baudrate = sys.argv[3]
 
+    debug = os.environ.get("ALARMDECODER_DEBUG") is not None
+
     print "Flashing device: {0} - {2} baud\r\nFirmware: {1}".format(device, firmware, baudrate)
 
-    if ':' in device:
-        hostname, port = device.split(':')
-        dev = alarmdecoder.devices.SocketDevice(interface=(hostname, int(port)))
-        dev.open()
-    else:
-        dev = alarmdecoder.devices.SerialDevice(interface=device)
-        dev.open(baudrate=baudrate, no_reader_thread=True)
+    dev = None
+    try:
+        if ':' in device:
+            hostname, port = device.split(':')
+            dev = alarmdecoder.devices.SocketDevice(interface=(hostname, int(port)))
+            dev.open(no_reader_thread=True)
+        else:
+            dev = alarmdecoder.devices.SerialDevice(interface=device)
+            dev.open(baudrate=baudrate, no_reader_thread=True)
 
-    time.sleep(3)
-    alarmdecoder.util.Firmware.upload(dev, firmware, handle_firmware)
+        time.sleep(3)
+        alarmdecoder.util.Firmware.upload(dev, firmware, handle_firmware, debug=debug)
 
-    dev.close()
+    except alarmdecoder.util.NoDeviceError, ex:
+        print "Error: Could not find device: {0}".format(ex)
+    except alarmdecoder.util.UploadError, ex:
+        print "Error: Error uploading firmware: {0}".format(ex)
+    except Exception, ex:
+        print "Error: {0}".format(ex)
+    finally:
+        if dev is not None:
+            dev.close()
 
 if __name__ == "__main__":
     main()

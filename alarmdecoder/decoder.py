@@ -104,13 +104,13 @@ class AlarmDecoder(object):
         self._armed_status = None
         self._fire_status = (False, 0)
         self._battery_status = (False, 0)
-        self._panic_status = None
+        self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
 
         self.address = 18
         self.configbits = 0xFF00
-        self.address_mask = 0x00000000
+        self.address_mask = 0xFFFFFFF
         self.emulate_zone = [False for x in range(5)]
         self.emulate_relay = [False for x in range(4)]
         self.emulate_lrr = False
@@ -243,7 +243,9 @@ class AlarmDecoder(object):
         """
         Sets configuration entries on the device.
         """
-        config_string = ''
+        self.send("C{0}\r".format(self.get_config_string()))
+
+    def get_config_string(self):
         config_entries = []
 
         # HACK: This is ugly.. but I can't think of an elegant way of doing it.
@@ -258,9 +260,7 @@ class AlarmDecoder(object):
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
         config_entries.append(('MODE', PANEL_TYPES.keys()[PANEL_TYPES.values().index(self.mode)]))
 
-        config_string = '&'.join(['='.join(t) for t in config_entries])
-
-        self.send("C{0}\r".format(config_string))
+        return '&'.join(['='.join(t) for t in config_entries])
 
     def reboot(self):
         """
