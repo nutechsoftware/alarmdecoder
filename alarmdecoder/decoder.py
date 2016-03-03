@@ -110,7 +110,7 @@ class AlarmDecoder(object):
 
         self.address = 18
         self.configbits = 0xFF00
-        self.address_mask = 0xFFFFFFF
+        self.address_mask = 0xFFFFFFFF
         self.emulate_zone = [False for x in range(5)]
         self.emulate_relay = [False for x in range(4)]
         self.emulate_lrr = False
