@@ -15,30 +15,37 @@ AlarmDecoder
 Summary
 -------
 
-This Python library aims to provide a consistent interface for the `AlarmDecoder`_ product line. (AD2USB, AD2SERIAL and AD2PI)
+This Python library aims to provide a consistent interface for the
+`AlarmDecoder`_ product line. (AD2USB, AD2SERIAL and AD2PI).
 This also includes devices that have been exposed via `ser2sock`_, which
 supports encryption via SSL/TLS.
 
 ------------
 Installation
 ------------
-AlarmDecoder can be installed through pip:
+
+AlarmDecoder can be installed through ``pip``::
+
     pip install alarmdecoder
 
-or from source:
+or from source::
+
     python setup.py install
 
-* Note: python-setuptools is required for installation.
+* Note: ``python-setuptools`` is required for installation.
 
 ------------
 Requirements
 ------------
+
 Required:
+
 * An `AlarmDecoder`_ device
 * Python 2.7
 * `pyserial`_ >= 2.7
 
 Optional:
+
 * `pyftdi`_ >= 0.9.0
 * `pyusb`_ >= 1.0.0b1
 * `pyopenssl`_
@@ -46,12 +53,15 @@ Optional:
 -------------
 Documentation
 -------------
+
 API documentation can be found at `readthedocs`_.
 
 --------
 Examples
 --------
-A basic example is included below.  Please see the `examples`_ directory for more.::
+
+A basic example is included below. Please see the `examples`_ directory for
+more.::
 
     import time
     from alarmdecoder import AlarmDecoder
