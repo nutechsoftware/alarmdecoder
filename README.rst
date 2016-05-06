@@ -24,11 +24,11 @@ supports encryption via SSL/TLS.
 Installation
 ------------
 
-AlarmDecoder can be installed through ``pip``:
+AlarmDecoder can be installed through ``pip``::
 
     pip install alarmdecoder
 
-or from source:
+or from source::
 
     python setup.py install
 
