@@ -60,6 +60,7 @@
 
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 <span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">ExpanderMessage</span>
+<span class="kn">from</span> <span class="nn">.panels</span> <span class="kn">import</span> <span class="n">ADEMCO</span><span class="p">,</span> <span class="n">DSC</span>
 
 
 <div class="viewcode-block" id="Zone"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zone">[docs]</a><span class="k">class</span> <span class="nc">Zone</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -86,8 +87,10 @@
     <span class="sd">&quot;&quot;&quot;Zone status&quot;&quot;&quot;</span>
     <span class="n">timestamp</span> <span class="o">=</span> <span class="bp">None</span>
     <span class="sd">&quot;&quot;&quot;Timestamp of last update&quot;&quot;&quot;</span>
+    <span class="n">expander</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="sd">&quot;&quot;&quot;Does this zone exist on an expander?&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">CLEAR</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">CLEAR</span><span class="p">,</span> <span class="n">expander</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 
@@ -102,6 +105,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="n">expander</span>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -165,13 +169,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span> <span class="o">=</span> <span class="n">value</span>
 </div>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alarmdecoder_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Constructor</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">alarmdecoder_object</span> <span class="o">=</span> <span class="n">alarmdecoder_object</span>
 
 <div class="viewcode-block" id="Zonetracker.update"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -181,9 +187,12 @@
 <span class="sd">        :type message: :py:class:`~alarmdecoder.messages.Message` or :py:class:`~alarmdecoder.messages.ExpanderMessage`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
-                <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander_to_zone</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">ExpanderMessage</span><span class="o">.</span><span class="n">ZONE</span><span class="p">:</span>
+                <span class="n">zone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander_to_zone</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="n">message</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">alarmdecoder_object</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">zone</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                 <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span>
                 <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">status</span> <span class="o">=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">FAULT</span>
@@ -198,7 +207,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
 
                 <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span> <span class="n">expander</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c"># Panel is ready, restore all zones.</span>
@@ -207,14 +216,17 @@
             <span class="c">#       multiple partitions.  In it&#39;s current state a ready on</span>
             <span class="c">#       partition #1 will end up clearing all zones, even if they</span>
             <span class="c">#       exist elsewhere and it shouldn&#39;t.</span>
-            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ready</span><span class="p">:</span>
+            <span class="c">#</span>
+            <span class="c"># NOTE: SYSTEM messages provide inconsistent ready statuses.  This</span>
+            <span class="c">#       may need to be extended later for other panels.</span>
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">ready</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;SYSTEM&quot;</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="c"># Process fault</span>
-            <span class="k">elif</span> <span class="s">&quot;FAULT&quot;</span> <span class="ow">in</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span> <span class="ow">or</span> <span class="n">message</span><span class="o">.</span><span class="n">check_zone</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">check_zone</span> <span class="ow">or</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;FAULT&quot;</span><span class="p">):</span>
                 <span class="c"># Apparently this representation can be both base 10</span>
                 <span class="c"># or base 16, depending on where the message came</span>
                 <span class="c"># from.</span>
@@ -255,7 +267,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_clear_expired_zones</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="Zonetracker.expander_to_zone"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.expander_to_zone">[docs]</a>    <span class="k">def</span> <span class="nf">expander_to_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+<div class="viewcode-block" id="Zonetracker.expander_to_zone"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.zonetracking.Zonetracker.expander_to_zone">[docs]</a>    <span class="k">def</span> <span class="nf">expander_to_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">panel_type</span><span class="o">=</span><span class="n">ADEMCO</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert an address and channel into a zone number.</span>
 
@@ -267,12 +279,19 @@
 <span class="sd">        :returns: zone number associated with an address and channel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c"># TODO: This is going to need to be reworked to support the larger</span>
-        <span class="c">#       panels without fixed addressing on the expanders.</span>
+        <span class="n">zone</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">address</span> <span class="o">-</span> <span class="mi">7</span>   <span class="c"># Expanders start at address 7.</span>
+        <span class="k">if</span> <span class="n">panel_type</span> <span class="o">==</span> <span class="n">ADEMCO</span><span class="p">:</span>
+            <span class="c"># TODO: This is going to need to be reworked to support the larger</span>
+            <span class="c">#       panels without fixed addressing on the expanders.</span>
 
-        <span class="k">return</span> <span class="n">address</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="p">(</span><span class="n">idx</span> <span class="o">*</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">address</span> <span class="o">-</span> <span class="mi">7</span>   <span class="c"># Expanders start at address 7.</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="n">address</span> <span class="o">+</span> <span class="n">channel</span> <span class="o">+</span> <span class="p">(</span><span class="n">idx</span> <span class="o">*</span> <span class="mi">7</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">elif</span> <span class="n">panel_type</span> <span class="o">==</span> <span class="n">DSC</span><span class="p">:</span>
+            <span class="n">zone</span> <span class="o">=</span> <span class="p">(</span><span class="n">address</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">channel</span>
+
+        <span class="k">return</span> <span class="n">zone</span>
 </div>
     <span class="k">def</span> <span class="nf">_clear_zones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -347,7 +366,7 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">z</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zone_expired</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_add_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_add_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">,</span> <span class="n">expander</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a zone to the internal zone list.</span>
 
@@ -359,10 +378,9 @@
 <span class="sd">        :type status: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span> <span class="o">=</span> <span class="n">Zone</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span> <span class="o">=</span> <span class="n">Zone</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">expander</span><span class="o">=</span><span class="n">expander</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">on_fault</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_zone</span><span class="p">(</span><span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_update_zone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -378,9 +396,11 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">zone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s">&#39;Zone does not exist and cannot be updated: </span><span class="si">%d</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">zone</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+        <span class="n">old_status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">status</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">old_status</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="n">Zone</span><span class="o">.</span><span class="n">CLEAR</span><span class="p">:</span>
@@ -388,6 +408,9 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">zone</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">on_restore</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">old_status</span> <span class="o">!=</span> <span class="n">status</span> <span class="ow">and</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_fault</span><span class="p">(</span><span class="n">zone</span><span class="o">=</span><span class="n">zone</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_zone_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zone</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -398,7 +421,7 @@
 
 <span class="sd">        :returns: whether or not the zone is expired</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">Zonetracker</span><span class="o">.</span><span class="n">EXPIRE</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="n">Zonetracker</span><span class="o">.</span><span class="n">EXPIRE</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="p">[</span><span class="n">zone</span><span class="p">]</span><span class="o">.</span><span class="n">expander</span> <span class="ow">is</span> <span class="bp">False</span></div>
 </pre></div>
 
           </div>
@@ -438,7 +461,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>

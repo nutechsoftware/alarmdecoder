@@ -351,6 +351,20 @@
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.internal_address_mask">
+<tt class="descname">internal_address_mask</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.internal_address_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.internal_address_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the address mask used for updating internal status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">address mask</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="alarmdecoder.decoder.AlarmDecoder.open">
 <tt class="descname">open</tt><big>(</big><em>baudrate=None</em>, <em>no_reader_thread=False</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.open" title="Permalink to this definition">¶</a></dt>
@@ -603,7 +617,7 @@ Also supports SSL if using <a class="reference external" href="http://github.com
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -637,7 +651,7 @@ by find_all().</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.devices.USBDevice" title="alarmdecoder.devices.USBDevice"><tt class="xref py py-class docutils literal"><span class="pre">USBDevice</span></tt></a> object utilizing the specified device</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -724,7 +738,7 @@ reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -752,7 +766,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -768,7 +782,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -792,7 +806,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -857,7 +871,7 @@ reading.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of devices</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -892,7 +906,7 @@ reader thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -920,7 +934,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>string</em>) &#8211; data to write</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body">py:class:<cite>~alarmdecoder.util.CommError</cite></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">py:class:<cite>~alarmdecoder.util.CommError</cite></td>
 </tr>
 </tbody>
 </table>
@@ -936,7 +950,7 @@ reader thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -960,7 +974,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1061,7 +1075,7 @@ thread.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1091,7 +1105,7 @@ thread.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">number of bytes sent</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -1107,7 +1121,7 @@ thread.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">character read from the device</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a></td>
 </tr>
 </tbody>
 </table>
@@ -1131,7 +1145,7 @@ reading.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">line that was read</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.CommError" title="alarmdecoder.util.CommError"><tt class="xref py py-class docutils literal"><span class="pre">CommError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1462,7 +1476,7 @@ devices.</p>
 <p>Provides zone tracking functionality for the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> (AD2) device family.</p>
 <dl class="class">
 <dt id="alarmdecoder.zonetracking.Zone">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zone</tt><big>(</big><em>zone=0</em>, <em>name=''</em>, <em>status=0</em>, <em>expander=False</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Representation of a panel zone.</p>
 <dl class="attribute">
@@ -1512,11 +1526,17 @@ devices.</p>
 <dd><p>Timestamp of last update</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="alarmdecoder.zonetracking.Zone.expander">
+<tt class="descname">expander</tt><em class="property"> = False</em><a class="headerlink" href="#alarmdecoder.zonetracking.Zone.expander" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does this zone exist on an expander?</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="alarmdecoder.zonetracking.Zonetracker">
-<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zonetracker</tt><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">alarmdecoder.zonetracking.</tt><tt class="descname">Zonetracker</tt><big>(</big><em>alarmdecoder_object</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Handles tracking of zones and their statuses.</p>
 <dl class="attribute">
@@ -1583,7 +1603,7 @@ devices.</p>
 
 <dl class="method">
 <dt id="alarmdecoder.zonetracking.Zonetracker.expander_to_zone">
-<tt class="descname">expander_to_zone</tt><big>(</big><em>address</em>, <em>channel</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.expander_to_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.expander_to_zone" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">expander_to_zone</tt><big>(</big><em>address</em>, <em>channel</em>, <em>panel_type=0</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/zonetracking.html#Zonetracker.expander_to_zone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.zonetracking.Zonetracker.expander_to_zone" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert an address and channel into a zone number.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1685,7 +1705,7 @@ devices.</p>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises :</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#alarmdecoder.util.NoDeviceError" title="alarmdecoder.util.NoDeviceError"><tt class="xref py py-class docutils literal"><span class="pre">NoDeviceError</span></tt></a>, <a class="reference internal" href="#alarmdecoder.util.TimeoutError" title="alarmdecoder.util.TimeoutError"><tt class="xref py py-class docutils literal"><span class="pre">TimeoutError</span></tt></a></p>
 </td>
 </tr>
 </tbody>
@@ -1762,7 +1782,7 @@ devices.</p>
     </div>
     <div class="footer">
         &copy; Copyright 2013, Nu Tech Software Solutions, Inc..
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
 </html>
