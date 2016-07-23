@@ -61,7 +61,7 @@ Examples
 --------
 
 A basic example is included below. Please see the `examples`_ directory for
-more.
+more.:
 
     import time
     from alarmdecoder import AlarmDecoder
@@ -81,8 +81,8 @@ more.
                 while True:
                     time.sleep(1)
 
-        except Exception, ex:
-            print 'Exception:', ex
+        except Exception as ex:
+            print ('Exception:', ex)
 
     def handle_message(sender, message):
         """
