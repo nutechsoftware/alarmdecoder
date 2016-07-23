@@ -144,7 +144,7 @@ class Firmware(object):
                         else:
                             position = 0
 
-                except Exception, err:
+                except Exception as err:
                     pass
 
             if timer:
@@ -186,7 +186,7 @@ class Firmware(object):
                 dev.write("=")
                 read_until('!load', timeout=15.0)
 
-            except TimeoutError, err:
+            except TimeoutError as err:
                 retry -= 1
             else:
                 retry = 0
@@ -196,7 +196,7 @@ class Firmware(object):
         if found_loader:
             try:
                 do_upload()
-            except UploadError, err:
+            except UploadError as err:
                 stage_callback(Firmware.STAGE_ERROR, error=str(err))
             else:
                 stage_callback(Firmware.STAGE_DONE)
