@@ -29,8 +29,8 @@ def main():
             while True:
                 time.sleep(1)
 
-    except Exception, ex:
-        print 'Exception:', ex
+    except Exception as ex:
+        print('Exception:', ex)
 
 def handle_rfx(sender, message):
     """
@@ -38,7 +38,7 @@ def handle_rfx(sender, message):
     """
     # Check for our target serial number and loop
     if message.serial_number == RF_DEVICE_SERIAL_NUMBER and message.loop[0] == True:
-        print message.serial_number, 'triggered loop #1'
+        print(message.serial_number, 'triggered loop #1')
 
 if __name__ == '__main__':
     main()

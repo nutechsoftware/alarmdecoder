@@ -172,10 +172,10 @@ class Device(object):
                 except SSL.WantReadError:
                     pass
 
-                except CommError, err:
+                except CommError as err:
                     self._device.close()
 
-                except Exception, err:
+                except Exception as err:
                     self._device.close()
                     self._running = False
                     raise
@@ -227,7 +227,7 @@ class USBDevice(Device):
         try:
             cls.__devices = Ftdi.find_all(query, nocache=True)
 
-        except (usb.core.USBError, FtdiError), err:
+        except (usb.core.USBError, FtdiError) as err:
             raise CommError('Error enumerating AD2USB devices: {0}'.format(str(err)), err)
 
         return cls.__devices
@@ -434,10 +434,10 @@ class USBDevice(Device):
 
             self._id = self._serial_number
 
-        except (usb.core.USBError, FtdiError), err:
+        except (usb.core.USBError, FtdiError) as err:
             raise NoDeviceError('Error opening device: {0}'.format(str(err)), err)
 
-        except KeyError, err:
+        except KeyError as err:
             raise NoDeviceError('Unsupported device. ({0:04x}:{1:04x})  You probably need a newer version of pyftdi.'.format(err[0][0], err[0][1]))
 
         else:
@@ -479,7 +479,7 @@ class USBDevice(Device):
 
             self.on_write(data=data)
 
-        except FtdiError, err:
+        except FtdiError as err:
             raise CommError('Error writing to device: {0}'.format(str(err)), err)
 
     def read(self):
@@ -494,7 +494,7 @@ class USBDevice(Device):
         try:
             ret = self._device.read_data(1)
 
-        except (usb.core.USBError, FtdiError), err:
+        except (usb.core.USBError, FtdiError) as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
@@ -543,7 +543,7 @@ class USBDevice(Device):
                 else:
                     time.sleep(0.01)
 
-        except (usb.core.USBError, FtdiError), err:
+        except (usb.core.USBError, FtdiError) as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
@@ -660,7 +660,7 @@ class SerialDevice(Device):
             else:
                 devices = serial.tools.list_ports.comports()
 
-        except serial.SerialException, err:
+        except serial.SerialException as err:
             raise CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
 
         return devices
@@ -731,7 +731,7 @@ class SerialDevice(Device):
             #       all issues with it.
             self._device.baudrate = baudrate
 
-        except (serial.SerialException, ValueError, OSError), err:
+        except (serial.SerialException, ValueError, OSError) as err:
             raise NoDeviceError('Error opening device on {0}.'.format(self._port), err)
 
         else:
@@ -771,7 +771,7 @@ class SerialDevice(Device):
         except serial.SerialTimeoutException:
             pass
 
-        except serial.SerialException, err:
+        except serial.SerialException as err:
             raise CommError('Error writing to device.', err)
 
         else:
@@ -789,7 +789,7 @@ class SerialDevice(Device):
         try:
             ret = self._device.read(1)
 
-        except serial.SerialException, err:
+        except serial.SerialException as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return ret
@@ -839,7 +839,7 @@ class SerialDevice(Device):
                 else:
                     time.sleep(0.01)
 
-        except (OSError, serial.SerialException), err:
+        except (OSError, serial.SerialException) as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
@@ -1014,7 +1014,7 @@ class SocketDevice(Device):
 
             self._id = '{0}:{1}'.format(self._host, self._port)
 
-        except socket.error, err:
+        except socket.error as err:
             raise NoDeviceError('Error opening device at {0}:{1}'.format(self._host, self._port), err)
 
         else:
@@ -1067,7 +1067,7 @@ class SocketDevice(Device):
 
             self.on_write(data=data)
 
-        except (SSL.Error, socket.error), err:
+        except (SSL.Error, socket.error) as err:
             raise CommError('Error writing to device.', err)
 
         return data_sent
@@ -1087,7 +1087,7 @@ class SocketDevice(Device):
             if (len(read_ready) != 0):
                 data = self._device.recv(1)
 
-        except socket.error, err:
+        except socket.error as err:
             raise CommError('Error while reading from device: {0}'.format(str(err)), err)
 
         return data
@@ -1143,10 +1143,10 @@ class SocketDevice(Device):
                 else:
                     time.sleep(0.01)
 
-        except socket.error, err:
+        except socket.error as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
-        except SSL.SysCallError, err:
+        except SSL.SysCallError as err:
             errno, msg = err
             raise CommError('SSL error while reading from device: {0} ({1})'.format(msg, errno))
 
@@ -1175,7 +1175,7 @@ class SocketDevice(Device):
             self._device.setblocking(0)
             while(self._device.recv(1)):
                 pass
-        except socket.error, err:
+        except socket.error as err:
             pass
         finally:
             self._device.setblocking(1)
@@ -1213,7 +1213,7 @@ class SocketDevice(Device):
 
             self._device = SSL.Connection(ctx, self._device)
 
-        except SSL.Error, err:
+        except SSL.Error as err:
             raise CommError('Error setting up SSL connection.', err)
 
     def _verify_ssl_callback(self, connection, x509, errnum, errdepth, ok):

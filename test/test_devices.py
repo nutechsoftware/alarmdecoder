@@ -37,19 +37,19 @@ class TestUSBDevice(TestCase):
         with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
             device = USBDevice.find()
 
-            self.assertEquals(device.interface, 'AD2')
+            self.assertEqual(device.interface, 'AD2')
 
     def test_find_with_param(self):
         with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
             device = USBDevice.find((0, 0, 'AD2-1', 1, 'AD2'))
-            self.assertEquals(device.interface, 'AD2-1')
+            self.assertEqual(device.interface, 'AD2-1')
 
             device = USBDevice.find((0, 0, 'AD2-2', 1, 'AD2'))
-            self.assertEquals(device.interface, 'AD2-2')
+            self.assertEqual(device.interface, 'AD2-2')
 
     def test_events(self):
-        self.assertEquals(self._attached, False)
-        self.assertEquals(self._detached, False)
+        self.assertEqual(self._attached, False)
+        self.assertEqual(self._detached, False)
 
         # this is ugly, but it works.
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
@@ -60,14 +60,14 @@ class TestUSBDevice(TestCase):
                 time.sleep(1)
                 USBDevice.stop_detection()
 
-        self.assertEquals(self._attached, True)
-        self.assertEquals(self._detached, True)
+        self.assertEqual(self._attached, True)
+        self.assertEqual(self._detached, True)
 
     def test_find_all(self):
         with patch.object(USBDevice, 'find_all', return_value=[]) as mock:
             devices = USBDevice.find_all()
 
-        self.assertEquals(devices, [])
+        self.assertEqual(devices, [])
 
     def test_find_all_exception(self):
         with patch.object(Ftdi, 'find_all', side_effect=[USBError('testing'), FtdiError]) as mock:
@@ -80,16 +80,16 @@ class TestUSBDevice(TestCase):
     def test_interface_serial_number(self):
         self._device.interface = 'AD2USB'
 
-        self.assertEquals(self._device.interface, 'AD2USB')
-        self.assertEquals(self._device.serial_number, 'AD2USB')
-        self.assertEquals(self._device._device_number, 0)
+        self.assertEqual(self._device.interface, 'AD2USB')
+        self.assertEqual(self._device.serial_number, 'AD2USB')
+        self.assertEqual(self._device._device_number, 0)
 
     def test_interface_index(self):
         self._device.interface = 1
 
-        self.assertEquals(self._device.interface, 1)
-        self.assertEquals(self._device.serial_number, None)
-        self.assertEquals(self._device._device_number, 1)
+        self.assertEqual(self._device.interface, 1)
+        self.assertEqual(self._device.serial_number, None)
+        self.assertEqual(self._device._device_number, 1)
 
     def test_open(self):
         self._device.interface = 'AD2USB'
@@ -148,7 +148,7 @@ class TestUSBDevice(TestCase):
             except StopIteration:
                 pass
 
-            self.assertEquals(ret, "testing")
+            self.assertEqual(ret, "testing")
 
     def test_read_line_timeout(self):
         with patch.object(self._device._device, 'read_data', return_value='a') as mock:
@@ -235,7 +235,7 @@ class TestSerialDevice(TestCase):
             except StopIteration:
                 pass
 
-            self.assertEquals(ret, "testing")
+            self.assertEqual(ret, "testing")
 
     def test_read_line_timeout(self):
         with patch.object(self._device._device, 'read', return_value='a') as mock:
@@ -317,7 +317,7 @@ class TestSocketDevice(TestCase):
                     except StopIteration:
                         pass
 
-                    self.assertEquals(ret, "testing")
+                    self.assertEqual(ret, "testing")
 
     def test_read_line_timeout(self):
         with patch('socket.socket.fileno', return_value=1):
@@ -362,7 +362,7 @@ class TestSocketDevice(TestCase):
                     with patch.object(socket.socket, 'fileno', return_value=fileno):
                         try:
                             self._device.open(no_reader_thread=True)
-                        except SSL.SysCallError, ex:
+                        except SSL.SysCallError as ex:
                             pass
 
         os.close(fileno)
@@ -387,7 +387,7 @@ class TestSocketDevice(TestCase):
                         with self.assertRaises(CommError):
                             try:
                                 self._device.open(no_reader_thread=True)
-                            except SSL.SysCallError, ex:
+                            except SSL.SysCallError as ex:
                                 pass
 
         os.close(fileno)

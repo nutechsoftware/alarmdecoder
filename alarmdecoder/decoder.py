@@ -51,15 +51,15 @@ class AlarmDecoder(object):
     on_write = event.Event("This event is called when data has been written to the device.\n\n**Callback definition:** *def callback(device, data)*")
 
     # Constants
-    KEY_F1 = unichr(1) + unichr(1) + unichr(1)
+    KEY_F1 = chr(1) + chr(1) + chr(1)
     """Represents panel function key #1"""
-    KEY_F2 = unichr(2) + unichr(2) + unichr(2)
+    KEY_F2 = chr(2) + chr(2) + chr(2)
     """Represents panel function key #2"""
-    KEY_F3 = unichr(3) + unichr(3) + unichr(3)
+    KEY_F3 = chr(3) + chr(3) + chr(3)
     """Represents panel function key #3"""
-    KEY_F4 = unichr(4) + unichr(4) + unichr(4)
+    KEY_F4 = chr(4) + chr(4) + chr(4)
     """Represents panel function key #4"""
-    KEY_PANIC = unichr(5) + unichr(5) + unichr(5)
+    KEY_PANIC = chr(5) + chr(5) + chr(5)
     """Represents a panic keypress"""
 
     BATTERY_TIMEOUT = 30
@@ -258,7 +258,7 @@ class AlarmDecoder(object):
                                ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
-        config_entries.append(('MODE', PANEL_TYPES.keys()[PANEL_TYPES.values().index(self.mode)]))
+        config_entries.append(('MODE', list(PANEL_TYPES.keys())[list(PANEL_TYPES.values()).index(self.mode)]))
 
         return '&'.join(['='.join(t) for t in config_entries])
 

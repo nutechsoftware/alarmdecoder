@@ -39,7 +39,7 @@ class TestZonetracking(TestCase):
         zone, msg = self._build_expander_message('!EXP:07,01,01')
         self._zonetracker.update(msg)
 
-        self.assertEquals(self._zonetracker._zones[zone].status, Zone.FAULT)
+        self.assertEqual(self._zonetracker._zones[zone].status, Zone.FAULT)
         self.assertTrue(self._faulted)
 
     def test_zone_restore(self):
@@ -49,31 +49,31 @@ class TestZonetracking(TestCase):
         zone, msg = self._build_expander_message('!EXP:07,01,00')
         self._zonetracker.update(msg)
 
-        self.assertEquals(self._zonetracker._zones[zone].status, Zone.CLEAR)
+        self.assertEqual(self._zonetracker._zones[zone].status, Zone.CLEAR)
         self.assertTrue(self._restored)
 
     def test_message_ready(self):
         msg = Message('[0000000000000010----],001,[f707000600e5800c0c020000],"                                "')
         self._zonetracker.update(msg)
 
-        self.assertEquals(len(self._zonetracker._zones_faulted), 1)
+        self.assertEqual(len(self._zonetracker._zones_faulted), 1)
 
         msg = Message('[1000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self._zonetracker.update(msg)
 
-        self.assertEquals(len(self._zonetracker._zones_faulted), 0)
+        self.assertEqual(len(self._zonetracker._zones_faulted), 0)
 
     def test_message_fault_text(self):
         msg = Message('[0000000000000000----],001,[f707000600e5800c0c020000],"FAULT 1                         "')
         self._zonetracker.update(msg)
 
-        self.assertEquals(len(self._zonetracker._zones_faulted), 1)
+        self.assertEqual(len(self._zonetracker._zones_faulted), 1)
 
     def test_ECP_failure(self):
         msg = Message('[0000000000000010----],0bf,[f707000600e5800c0c020000],"CHECK 1                         "')
         self._zonetracker.update(msg)
 
-        self.assertEquals(self._zonetracker._zones['1'].status, Zone.CHECK)
+        self.assertEqual(self._zonetracker._zones['1'].status, Zone.CHECK)
 
     def test_zone_restore_skip(self):
         panel_messages = [

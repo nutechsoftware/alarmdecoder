@@ -21,12 +21,12 @@ def main():
         while True:
             time.sleep(1)
 
-    except Exception, ex:
-        print 'Exception:', ex
+    except Exception as ex:
+        print('Exception:', ex)
 
     finally:
         # Close all devices and stop detection.
-        for sn, device in __devices.iteritems():
+        for sn, device in __devices.items():
             device.close()
 
         USBDevice.stop_detection()
@@ -48,7 +48,7 @@ def handle_message(sender, message):
     """
     Handles message events from the AlarmDecoder.
     """
-    print sender, message.raw
+    print(sender, message.raw)
 
 def handle_attached(sender, device):
     """
@@ -58,7 +58,7 @@ def handle_attached(sender, device):
     dev = create_device(device)
     __devices[dev.id] = dev
 
-    print 'attached', dev.id
+    print('attached', dev.id)
 
 def handle_detached(sender, device):
     """
@@ -67,12 +67,12 @@ def handle_detached(sender, device):
     vendor, product, sernum, ifcount, description = device
 
     # Close and remove the device from our list.
-    if sernum in __devices.keys():
+    if sernum in list(__devices.keys()):
         __devices[sernum].close()
 
         del __devices[sernum]
 
-    print 'detached', sernum
+    print('detached', sernum)
 
 if __name__ == '__main__':
     main()

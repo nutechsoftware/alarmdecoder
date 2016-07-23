@@ -47,14 +47,14 @@ def main():
 
                 time.sleep(1)
 
-    except Exception, ex:
-        print 'Exception:', ex
+    except Exception as ex:
+        print('Exception:', ex)
 
 def handle_zone_fault(sender, zone):
     """
     Handles zone fault messages.
     """
-    print 'zone faulted', zone
+    print('zone faulted', zone)
 
     # Restore the zone
     sender.clear_zone(zone)
@@ -63,7 +63,7 @@ def handle_zone_restore(sender, zone):
     """
     Handles zone restore messages.
     """
-    print 'zone cleared', zone
+    print('zone cleared', zone)
 
 if __name__ == '__main__':
     main()
