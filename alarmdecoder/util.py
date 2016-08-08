@@ -8,6 +8,7 @@ Provides utility classes for the `AlarmDecoder`_ (AD2) devices.
 
 import time
 import threading
+from io import open
 
 
 class NoDeviceError(Exception):

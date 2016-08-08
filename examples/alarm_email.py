@@ -38,9 +38,8 @@ def handle_alarm(sender, **kwargs):
     """
     Handles alarm events from the AlarmDecoder.
     """
-    status = kwargs.pop('status', None)
     zone = kwargs.pop('zone', None)
-    text = "Alarm status: {0} - Zone {1}".format(status, zone)
+    text = "Alarm: Zone {0}".format(zone)
 
     # Build the email message
     msg = MIMEText(text)

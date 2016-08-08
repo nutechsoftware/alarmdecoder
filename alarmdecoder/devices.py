@@ -21,10 +21,12 @@ import serial
 import serial.tools.list_ports
 import socket
 import select
+from builtins import bytes
 
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
 
+have_pyftdi = False
 try:
     from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
     import usb.core
@@ -33,7 +35,15 @@ try:
     have_pyftdi = True
 
 except ImportError:
-    have_pyftdi = False
+    try:
+        from pyftdi.ftdi import Ftdi, FtdiError
+        import usb.core
+        import usb.util
+
+        have_pyftdi = True
+
+    except ImportError:
+        have_pyftdi = False
 
 try:
     from OpenSSL import SSL, crypto
@@ -41,8 +51,16 @@ try:
     have_openssl = True
 
 except ImportError:
-    from collections import namedtuple
-    SSL = namedtuple('SSL', ['Error', 'WantReadError', 'SysCallError'])
+    class SSL:
+        class Error(BaseException):
+            pass
+
+        class WantReadError(BaseException):
+            pass
+
+        class SysCallError(BaseException):
+            pass
+
     have_openssl = False
 
 
@@ -62,7 +80,7 @@ class Device(object):
         Constructor
         """
         self._id = ''
-        self._buffer = ''
+        self._buffer = b''
         self._device = None
         self._running = False
         self._read_thread = None
@@ -519,7 +537,7 @@ class USBDevice(Device):
         timeout_event.reading = True
 
         if purge_buffer:
-            self._buffer = ''
+            self._buffer = b''
 
         got_line, ret = False, None
 
@@ -531,11 +549,11 @@ class USBDevice(Device):
             while timeout_event.reading:
                 buf = self._device.read_data(1)
 
-                if buf != '':
+                if buf != b'':
                     self._buffer += buf
 
-                    if buf == "\n":
-                        self._buffer = self._buffer.rstrip("\r\n")
+                    if buf == b"\n":
+                        self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
                             got_line = True
@@ -548,7 +566,7 @@ class USBDevice(Device):
 
         else:
             if got_line:
-                ret, self._buffer = self._buffer, ''
+                ret, self._buffer = self._buffer, b''
 
                 self.on_read(data=ret)
 
@@ -814,7 +832,7 @@ class SerialDevice(Device):
         timeout_event.reading = True
 
         if purge_buffer:
-            self._buffer = ''
+            self._buffer = b''
 
         got_line, ret = False, None
 
@@ -824,14 +842,14 @@ class SerialDevice(Device):
 
         try:
             while timeout_event.reading:
-                buf = self._device.read(1)
+                buf = bytes(self._device.read(1), 'utf-8')
 
                 # NOTE: AD2SERIAL apparently sends down \xFF on boot.
-                if buf != '' and buf != "\xff":
+                if buf != b'' and buf != b"\xff":
                     self._buffer += buf
 
-                    if buf == "\n":
-                        self._buffer = self._buffer.rstrip("\r\n")
+                    if buf == b"\n":
+                        self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
                             got_line = True
@@ -844,7 +862,7 @@ class SerialDevice(Device):
 
         else:
             if got_line:
-                ret, self._buffer = self._buffer, ''
+                ret, self._buffer = self._buffer, b''
 
                 self.on_read(data=ret)
 
@@ -1112,7 +1130,7 @@ class SocketDevice(Device):
         timeout_event.reading = True
 
         if purge_buffer:
-            self._buffer = ''
+            self._buffer = b''
 
         got_line, ret = False, None
 
@@ -1128,13 +1146,13 @@ class SocketDevice(Device):
                     time.sleep(0.01)
                     continue
 
-                buf = self._device.recv(1)
+                buf = bytes(self._device.recv(1), 'utf-8')
 
-                if buf != '':
+                if buf != b'':
                     self._buffer += buf
 
-                    if buf == "\n":
-                        self._buffer = self._buffer.rstrip("\r\n")
+                    if buf == b"\n":
+                        self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
                             got_line = True
@@ -1155,7 +1173,7 @@ class SocketDevice(Device):
 
         else:
             if got_line:
-                ret, self._buffer = self._buffer, ''
+                ret, self._buffer = self._buffer, b''
 
                 self.on_read(data=ret)
 

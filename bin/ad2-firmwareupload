@@ -16,10 +16,10 @@ def handle_firmware(stage, **kwargs):
         sys.stdout.write('.')
         sys.stdout.flush()
     elif stage == alarmdecoder.util.Firmware.STAGE_BOOT:
-        if handle_firmware.wait_tick > 0: print ""
-        print "Rebooting device.."
+        if handle_firmware.wait_tick > 0: print("")
+        print("Rebooting device..")
     elif stage == alarmdecoder.util.Firmware.STAGE_LOAD:
-        print 'Waiting for boot loader..'
+        print('Waiting for boot loader..')
     elif stage == alarmdecoder.util.Firmware.STAGE_UPLOADING:
         if handle_firmware.upload_tick == 0:
             sys.stdout.write('Uploading firmware.')
@@ -30,11 +30,11 @@ def handle_firmware(stage, **kwargs):
             sys.stdout.write('.')
             sys.stdout.flush()
     elif stage == alarmdecoder.util.Firmware.STAGE_DONE:
-        print "\r\nDone!"
+        print("\r\nDone!")
     elif stage == alarmdecoder.util.Firmware.STAGE_ERROR:
-        print "\r\nError: {0}".format(kwargs.get("error", ""))
+        print("\r\nError: {0}".format(kwargs.get("error", "")))
     elif stage == alarmdecoder.util.Firmware.STAGE_DEBUG:
-        print "\r\nDBG: {0}".format(kwargs.get("data", ""))
+        print("\r\nDBG: {0}".format(kwargs.get("data", "")))
 
 def main():
     device = '/dev/ttyUSB0'
@@ -42,7 +42,7 @@ def main():
     baudrate = 115200
 
     if len(sys.argv) < 2:
-        print "Syntax: {0} <firmware> [device path or hostname:port] [baudrate]".format(sys.argv[0])
+        print("Syntax: {0} <firmware> [device path or hostname:port] [baudrate]".format(sys.argv[0]))
         sys.exit(1)
 
     firmware = sys.argv[1]
@@ -53,8 +53,7 @@ def main():
         baudrate = sys.argv[3]
 
     debug = os.environ.get("ALARMDECODER_DEBUG") is not None
-
-    print "Flashing device: {0} - {2} baud\r\nFirmware: {1}".format(device, firmware, baudrate)
+    print("Flashing device: {0} - {2} baud\r\nFirmware: {1}".format(device, firmware, baudrate))
 
     dev = None
     try:

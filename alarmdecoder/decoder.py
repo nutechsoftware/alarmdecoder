@@ -9,6 +9,8 @@ Provides the main AlarmDecoder class.
 import time
 import re
 
+from builtins import chr
+
 from .event import event
 from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
@@ -74,9 +76,9 @@ class AlarmDecoder(object):
     """The configuration bits set on the device."""
     address_mask = 0xFFFFFFFF
     """The address mask configured on the device."""
-    emulate_zone = [False for _ in range(5)]
+    emulate_zone = [False for _ in list(range(5))]
     """List containing the devices zone emulation status."""
-    emulate_relay = [False for _ in range(4)]
+    emulate_relay = [False for _ in list(range(4))]
     """List containing the devices relay emulation status."""
     emulate_lrr = False
     """The status of the devices LRR emulation."""
@@ -111,8 +113,8 @@ class AlarmDecoder(object):
         self.address = 18
         self.configbits = 0xFF00
         self.address_mask = 0xFFFFFFFF
-        self.emulate_zone = [False for x in range(5)]
-        self.emulate_relay = [False for x in range(4)]
+        self.emulate_zone = [False for x in list(range(5))]
+        self.emulate_relay = [False for x in list(range(4))]
         self.emulate_lrr = False
         self.deduplicate = False
         self.mode = ADEMCO
@@ -231,7 +233,7 @@ class AlarmDecoder(object):
         """
 
         if self._device:
-            self._device.write(str(data))
+            self._device.write(str.encode(data))
 
     def get_config(self):
         """
@@ -258,7 +260,9 @@ class AlarmDecoder(object):
                                ''.join(['Y' if r else 'N' for r in self.emulate_relay])))
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
-        config_entries.append(('MODE', list(PANEL_TYPES.keys())[list(PANEL_TYPES.values()).index(self.mode)]))
+        config_entries.append(('MODE', list(PANEL_TYPES)[list(PANEL_TYPES.values()).index(self.mode)]))
+
+        config_string = '&'.join(['='.join(t) for t in config_entries])
 
         return '&'.join(['='.join(t) for t in config_entries])
 
@@ -320,6 +324,8 @@ class AlarmDecoder(object):
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
+
+        data = data.decode('utf-8')
 
         if data is not None:
             data = data.lstrip('\0')
@@ -444,9 +450,9 @@ class AlarmDecoder(object):
             elif key == 'MASK':
                 self.address_mask = int(val, 16)
             elif key == 'EXP':
-                self.emulate_zone = [val[z] == 'Y' for z in range(5)]
+                self.emulate_zone = [val[z] == 'Y' for z in list(range(5))]
             elif key == 'REL':
-                self.emulate_relay = [val[r] == 'Y' for r in range(4)]
+                self.emulate_relay = [val[r] == 'Y' for r in list(range(4))]
             elif key == 'LRR':
                 self.emulate_lrr = (val == 'Y')
             elif key == 'DEDUPLICATE':
