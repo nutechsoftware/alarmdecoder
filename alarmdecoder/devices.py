@@ -842,7 +842,7 @@ class SerialDevice(Device):
 
         try:
             while timeout_event.reading:
-                buf = bytes(self._device.read(1), 'utf-8')
+                buf = self._device.read(1)
 
                 # NOTE: AD2SERIAL apparently sends down \xFF on boot.
                 if buf != b'' and buf != b"\xff":
@@ -1146,7 +1146,7 @@ class SocketDevice(Device):
                     time.sleep(0.01)
                     continue
 
-                buf = bytes(self._device.recv(1), 'utf-8')
+                buf = self._device.recv(1)
 
                 if buf != b'':
                     self._buffer += buf
