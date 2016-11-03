@@ -87,6 +87,14 @@ class AlarmDecoder(object):
     mode = ADEMCO
     """The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC."""
 
+    #Version Information
+    serial_number = 0xFFFFFFFF
+    """The device serial number"""
+    version_number = '2.2a.8'
+    """The device firmware version"""
+    version_flags = "TX;RX;SM;VZ;RF;ZX;RE;AU;3X;CG;DD;MF;LR;KE;MK;CB;DS;ER"
+    """Device flags enabled"""
+
     def __init__(self, device):
         """
         Constructor
@@ -118,6 +126,10 @@ class AlarmDecoder(object):
         self.emulate_lrr = False
         self.deduplicate = False
         self.mode = ADEMCO
+
+        self.serial_number = 0xFFFFFFFF
+        self.version_number = '2.2a.8'
+        self.version_flags = "TX;RX;SM;VZ;RF;ZX;RE;AU;3X;CG;DD;MF;LR;KE;MK;CB;DS;ER"
 
     def __enter__(self):
         """
@@ -266,6 +278,12 @@ class AlarmDecoder(object):
 
         return '&'.join(['='.join(t) for t in config_entries])
 
+    def get_version(self):
+        """
+        Retrieves the version string from the device.  Called automatically by :py:meth:`_on_open`.
+        """
+        self.send("V\r")
+
     def reboot(self):
         """
         Reboots the device.
@@ -354,6 +372,9 @@ class AlarmDecoder(object):
         elif data.startswith('!CONFIG'):
             self._handle_config(data)
 
+        elif data.startswith('!VER'):
+            self._handle_version(data)
+
         elif data.startswith('!Sending'):
             self._handle_sending(data)
 
@@ -431,6 +452,21 @@ class AlarmDecoder(object):
         self.on_lrr_message(message=msg)
 
         return msg
+
+    def _handle_version(self, data):
+        """
+        Handles received version data.
+        
+        :param data: Version string to parse
+        :type data: string
+        """
+
+        _, version_string = data.split(':')
+        version_parts = version_string.split(',')
+
+        self.serial_number = version_parts[0]
+        self.version_number = version_parts[1]
+        self.version_flags = version_parts[2]
 
     def _handle_config(self, data):
         """
@@ -655,6 +691,8 @@ class AlarmDecoder(object):
         Internal handler for opening the device.
         """
         self.get_config()
+
+        self.get_version()
 
         self.on_open()
 
