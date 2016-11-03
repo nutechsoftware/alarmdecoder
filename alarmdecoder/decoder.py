@@ -90,9 +90,9 @@ class AlarmDecoder(object):
     #Version Information
     serial_number = 0xFFFFFFFF
     """The device serial number"""
-    version_number = '2.2a.8'
+    version_number = 'Unknown'
     """The device firmware version"""
-    version_flags = "TX;RX;SM;VZ;RF;ZX;RE;AU;3X;CG;DD;MF;LR;KE;MK;CB;DS;ER"
+    version_flags = ""
     """Device flags enabled"""
 
     def __init__(self, device):
@@ -128,8 +128,8 @@ class AlarmDecoder(object):
         self.mode = ADEMCO
 
         self.serial_number = 0xFFFFFFFF
-        self.version_number = '2.2a.8'
-        self.version_flags = "TX;RX;SM;VZ;RF;ZX;RE;AU;3X;CG;DD;MF;LR;KE;MK;CB;DS;ER"
+        self.version_number = 'Unknown'
+        self.version_flags = ""
 
     def __enter__(self):
         """
