@@ -171,7 +171,7 @@ class Message(BaseMessage):
         self.text = alpha.strip('"')
         self.mask = int(self.panel_data[3:3+8], 16)
 
-        if self.panel_type == ADEMCO:
+        if self.panel_type in (ADEMCO, DSC):
             if int(self.panel_data[19:21], 16) & 0x01 > 0:
                 # Current cursor location on the alpha display.
                 self.cursor_location = int(self.panel_data[21:23], 16)
