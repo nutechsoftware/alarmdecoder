@@ -226,7 +226,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="c"># Process fault</span>
-            <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">check_zone</span> <span class="ow">or</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;FAULT&quot;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">message</span><span class="o">.</span><span class="n">check_zone</span> <span class="ow">or</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;FAULT&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;ALARM&quot;</span><span class="p">):</span>
                 <span class="c"># Apparently this representation can be both base 10</span>
                 <span class="c"># or base 16, depending on where the message came</span>
                 <span class="c"># from.</span>
@@ -307,7 +307,7 @@
         <span class="n">it</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones_faulted</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="ow">not</span> <span class="n">found_last_faulted</span><span class="p">:</span>
-                <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_zone_fault</span><span class="p">:</span>
                     <span class="n">found_last_faulted</span> <span class="o">=</span> <span class="bp">True</span>
@@ -320,7 +320,7 @@
         <span class="c"># between to our clear list.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="ow">not</span> <span class="n">at_end</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">found_current</span><span class="p">:</span>
-                <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="n">zone</span><span class="p">:</span>
                     <span class="n">found_current</span> <span class="o">=</span> <span class="bp">True</span>
@@ -338,7 +338,7 @@
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">while</span> <span class="ow">not</span> <span class="n">found_current</span><span class="p">:</span>
-                    <span class="n">z</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
 
                     <span class="k">if</span> <span class="n">z</span> <span class="o">==</span> <span class="n">zone</span><span class="p">:</span>
                         <span class="n">found_current</span> <span class="o">=</span> <span class="bp">True</span>
@@ -359,7 +359,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">zones</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zones</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="n">zones</span> <span class="o">+=</span> <span class="p">[</span><span class="n">z</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">zones</span><span class="p">:</span>

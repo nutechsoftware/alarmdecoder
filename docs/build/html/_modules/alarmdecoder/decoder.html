@@ -58,6 +58,8 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="kn">import</span> <span class="nb">chr</span>
+
 <span class="kn">from</span> <span class="nn">.event</span> <span class="kn">import</span> <span class="n">event</span>
 <span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="n">InvalidMessageError</span>
 <span class="kn">from</span> <span class="nn">.messages</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">ExpanderMessage</span><span class="p">,</span> <span class="n">RFMessage</span><span class="p">,</span> <span class="n">LRRMessage</span>
@@ -100,15 +102,15 @@
     <span class="n">on_write</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">Event</span><span class="p">(</span><span class="s">&quot;This event is called when data has been written to the device.</span><span class="se">\n\n</span><span class="s">**Callback definition:** *def callback(device, data)*&quot;</span><span class="p">)</span>
 
     <span class="c"># Constants</span>
-    <span class="n">KEY_F1</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">KEY_F1</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents panel function key #1&quot;&quot;&quot;</span>
-    <span class="n">KEY_F2</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">KEY_F2</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents panel function key #2&quot;&quot;&quot;</span>
-    <span class="n">KEY_F3</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">KEY_F3</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents panel function key #3&quot;&quot;&quot;</span>
-    <span class="n">KEY_F4</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">KEY_F4</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents panel function key #4&quot;&quot;&quot;</span>
-    <span class="n">KEY_PANIC</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">unichr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">KEY_PANIC</span> <span class="o">=</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Represents a panic keypress&quot;&quot;&quot;</span>
 
     <span class="n">BATTERY_TIMEOUT</span> <span class="o">=</span> <span class="mi">30</span>
@@ -123,9 +125,9 @@
     <span class="sd">&quot;&quot;&quot;The configuration bits set on the device.&quot;&quot;&quot;</span>
     <span class="n">address_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
     <span class="sd">&quot;&quot;&quot;The address mask configured on the device.&quot;&quot;&quot;</span>
-    <span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+    <span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))]</span>
     <span class="sd">&quot;&quot;&quot;List containing the devices zone emulation status.&quot;&quot;&quot;</span>
-    <span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+    <span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">))]</span>
     <span class="sd">&quot;&quot;&quot;List containing the devices relay emulation status.&quot;&quot;&quot;</span>
     <span class="n">emulate_lrr</span> <span class="o">=</span> <span class="bp">False</span>
     <span class="sd">&quot;&quot;&quot;The status of the devices LRR emulation.&quot;&quot;&quot;</span>
@@ -133,6 +135,14 @@
     <span class="sd">&quot;&quot;&quot;The status of message deduplication as configured on the device.&quot;&quot;&quot;</span>
     <span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
     <span class="sd">&quot;&quot;&quot;The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC.&quot;&quot;&quot;</span>
+
+    <span class="c">#Version Information</span>
+    <span class="n">serial_number</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+    <span class="sd">&quot;&quot;&quot;The device serial number&quot;&quot;&quot;</span>
+    <span class="n">version_number</span> <span class="o">=</span> <span class="s">&#39;Unknown&#39;</span>
+    <span class="sd">&quot;&quot;&quot;The device firmware version&quot;&quot;&quot;</span>
+    <span class="n">version_flags</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Device flags enabled&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -153,18 +163,22 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_armed_status</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fire_status</span> <span class="o">=</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_battery_status</span> <span class="o">=</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_panic_status</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_panic_status</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relay_status</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_internal_address_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="mi">18</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configbits</span> <span class="o">=</span> <span class="mh">0xFF00</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">=</span> <span class="mh">0x00000000</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">))]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="o">=</span> <span class="bp">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">ADEMCO</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_number</span> <span class="o">=</span> <span class="mh">0xFFFFFFFF</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_number</span> <span class="o">=</span> <span class="s">&#39;Unknown&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_flags</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -280,7 +294,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </div>
 <div class="viewcode-block" id="AlarmDecoder.get_config"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -292,7 +306,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets configuration entries on the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">config_string</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;C{0}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_config_string</span><span class="p">()))</span>
+</div>
+<div class="viewcode-block" id="AlarmDecoder.get_config_string"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.get_config_string">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config_entries</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c"># HACK: This is ugly.. but I can&#39;t think of an elegant way of doing it.</span>
@@ -305,11 +321,17 @@
                                <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="n">r</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span><span class="p">])))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;LRR&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
         <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">,</span> <span class="s">&#39;Y&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deduplicate</span> <span class="k">else</span> <span class="s">&#39;N&#39;</span><span class="p">))</span>
-        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MODE&#39;</span><span class="p">,</span> <span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">values</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)]))</span>
+        <span class="n">config_entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;MODE&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">PANEL_TYPES</span><span class="p">)[</span><span class="nb">list</span><span class="p">(</span><span class="n">PANEL_TYPES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">)]))</span>
 
         <span class="n">config_string</span> <span class="o">=</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">config_entries</span><span class="p">])</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;C{0}</span><span class="se">\r</span><span class="s">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">config_string</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s">&#39;&amp;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;=&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">config_entries</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="AlarmDecoder.get_version"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.get_version">[docs]</a>    <span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the version string from the device.  Called automatically by :py:meth:`_on_open`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">&quot;V</span><span class="se">\r</span><span class="s">&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="AlarmDecoder.reboot"><a class="viewcode-back" href="../../alarmdecoder.html#alarmdecoder.decoder.AlarmDecoder.reboot">[docs]</a>    <span class="k">def</span> <span class="nf">reboot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -370,6 +392,8 @@
 <span class="sd">        :returns: :py:class:`~alarmdecoder.messages.Message`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">)</span>
 
@@ -396,6 +420,9 @@
 
         <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;!CONFIG&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_config</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;!VER&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_version</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;!Sending&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_sending</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -475,6 +502,21 @@
 
         <span class="k">return</span> <span class="n">msg</span>
 
+    <span class="k">def</span> <span class="nf">_handle_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handles received version data.</span>
+<span class="sd">        </span>
+<span class="sd">        :param data: Version string to parse</span>
+<span class="sd">        :type data: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">version_string</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">version_parts</span> <span class="o">=</span> <span class="n">version_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_number</span> <span class="o">=</span> <span class="n">version_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_number</span> <span class="o">=</span> <span class="n">version_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version_flags</span> <span class="o">=</span> <span class="n">version_parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">_handle_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handles received configuration data.</span>
@@ -493,9 +535,9 @@
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;MASK&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">address_mask</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;EXP&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emulate_zone</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">z</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">))]</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;REL&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">emulate_relay</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">))]</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;LRR&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">emulate_lrr</span> <span class="o">=</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="s">&#39;Y&#39;</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s">&#39;DEDUPLICATE&#39;</span><span class="p">:</span>
@@ -698,6 +740,8 @@
 <span class="sd">        Internal handler for opening the device.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">on_open</span><span class="p">()</span>
 

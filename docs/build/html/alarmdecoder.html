@@ -310,6 +310,24 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.serial_number">
+<tt class="descname">serial_number</tt><em class="property"> = 4294967295</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.serial_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device serial number</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.version_number">
+<tt class="descname">version_number</tt><em class="property"> = 'Unknown'</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.version_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device firmware version</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.decoder.AlarmDecoder.version_flags">
+<tt class="descname">version_flags</tt><em class="property"> = ''</em><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.version_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Device flags enabled</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="alarmdecoder.decoder.AlarmDecoder.id">
 <tt class="descname">id</tt><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.id" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ID of the <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> device.</p>
@@ -414,6 +432,17 @@ thread should be started.</li>
 <dt id="alarmdecoder.decoder.AlarmDecoder.save_config">
 <tt class="descname">save_config</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.save_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.save_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets configuration entries on the device.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.get_config_string">
+<tt class="descname">get_config_string</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.get_config_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.get_config_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.decoder.AlarmDecoder.get_version">
+<tt class="descname">get_version</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/decoder.html#AlarmDecoder.get_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.decoder.AlarmDecoder.get_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the version string from the device.  Called automatically by <tt class="xref py py-meth docutils literal"><span class="pre">_on_open()</span></tt>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -813,6 +842,12 @@ reading.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="alarmdecoder.devices.USBDevice.purge">
+<tt class="descname">purge</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Purges read/write buffers.</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="alarmdecoder.devices.USBDevice.DetectThread">
 <em class="property">class </em><tt class="descname">DetectThread</tt><big>(</big><em>on_attached=None</em>, <em>on_detached=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#USBDevice.DetectThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.USBDevice.DetectThread" title="Permalink to this definition">¶</a></dt>
@@ -979,6 +1014,12 @@ reading.</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.devices.SerialDevice.purge">
+<tt class="descname">purge</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SerialDevice.purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SerialDevice.purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Purges read/write buffers.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1150,6 +1191,12 @@ reading.</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="alarmdecoder.devices.SocketDevice.purge">
+<tt class="descname">purge</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/alarmdecoder/devices.html#SocketDevice.purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.devices.SocketDevice.purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Purges read/write buffers.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1656,6 +1703,20 @@ devices.</p>
 <p>The format of the panel message was invalid.</p>
 </dd></dl>
 
+<dl class="exception">
+<dt id="alarmdecoder.util.UploadError">
+<em class="property">exception </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">UploadError</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#UploadError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.UploadError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Generic firmware upload error.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="alarmdecoder.util.UploadChecksumError">
+<em class="property">exception </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">UploadChecksumError</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#UploadChecksumError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.UploadChecksumError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#alarmdecoder.util.UploadError" title="alarmdecoder.util.UploadError"><tt class="xref py py-class docutils literal"><span class="pre">alarmdecoder.util.UploadError</span></tt></a></p>
+<p>The firmware upload failed due to a checksum error.</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="alarmdecoder.util.Firmware">
 <em class="property">class </em><tt class="descclassname">alarmdecoder.util.</tt><tt class="descname">Firmware</tt><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware" title="Permalink to this definition">¶</a></dt>
@@ -1691,9 +1752,19 @@ devices.</p>
 <tt class="descname">STAGE_DONE</tt><em class="property"> = 5</em><a class="headerlink" href="#alarmdecoder.util.Firmware.STAGE_DONE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="alarmdecoder.util.Firmware.STAGE_ERROR">
+<tt class="descname">STAGE_ERROR</tt><em class="property"> = 98</em><a class="headerlink" href="#alarmdecoder.util.Firmware.STAGE_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="alarmdecoder.util.Firmware.STAGE_DEBUG">
+<tt class="descname">STAGE_DEBUG</tt><em class="property"> = 99</em><a class="headerlink" href="#alarmdecoder.util.Firmware.STAGE_DEBUG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="staticmethod">
 <dt id="alarmdecoder.util.Firmware.upload">
-<em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">upload</tt><big>(</big><em>dev</em>, <em>filename</em>, <em>progress_callback=None</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/alarmdecoder/util.html#Firmware.upload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#alarmdecoder.util.Firmware.upload" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uploads firmware to an <a class="reference external" href="http://www.alarmdecoder.com">AlarmDecoder</a> device.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
