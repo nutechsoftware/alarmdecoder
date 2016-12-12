@@ -9,7 +9,10 @@ Provides the main AlarmDecoder class.
 import time
 import re
 
-from builtins import chr
+try:
+    from builtins import chr
+except ImportError:
+    pass
 
 from .event import event
 from .util import InvalidMessageError
@@ -456,7 +459,7 @@ class AlarmDecoder(object):
     def _handle_version(self, data):
         """
         Handles received version data.
-        
+
         :param data: Version string to parse
         :type data: string
         """

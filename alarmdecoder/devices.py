@@ -21,7 +21,7 @@ import serial
 import serial.tools.list_ports
 import socket
 import select
-from builtins import bytes
+import sys
 
 from .util import CommError, TimeoutError, NoDeviceError, InvalidMessageError
 from .event import event
@@ -62,6 +62,20 @@ except ImportError:
             pass
 
     have_openssl = False
+
+
+def bytes_hack(buf):
+    """
+    Hacky workaround for old installs of the library on systems without python-future that were
+    keeping the 2to3 update from working after auto-update.
+    """
+    ub = None
+    if sys.version_info > (3,):
+        ub = buf
+    else:
+        ub = bytes(buf)
+
+    return ub
 
 
 class Device(object):
@@ -550,9 +564,11 @@ class USBDevice(Device):
                 buf = self._device.read_data(1)
 
                 if buf != b'':
-                    self._buffer += buf
+                    ub = bytes_hack(buf)
 
-                    if buf == b"\n":
+                    self._buffer += ub
+
+                    if ub == b"\n":
                         self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
@@ -846,9 +862,11 @@ class SerialDevice(Device):
 
                 # NOTE: AD2SERIAL apparently sends down \xFF on boot.
                 if buf != b'' and buf != b"\xff":
-                    self._buffer += buf
+                    ub = bytes_hack(buf)
 
-                    if buf == b"\n":
+                    self._buffer += ub
+
+                    if ub == b"\n":
                         self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
@@ -1149,9 +1167,11 @@ class SocketDevice(Device):
                 buf = self._device.recv(1)
 
                 if buf != b'':
-                    self._buffer += buf
+                    ub = bytes_hack(buf)
 
-                    if buf == b"\n":
+                    self._buffer += ub
+
+                    if ub == b"\n":
                         self._buffer = self._buffer.rstrip(b"\r\n")
 
                         if len(self._buffer) > 0:
