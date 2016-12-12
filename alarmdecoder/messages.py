@@ -15,7 +15,10 @@ devices.
 import re
 import datetime
 
-from reprlib import repr
+try:
+    from reprlib import repr
+except ImportError:
+    from repr import repr
 
 from .util import InvalidMessageError
 from .panels import PANEL_TYPES, ADEMCO, DSC
