@@ -248,7 +248,9 @@ class AlarmDecoder(object):
         """
 
         if self._device:
-            self._device.write(str.encode(data))
+            if isinstance(data, str):
+                data = str.encode(data)
+            self._device.write(data)
 
     def get_config(self):
         """
