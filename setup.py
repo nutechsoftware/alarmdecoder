@@ -14,7 +14,7 @@ if sys.version_info < (3,):
     extra_requirements.append('future==0.14.3')
 
 setup(name='alarmdecoder',
-    version='0.12.0',
+    version='0.12.1',
     description='Python interface for the AlarmDecoder (AD2) family '
                 'of alarm devices which includes the AD2USB, AD2SERIAL and AD2PI.',
     long_description=readme(),
