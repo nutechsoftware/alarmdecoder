@@ -6,6 +6,7 @@ Provides the main AlarmDecoder class.
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
+import sys
 import time
 import re
 
@@ -250,6 +251,12 @@ class AlarmDecoder(object):
         if self._device:
             if isinstance(data, str):
                 data = str.encode(data)
+
+            # Hack to support unicode under Python 2.x
+            if sys.version_info < (3,):
+                if isinstance(data, unicode):
+                    data = bytes(data)
+
             self._device.write(data)
 
     def get_config(self):
