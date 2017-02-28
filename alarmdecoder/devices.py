@@ -800,6 +800,10 @@ class SerialDevice(Device):
         :raises: py:class:`~alarmdecoder.util.CommError`
         """
         try:
+            # Hack to support unicode under Python 2.x
+            if isinstance(data, str) or (sys.version_info < (3,) and isinstance(data, unicode)):
+                data = data.encode('utf-8')
+
             self._device.write(data)
 
         except serial.SerialTimeoutException:
@@ -821,7 +825,7 @@ class SerialDevice(Device):
         ret = None
 
         try:
-            ret = self._device.read(1)
+            ret = self._device.read(1).decode('utf-8')
 
         except serial.SerialException as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
@@ -890,7 +894,7 @@ class SerialDevice(Device):
         finally:
             timer.cancel()
 
-        return ret
+        return ret.decode('utf-8')
 
     def purge(self):
         """
@@ -1096,6 +1100,9 @@ class SocketDevice(Device):
         data_sent = None
 
         try:
+            if isinstance(data, str):
+                data = data.encode('utf-8')
+
             data_sent = self._device.send(data)
 
             if data_sent == 0:
@@ -1118,7 +1125,7 @@ class SocketDevice(Device):
         data = None
 
         try:
-            read_ready, _, _ = select.select([self._device], [], [], 0)
+            read_ready, _, _ = select.select([self._device], [], [])
 
             if (len(read_ready) != 0):
                 data = self._device.recv(1)
@@ -1126,7 +1133,7 @@ class SocketDevice(Device):
         except socket.error as err:
             raise CommError('Error while reading from device: {0}'.format(str(err)), err)
 
-        return data
+        return data.decode('utf-8')
 
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
@@ -1158,7 +1165,7 @@ class SocketDevice(Device):
 
         try:
             while timeout_event.reading:
-                read_ready, _, _ = select.select([self._device], [], [], 0)
+                read_ready, _, _ = select.select([self._device], [], [])
 
                 if (len(read_ready) == 0):
                     time.sleep(0.01)
@@ -1166,7 +1173,7 @@ class SocketDevice(Device):
 
                 buf = self._device.recv(1)
 
-                if buf != b'':
+                if buf != b'' and buf != b"\xff":
                     ub = bytes_hack(buf)
 
                     self._buffer += ub
@@ -1203,7 +1210,7 @@ class SocketDevice(Device):
         finally:
             timer.cancel()
 
-        return ret
+        return ret.decode('utf-8')
 
     def purge(self):
         """

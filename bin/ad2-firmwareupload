@@ -2,6 +2,7 @@
 
 import os
 import sys, time
+import traceback
 import alarmdecoder
 
 def handle_firmware(stage, **kwargs):
@@ -68,12 +69,12 @@ def main():
         time.sleep(3)
         alarmdecoder.util.Firmware.upload(dev, firmware, handle_firmware, debug=debug)
 
-    except alarmdecoder.util.NoDeviceError, ex:
-        print "Error: Could not find device: {0}".format(ex)
-    except alarmdecoder.util.UploadError, ex:
-        print "Error: Error uploading firmware: {0}".format(ex)
-    except Exception, ex:
-        print "Error: {0}".format(ex)
+    except alarmdecoder.util.NoDeviceError as ex:
+        print("Error: Could not find device: {0}".format(ex))
+    except alarmdecoder.util.UploadError as ex:
+        print("Error: Error uploading firmware: {0}".format(ex))
+    except Exception as ex:
+        print("Error: {0}: {1}".format(ex, traceback.format_exc()))
     finally:
         if dev is not None:
             dev.close()

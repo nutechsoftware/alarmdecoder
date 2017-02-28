@@ -94,7 +94,7 @@ class Firmware(object):
 
                     if line[0] == ':':
                         dev.write(line + "\r")
-                        response = dev.read_line(timeout=5.0, purge_buffer=True)
+                        response = dev.read_line(timeout=5.0, purge_buffer=True) #.decode('utf-8')
                         if debug:
                             stage_callback(Firmware.STAGE_DEBUG, data="line={0} - line={1} response={2}".format(line_cnt, line, response));
 
@@ -135,7 +135,7 @@ class Firmware(object):
 
             while timeout_event.reading:
                 try:
-                    char = dev.read()
+                    char = dev.read() #.decode('utf-8')
 
                     if char is not None and char != '':
                         if char == pattern[position]:
@@ -179,13 +179,13 @@ class Firmware(object):
             try:
                 stage_callback(Firmware.STAGE_BOOT)
                 dev.write("=")
-                read_until('!boot', timeout=15.0)
+                read_until(u'!boot', timeout=15.0)
 
                 # Get ourselves into the boot loader and wait for indication
                 # that it's ready for the firmware upload.
                 stage_callback(Firmware.STAGE_LOAD)
                 dev.write("=")
-                read_until('!load', timeout=15.0)
+                read_until(u'!load', timeout=15.0)
 
             except TimeoutError as err:
                 retry -= 1
