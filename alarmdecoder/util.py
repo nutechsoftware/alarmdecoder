@@ -8,7 +8,11 @@ Provides utility classes for the `AlarmDecoder`_ (AD2) devices.
 
 import time
 import threading
+import select
+import alarmdecoder
+
 from io import open
+from collections import deque
 
 
 class NoDeviceError(Exception):
@@ -53,6 +57,30 @@ class UploadChecksumError(UploadError):
     pass
 
 
+def bytes_available(device):
+    bytes_avail = 0
+
+    if isinstance(device, alarmdecoder.devices.SerialDevice):
+        if hasattr(device._device, "in_waiting"):
+            bytes_avail = device._device.in_waiting
+        else:
+            bytes_avail = device._device.inWaiting()
+    elif isinstance(device, alarmdecoder.devices.SocketDevice):
+        bytes_avail = 4096
+
+    return bytes_avail
+
+def read_firmware_file(file_path):
+    data_queue = deque()
+
+    with open(file_path) as firmware_handle:
+        for line in firmware_handle:
+            line = line.rstrip()
+            if line != '' and line[0] == ':':
+                data_queue.append(line + "\r")
+
+    return data_queue
+
 class Firmware(object):
     """
     Represents firmware for the `AlarmDecoder`_ devices.
@@ -62,144 +90,134 @@ class Firmware(object):
     STAGE_START = 0
     STAGE_WAITING = 1
     STAGE_BOOT = 2
+    STAGE_WAITING_ON_LOADER = 2.5
     STAGE_LOAD = 3
     STAGE_UPLOADING = 4
     STAGE_DONE = 5
     STAGE_ERROR = 98
     STAGE_DEBUG = 99
 
-    # FIXME: Rewrite this monstrosity.
     @staticmethod
-    def upload(dev, filename, progress_callback=None, debug=False):
+    def read(device):
+        response = None
+        bytes_avail = bytes_available(device)
+
+        if isinstance(device, alarmdecoder.devices.SerialDevice):
+            response = device._device.read(bytes_avail)
+        elif isinstance(device, alarmdecoder.devices.SocketDevice):
+            response = device._device.recv(bytes_avail)
+
+        return response
+
+    @staticmethod
+    def upload(device, file_path, progress_callback=None, debug=False):
         """
         Uploads firmware to an `AlarmDecoder`_ device.
 
-        :param filename: firmware filename
-        :type filename: string
+        :param file_path: firmware file path
+        :type file_path: string
         :param progress_callback: callback function used to report progress
         :type progress_callback: function
 
         :raises: :py:class:`~alarmdecoder.util.NoDeviceError`, :py:class:`~alarmdecoder.util.TimeoutError`
         """
 
-        def do_upload():
-            """
-            Perform the actual firmware upload to the device.
-            """
-            with open(filename) as upload_file:
-                line_cnt = 0
-                for line in upload_file:
-                    line_cnt += 1
-                    line = line.rstrip()
-
-                    if line[0] == ':':
-                        dev.write(line + "\r")
-                        response = dev.read_line(timeout=5.0, purge_buffer=True) #.decode('utf-8')
-                        if debug:
-                            stage_callback(Firmware.STAGE_DEBUG, data="line={0} - line={1} response={2}".format(line_cnt, line, response));
-
-                        if '!ce' in response:
-                            raise UploadChecksumError("Checksum error on line " + str(line_cnt) + " of " + filename);
-
-                        elif '!no' in response:
-                            raise UploadError("Incorrect data sent to bootloader.")
-
-                        elif '!ok' in response:
-                            break
-
-                        else:
-                            if progress_callback is not None:
-                                progress_callback(Firmware.STAGE_UPLOADING)
-
-                        time.sleep(0.0)
-
-        def read_until(pattern, timeout=0.0):
-            """
-            Read characters until a specific pattern is found or the timeout is
-            hit.
-            """
-            def timeout_event():
-                """Handles the read timeout event."""
-                timeout_event.reading = False
-
-            timeout_event.reading = True
-
-            timer = None
-            if timeout > 0:
-                timer = threading.Timer(timeout, timeout_event)
-                timer.start()
-
-            position = 0
-
-            dev.purge()
-
-            while timeout_event.reading:
-                try:
-                    char = dev.read() #.decode('utf-8')
-
-                    if char is not None and char != '':
-                        if char == pattern[position]:
-                            position = position + 1
-                            if position == len(pattern):
-                                break
-                        else:
-                            position = 0
-
-                except Exception as err:
-                    pass
-
-            if timer:
-                if timer.is_alive():
-                    timer.cancel()
-                else:
-                    raise TimeoutError('Timeout while waiting for line terminator.')
-
-        def stage_callback(stage, **kwargs):
+        def progress_stage(stage, **kwargs):
             """Callback to update progress for the specified stage."""
             if progress_callback is not None:
                 progress_callback(stage, **kwargs)
 
-        if dev is None:
+            return stage
+
+        if device is None:
             raise NoDeviceError('No device specified for firmware upload.')
 
-        stage_callback(Firmware.STAGE_START)
+        fds = [device._device.fileno()]
 
-        if dev.is_reader_alive():
+        # Read firmware file into memory
+        try:
+            write_queue = read_firmware_file(file_path)
+        except IOError as err:
+            stage = progress_stage(Firmware.STAGE_ERROR, error=str(err))
+            return
+
+        data_read = ''
+        got_response = False
+        running = True
+        stage = progress_stage(Firmware.STAGE_START)
+
+        if device.is_reader_alive():
             # Close the reader thread and wait for it to die, otherwise
             # it interferes with our reading.
-            dev.stop_reader()
-            while dev._read_thread.is_alive():
-                stage_callback(Firmware.STAGE_WAITING)
+            device.stop_reader()
+            while device._read_thread.is_alive():
+                stage = progress_stage(Firmware.STAGE_WAITING)
                 time.sleep(0.5)
 
-        # Reboot the device and wait for the boot loader.
-        retry = 3
-        found_loader = False
-        while retry > 0:
-            try:
-                stage_callback(Firmware.STAGE_BOOT)
-                dev.write("=")
-                read_until(u'!boot', timeout=15.0)
+            time.sleep(3)
 
-                # Get ourselves into the boot loader and wait for indication
-                # that it's ready for the firmware upload.
-                stage_callback(Firmware.STAGE_LOAD)
-                dev.write("=")
-                read_until(u'!load', timeout=15.0)
+        try:
+            while running:
+                rr, wr, _ = select.select(fds, fds, [], 0.5)
 
-            except TimeoutError as err:
-                retry -= 1
-            else:
-                retry = 0
-                found_loader = True
+                if len(rr) != 0:
+                    response = Firmware.read(device)
 
-        # And finally do the upload.
-        if found_loader:
-            try:
-                do_upload()
-            except UploadError as err:
-                stage_callback(Firmware.STAGE_ERROR, error=str(err))
-            else:
-                stage_callback(Firmware.STAGE_DONE)
+                    for c in response:
+                        # HACK: Python 3 / PySerial hack.
+                        if isinstance(c, int):
+                            c = chr(c)
+
+                        if c == '\xff' or c == '\r':    # HACK: odd case for our mystery \xff byte.
+                            # Boot started, start looking for the !boot message
+                            if data_read.startswith("!sn"):
+                                stage = progress_stage(Firmware.STAGE_BOOT)
+                            # Entered bootloader upload mode, start uploading
+                            elif data_read.startswith("!load"):
+                                got_response = True
+                                stage = progress_stage(Firmware.STAGE_UPLOADING)
+                            # Checksum error
+                            elif data_read == '!ce':
+                                running = False
+                                raise UploadChecksumError("Checksum error in {0}".format(file_path))
+                            # Bad data
+                            elif data_read == '!no':
+                                running = False
+                                raise UploadError("Incorrect data sent to bootloader.")
+                            # Firmware upload complete
+                            elif data_read == '!ok':
+                                running = False
+                                stage = progress_stage(Firmware.STAGE_DONE)
+                            # All other responses are valid during upload.
+                            else:
+                                got_response = True
+                                if stage == Firmware.STAGE_UPLOADING:
+                                    progress_stage(stage)
+
+                            data_read = ''
+                        elif c == '\n':
+                            pass
+                        else:
+                            data_read += c
+
+                if len(wr) != 0:
+                    # Reboot device
+                    if stage in [Firmware.STAGE_START, Firmware.STAGE_WAITING]:
+                        device.write('=')
+                        stage = progress_stage(Firmware.STAGE_WAITING_ON_LOADER)
+
+                    # Enter bootloader
+                    elif stage == Firmware.STAGE_BOOT:
+                        device.write('=')
+                        stage = progress_stage(Firmware.STAGE_LOAD)
+
+                    # Upload firmware
+                    elif stage == Firmware.STAGE_UPLOADING:
+                        if len(write_queue) > 0 and got_response == True:
+                            got_response = False
+                            device.write(write_queue.popleft())
+
+        except UploadError as err:
+            stage = progress_stage(Firmware.STAGE_ERROR, error=str(err))
         else:
-            stage_callback(Firmware.STAGE_ERROR, error="Error entering bootloader.")
+            stage = progress_stage(Firmware.STAGE_DONE)
