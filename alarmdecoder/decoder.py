@@ -116,6 +116,7 @@ class AlarmDecoder(object):
         self._alarm_status = None
         self._bypass_status = None
         self._armed_status = None
+        self._armed_stay = False
         self._fire_status = (False, 0)
         self._battery_status = (False, 0)
         self._panic_status = False
@@ -615,10 +616,11 @@ class AlarmDecoder(object):
         message_status = message.armed_away | message.armed_home
         if message_status != self._armed_status:
             self._armed_status, old_status = message_status, self._armed_status
+            self._armed_stay = message.armed_home
 
             if old_status is not None:
                 if self._armed_status:
-                    self.on_arm()
+                    self.on_arm(stay=message.armed_home)
                 else:
                     self.on_disarm()
 
