@@ -613,18 +613,16 @@ class AlarmDecoder(object):
         :returns: bool indicating the new status
         """
 
-        message_status = message.armed_away | message.armed_home
-        if message_status != self._armed_status:
-            self._armed_status, old_status = message_status, self._armed_status
-            self._armed_stay = message.armed_home
-
+        self._armed_status, old_status = message.armed_away, self._armed_status
+        self._armed_stay, old_stay = message.armed_home, self._armed_stay
+        if message.armed_away != old_status or message.armed_home != old_stay:
             if old_status is not None:
-                if self._armed_status:
+                if self._armed_status or self._armed_stay:
                     self.on_arm(stay=message.armed_home)
                 else:
                     self.on_disarm()
 
-        return self._armed_status
+        return self._armed_status or self._armed_stay
 
     def _update_battery_status(self, message):
         """
