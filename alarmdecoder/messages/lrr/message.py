@@ -12,6 +12,7 @@ devices.
 from .. import BaseMessage
 from ...util import InvalidMessageError
 
+from .events import LRR_EVENT_TYPE
 
 class LRRMessage(BaseMessage):
     """
@@ -69,8 +70,10 @@ class LRRMessage(BaseMessage):
 
                 event_type_data = self.event_type.split('_')
                 self.event_prefix = event_type_data[0]
+                if self.event_prefix == 'CID':
+                    self.event_source = LRR_EVENT_TYPE.CID
                 self.event_status = int(event_type_data[1][0])
-                self.event_code = int(event_type_data[1][1:])
+                self.event_code = int(event_type_data[1][1:], 16)
 
             self.partition = int(self.partition)
 
