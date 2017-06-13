@@ -13,19 +13,29 @@ class LRRSystem(object):
 
         print("LRR Message: {0}".format(message.dict()))
 
-        source = message.event_source
-        if source == LRR_EVENT_TYPE.CID:
-            handled = self._handle_cid_message(message)
-        elif source == LRR_EVENT_TYPE.DSC:
-            handled = self._handle_dsc_message(message)
-        elif source == LRR_EVENT_TYPE.ADEMCO:
-            handled = self._handle_ademco_message(message)
-        elif source == LRR_EVENT_TYPE.ALARMDECODER:
-            handled = self._handle_alarmdecoder_message(message)
-        elif source == LRR_EVENT_TYPE.UNKNOWN:
-            handled = self._handle_unknown_message(message)
-        else:
-            pass
+        if message.version == 1:
+            if msg.event_type == 'ALARM_PANIC':
+                self._alarmdecoder._update_panic_status(True)
+                handled = True
+                
+            elif msg.event_type == 'CANCEL':
+                self._alarmdecoder._update_panic_status(False)
+                handled = True
+
+        elif message.version == 2:
+            source = message.event_source
+            if source == LRR_EVENT_TYPE.CID:
+                handled = self._handle_cid_message(message)
+            elif source == LRR_EVENT_TYPE.DSC:
+                handled = self._handle_dsc_message(message)
+            elif source == LRR_EVENT_TYPE.ADEMCO:
+                handled = self._handle_ademco_message(message)
+            elif source == LRR_EVENT_TYPE.ALARMDECODER:
+                handled = self._handle_alarmdecoder_message(message)
+            elif source == LRR_EVENT_TYPE.UNKNOWN:
+                handled = self._handle_unknown_message(message)
+            else:
+                pass
 
         return handled
 

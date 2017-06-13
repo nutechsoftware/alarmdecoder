@@ -458,17 +458,7 @@ class AlarmDecoder(object):
         """
         msg = LRRMessage(data)
 
-        # if msg.event_type == 'ALARM_PANIC':
-        #     self._panic_status = True
-        #     self.on_panic(status=True)
-        #
-        # elif msg.event_type == 'CANCEL':
-        #     if self._panic_status is True:
-        #         self._panic_status = False
-        #         self.on_panic(status=False)
-
         self._lrr_system.update(msg)
-
         self.on_lrr_message(message=msg)
 
         return msg
