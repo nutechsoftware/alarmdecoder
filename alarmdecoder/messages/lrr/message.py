@@ -12,7 +12,7 @@ devices.
 from .. import BaseMessage
 from ...util import InvalidMessageError
 
-from .events import LRR_EVENT_TYPE
+from .events import LRR_EVENT_TYPE, get_event_description
 
 
 class LRRMessage(BaseMessage):
@@ -39,6 +39,8 @@ class LRRMessage(BaseMessage):
     """Event status flag that represents triggered or restored events."""
     event_code = 0
     """Event code for the LRR message."""
+    event_description = ''
+    """Human-readable description of LRR event."""
 
     def __init__(self, data=None):
         """
@@ -78,6 +80,7 @@ class LRRMessage(BaseMessage):
                 self.event_source = _get_event_source(self.event_prefix)
                 self.event_status = int(event_type_data[1][0])
                 self.event_code = int(event_type_data[1][1:], 16)
+                self.event_description = get_event_description(self.event_source, self.event_code)
 
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
@@ -97,6 +100,7 @@ class LRRMessage(BaseMessage):
             event_source          = self.event_source,
             event_status          = self.event_status,
             event_code            = hex(self.event_code),
+            event_description     = self.event_description,
             **kwargs
         )
 
