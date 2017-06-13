@@ -93,6 +93,6 @@ class LRRMessage(BaseMessage):
             event_prefix          = self.event_prefix,
             event_source          = self.event_source,
             event_status          = self.event_status,
-            event_code            = self.event_code,
+            event_code            = hex(self.event_code),
             **kwargs
         )

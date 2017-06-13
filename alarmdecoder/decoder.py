@@ -18,6 +18,7 @@ except ImportError:
 from .event import event
 from .util import InvalidMessageError
 from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
+from .messages.lrr import LRRSystem
 from .zonetracking import Zonetracker
 from .panels import PANEL_TYPES, ADEMCO, DSC
 
@@ -99,7 +100,7 @@ class AlarmDecoder(object):
     version_flags = ""
     """Device flags enabled"""
 
-    def __init__(self, device):
+    def __init__(self, device, ignore_message_states=False):
         """
         Constructor
 
@@ -109,7 +110,9 @@ class AlarmDecoder(object):
         """
         self._device = device
         self._zonetracker = Zonetracker(self)
+        self._lrr_system = LRRSystem(self)
 
+        self._ignore_message_states = ignore_message_states
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
@@ -402,10 +405,12 @@ class AlarmDecoder(object):
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
+
         msg = Message(data)
 
         if self._internal_address_mask & msg.mask > 0:
-            self._update_internal_states(msg)
+            if not self._ignore_message_states:
+                self._update_internal_states(msg)
 
             self.on_message(message=msg)
 
@@ -453,14 +458,16 @@ class AlarmDecoder(object):
         """
         msg = LRRMessage(data)
 
-        if msg.event_type == 'ALARM_PANIC':
-            self._panic_status = True
-            self.on_panic(status=True)
+        # if msg.event_type == 'ALARM_PANIC':
+        #     self._panic_status = True
+        #     self.on_panic(status=True)
+        #
+        # elif msg.event_type == 'CANCEL':
+        #     if self._panic_status is True:
+        #         self._panic_status = False
+        #         self.on_panic(status=False)
 
-        elif msg.event_type == 'CANCEL':
-            if self._panic_status is True:
-                self._panic_status = False
-                self.on_panic(status=False)
+        self._lrr_system.update(msg)
 
         self.on_lrr_message(message=msg)
 
@@ -534,7 +541,7 @@ class AlarmDecoder(object):
         :param message: :py:class:`~alarmdecoder.messages.Message` to update internal states with
         :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`
         """
-        if isinstance(message, Message):
+        if isinstance(message, Message) and not self._ignore_message_states:
             self._update_power_status(message)
             self._update_alarm_status(message)
             self._update_zone_bypass_status(message)
@@ -547,7 +554,7 @@ class AlarmDecoder(object):
 
         self._update_zone_tracker(message)
 
-    def _update_power_status(self, message):
+    def _update_power_status(self, message=None, status=None):
         """
         Uses the provided message to update the AC power state.
 
@@ -556,8 +563,15 @@ class AlarmDecoder(object):
 
         :returns: bool indicating the new status
         """
-        if message.ac_power != self._power_status:
-            self._power_status, old_status = message.ac_power, self._power_status
+        power_status = status
+        if isinstance(message, Message):
+            power_status = message.ac_power
+
+        if power_status is None:
+            return
+
+        if power_status != self._power_status:
+            self._power_status, old_status = power_status, self._power_status
 
             if old_status is not None:
                 self.on_power_changed(status=self._power_status)
@@ -585,7 +599,7 @@ class AlarmDecoder(object):
 
         return self._alarm_status
 
-    def _update_zone_bypass_status(self, message):
+    def _update_zone_bypass_status(self, message=None, status=None):
         """
         Uses the provided message to update the zone bypass state.
 
@@ -594,16 +608,22 @@ class AlarmDecoder(object):
 
         :returns: bool indicating the new status
         """
+        bypass_status = status
+        if isinstance(message, Message):
+            bypass_status = message.zone_bypassed
 
-        if message.zone_bypassed != self._bypass_status:
-            self._bypass_status, old_status = message.zone_bypassed, self._bypass_status
+        if bypass_status is None:
+            return
+
+        if bypass_status != self._bypass_status:
+            self._bypass_status, old_status = bypass_status, self._bypass_status
 
             if old_status is not None:
                 self.on_bypass(status=self._bypass_status)
 
         return self._bypass_status
 
-    def _update_armed_status(self, message):
+    def _update_armed_status(self, message=None, status=None, status_stay=None):
         """
         Uses the provided message to update the armed state.
 
@@ -612,19 +632,28 @@ class AlarmDecoder(object):
 
         :returns: bool indicating the new status
         """
+        arm_status = status
+        stay_status = status_stay
 
-        self._armed_status, old_status = message.armed_away, self._armed_status
-        self._armed_stay, old_stay = message.armed_home, self._armed_stay
-        if message.armed_away != old_status or message.armed_home != old_stay:
-            if old_status is not None:
+        if isinstance(message, Message):
+            arm_status = message.armed_away
+            stay_status = message.armed_home
+
+        if arm_status is None or stay_status is None:
+            return
+
+        self._armed_status, old_status = arm_status, self._armed_status
+        self._armed_stay, old_stay = stay_status, self._armed_stay
+        if arm_status != old_status or stay_status != old_stay:
+            if old_status is not None or message is None:
                 if self._armed_status or self._armed_stay:
-                    self.on_arm(stay=message.armed_home)
+                    self.on_arm(stay=stay_status)
                 else:
                     self.on_disarm()
 
         return self._armed_status or self._armed_stay
 
-    def _update_battery_status(self, message):
+    def _update_battery_status(self, message=None, status=None):
         """
         Uses the provided message to update the battery state.
 
@@ -633,18 +662,24 @@ class AlarmDecoder(object):
 
         :returns: boolean indicating the new status
         """
+        battery_status = status
+        if isinstance(message, Message):
+            battery_status = message.battery_low
+
+        if battery_status is None:
+            return
 
         last_status, last_update = self._battery_status
-        if message.battery_low == last_status:
+        if battery_status == last_status:
             self._battery_status = (last_status, time.time())
         else:
-            if message.battery_low is True or time.time() > last_update + self._battery_timeout:
-                self._battery_status = (message.battery_low, time.time())
-                self.on_low_battery(status=message.battery_low)
+            if battery_status is True or time.time() > last_update + self._battery_timeout:
+                self._battery_status = (battery_status, time.time())
+                self.on_low_battery(status=battery_status)
 
         return self._battery_status[0]
 
-    def _update_fire_status(self, message):
+    def _update_fire_status(self, message=None, status=None):
         """
         Uses the provided message to update the fire alarm state.
 
@@ -653,16 +688,42 @@ class AlarmDecoder(object):
 
         :returns: boolean indicating the new status
         """
+        fire_status = status
+        if isinstance(message, Message):
+            fire_status = message.fire_alarm
+
+        if fire_status is None:
+            return
 
         last_status, last_update = self._fire_status
-        if message.fire_alarm == last_status:
+        if fire_status == last_status:
             self._fire_status = (last_status, time.time())
         else:
-            if message.fire_alarm is True or time.time() > last_update + self._fire_timeout:
-                self._fire_status = (message.fire_alarm, time.time())
-                self.on_fire(status=message.fire_alarm)
+            if fire_status is True or time.time() > last_update + self._fire_timeout:
+                self._fire_status = (fire_status, time.time())
+                self.on_fire(status=fire_status)
 
         return self._fire_status[0]
+
+    def _update_panic_status(self, status=None):
+        """
+        Updates the panic status of the alarm panel.
+
+        :param status: status to use to update
+        :type status: boolean
+
+        :returns: boolean indicating the new status
+        """
+        if status is None:
+            return
+
+        if status != self._panic_status:
+            self._panic_status, old_status = status, self._panic_status
+
+            if old_status is not None:
+                self.on_panic(status=self._panic_status)
+
+        return self._panic_status
 
     def _update_expander_status(self, message):
         """
