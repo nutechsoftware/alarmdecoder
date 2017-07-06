@@ -122,6 +122,9 @@ class AlarmDecoder(object):
         self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
+        
+        self.last_fault_time = 0
+        self.fault_expansion_time_limit = 30  # Seconds
 
         self.address = 18
         self.configbits = 0xFF00
@@ -693,8 +696,10 @@ class AlarmDecoder(object):
         # NOTE: This only happens on first boot or after exiting programming mode.
         if isinstance(message, Message):
             if not message.ready and ("Hit * for faults" in message.text or "Press * to show faults" in message.text):
-                self.send('*')
-                return
+                if time.time() > self.last_fault_expansion + self.fault_expansion_time_limit:
+                    self.last_fault_expansion = time.time()
+                    self.send('*')
+                    return
 
         self._zonetracker.update(message)
 
