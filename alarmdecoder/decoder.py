@@ -692,7 +692,7 @@ class AlarmDecoder(object):
         # Retrieve a list of faults.
         # NOTE: This only happens on first boot or after exiting programming mode.
         if isinstance(message, Message):
-            if not message.ready and "Hit * for faults" in message.text:
+            if not message.ready and ("Hit * for faults" in message.text or "Press * to show faults" in message.text):
                 self.send('*')
                 return
 
