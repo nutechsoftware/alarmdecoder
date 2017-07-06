@@ -21,6 +21,7 @@ from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
 from .messages.lrr import LRRSystem
 from .zonetracking import Zonetracker
 from .panels import PANEL_TYPES, ADEMCO, DSC
+from .states import FireState
 
 
 class AlarmDecoder(object):
@@ -100,6 +101,10 @@ class AlarmDecoder(object):
     version_flags = ""
     """Device flags enabled"""
 
+    FIRE_STATE_NONE = 0
+    FIRE_STATE_FIRE = 1
+    FIRE_STATE_ACKNOWLEDGED = 2
+
     def __init__(self, device, ignore_message_states=False):
         """
         Constructor
@@ -121,6 +126,9 @@ class AlarmDecoder(object):
         self._armed_status = None
         self._armed_stay = False
         self._fire_status = (False, 0)
+        self._fire_alarming = False
+        self._fire_alarming_changed = 0
+        self._fire_state = FireState.NONE
         self._battery_status = (False, 0)
         self._panic_status = False
         self._relay_status = {}
@@ -411,6 +419,8 @@ class AlarmDecoder(object):
         if self._internal_address_mask & msg.mask > 0:
             if not self._ignore_message_states:
                 self._update_internal_states(msg)
+            else:
+                self._update_fire_status(status=None)
 
             self.on_message(message=msg)
 
@@ -678,22 +688,66 @@ class AlarmDecoder(object):
 
         :returns: boolean indicating the new status
         """
+        is_lrr = status is not None
         fire_status = status
         if isinstance(message, Message):
             fire_status = message.fire_alarm
 
-        if fire_status is None:
-            return
-
         last_status, last_update = self._fire_status
-        if fire_status == last_status:
-            self._fire_status = (last_status, time.time())
-        else:
-            if fire_status is True or time.time() > last_update + self._fire_timeout:
-                self._fire_status = (fire_status, time.time())
-                self.on_fire(status=fire_status)
+        print("_update_fire_status: fire_status={fire_status} last_status={last_status} last_update={last_update}".format(fire_status=fire_status, last_status=last_status, last_update=last_update))
 
-        return self._fire_status[0]
+
+        if self._fire_state == FireState.NONE:
+            # Always move to a FIRE state if detected
+            if fire_status == True:
+                print("FIRE STATE: NONE -> ALARM")
+                self._fire_state = FireState.ALARM
+                self._fire_status = (fire_status, time.time())
+
+                self.on_fire(status=FireState.ALARM)
+
+        elif self._fire_state == FireState.ALARM:
+            # If we've received an LRR CANCEL message, move to ACKNOWLEDGED
+            if is_lrr and fire_status == False:
+                print("FIRE STATE: ALARM -> ACKNOWLEDGED")
+                self._fire_state = FireState.ACKNOWLEDGED
+                self._fire_status = (fire_status, time.time())
+                self.on_fire(status=FireState.ACKNOWLEDGED)
+            else:
+                # Handle bouncing status changes and timeout in order to revert back to NONE.
+                if last_status != fire_status or fire_status == True:
+                    self._fire_status = (fire_status, time.time())
+                
+                if fire_status == False and time.time() > last_update + self._fire_timeout:
+                    print("FIRE STATE: ALARM -> NONE")
+                    self._fire_state = FireState.NONE
+                    self.on_fire(status=FireState.NONE)
+
+        elif self._fire_state == FireState.ACKNOWLEDGED:
+            # If we've received a second LRR FIRE message after a CANCEL, revert back to FIRE and trigger another event.
+            if is_lrr and fire_status == True:
+                print("FIRE STATE: ACKNOWLEDGED -> ALARM")
+                self._fire_state = FireState.ALARM
+                self._fire_status = (fire_status, time.time())
+
+                self.on_fire(status=FireState.ALARM)
+            else:
+                # Handle bouncing status changes and timeout in order to revert back to NONE.
+                if last_status != fire_status or fire_status == True:
+                    self._fire_status = (fire_status, time.time())
+
+                # Handle timeout to revert back to NONE.            
+                if fire_status != True and time.time() > last_update + self._fire_timeout:
+                    print("FIRE STATE: ACKNOWLEDGED -> NONE")
+                    self._fire_state = FireState.NONE
+                    self.on_fire(status=FireState.NONE)
+
+        else:
+            print("INVALID FIRE STATE={}".format(self._fire_state))
+
+
+        return self._fire_state == FireState.ALARM
+
 
     def _update_panic_status(self, status=None):
         """

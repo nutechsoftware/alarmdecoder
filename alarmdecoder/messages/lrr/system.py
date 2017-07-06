@@ -40,7 +40,7 @@ class LRRSystem(object):
         return handled
 
     def _handle_cid_message(self, message):
-        handled = True
+        handled = False
 
         status = self._get_event_status(message)
         if status is None:
@@ -48,25 +48,39 @@ class LRRSystem(object):
             return
 
         if message.event_code in LRR_FIRE_EVENTS:
+            if message.event_code == LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER:
+                status = False
+
+            print("FIRE, status={}".format(status))
             self._alarmdecoder._update_fire_status(status=status)
-        elif message.event_code in LRR_POWER_EVENTS:
+            handled = True
+            
+        if message.event_code in LRR_POWER_EVENTS:
             self._alarmdecoder._update_power_status(status=status)
-        elif message.event_code in LRR_BYPASS_EVENTS:
+            handled = True
+
+        if message.event_code in LRR_BYPASS_EVENTS:
             self._alarmdecoder._update_zone_bypass_status(status=status)
-        elif message.event_code in LRR_BATTERY_EVENTS:
+            handled = True
+
+        if message.event_code in LRR_BATTERY_EVENTS:
             self._alarmdecoder._update_battery_status(status=status)
-        elif message.event_code in LRR_PANIC_EVENTS:
+            handled = True
+
+        if message.event_code in LRR_PANIC_EVENTS:
             if message.event_code == LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER:
                 status = False
 
             self._alarmdecoder._update_panic_status(status=status)
-        elif message.event_code in LRR_ARM_EVENTS:
+            handled = True
+
+        if message.event_code in LRR_ARM_EVENTS:
             # NOTE: status on OPENCLOSE messages is backwards.
             status_stay = (message.event_status == LRR_EVENT_STATUS.RESTORE \
                             and message.event_code in LRR_STAY_EVENTS)
             self._alarmdecoder._update_armed_status(status=not status, status_stay=status_stay)
-        else:
-            handled = False
+            handled = True
+
 
         return handled
 

@@ -42,7 +42,7 @@ class LRRMessage(BaseMessage):
     event_description = ''
     """Human-readable description of LRR event."""
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, skip_report_override=False):
         """
         Constructor
 
@@ -50,6 +50,8 @@ class LRRMessage(BaseMessage):
         :type data: string
         """
         BaseMessage.__init__(self)
+
+        self.skip_report_override = skip_report_override
 
         if data is not None:
             self._parse_message(data)
@@ -80,6 +82,10 @@ class LRRMessage(BaseMessage):
                 self.event_source = _get_event_source(self.event_prefix)
                 self.event_status = int(event_type_data[1][0])
                 self.event_code = int(event_type_data[1][1:], 16)
+
+                # replace last 2 digits of event_code with report_code, if applicable.
+                if not self.skip_report_override and self.report_code not in ['00', 'ff']:
+                    self.event_code = int(event_type_data[1][1] + self.report_code, 16)
                 self.event_description = get_event_description(self.event_source, self.event_code)
 
         except ValueError:
