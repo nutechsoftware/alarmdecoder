@@ -78,7 +78,13 @@ class LRRSystem(object):
             # NOTE: status on OPENCLOSE messages is backwards.
             status_stay = (message.event_status == LRR_EVENT_STATUS.RESTORE \
                             and message.event_code in LRR_STAY_EVENTS)
-            self._alarmdecoder._update_armed_status(status=not status, status_stay=status_stay)
+
+            if status_stay:
+                status = False
+            else:
+                status = not status
+
+            self._alarmdecoder._update_armed_status(status=status, status_stay=status_stay)
             handled = True
 
 
