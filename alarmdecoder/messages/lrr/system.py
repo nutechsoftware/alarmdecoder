@@ -1,7 +1,7 @@
 
 from .events import LRR_EVENT_TYPE, LRR_EVENT_STATUS, LRR_CID_EVENT
 from .events import LRR_FIRE_EVENTS, LRR_POWER_EVENTS, LRR_BYPASS_EVENTS, LRR_BATTERY_EVENTS, \
-                    LRR_PANIC_EVENTS, LRR_ARM_EVENTS, LRR_STAY_EVENTS
+                    LRR_PANIC_EVENTS, LRR_ARM_EVENTS, LRR_STAY_EVENTS, LRR_ALARM_EVENTS
 
 
 class LRRSystem(object):
@@ -51,16 +51,26 @@ class LRRSystem(object):
             if message.event_code == LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER:
                 status = False
 
-            print("FIRE, status={}".format(status))
             self._alarmdecoder._update_fire_status(status=status)
             handled = True
             
+        if message.event_code in LRR_ALARM_EVENTS:
+            kwargs = {}
+            field_name = 'zone'
+            if not status:
+                field_name = 'user'
+
+            kwargs[field_name] = int(message.event_data)
+            self._alarmdecoder._update_alarm_status(status=status, **kwargs)
+            handled = True
+
         if message.event_code in LRR_POWER_EVENTS:
             self._alarmdecoder._update_power_status(status=status)
             handled = True
 
         if message.event_code in LRR_BYPASS_EVENTS:
-            self._alarmdecoder._update_zone_bypass_status(status=status)
+            zone = int(message.event_data)
+            self._alarmdecoder._update_zone_bypass_status(status=status, zone=zone)
             handled = True
 
         if message.event_code in LRR_BATTERY_EVENTS:

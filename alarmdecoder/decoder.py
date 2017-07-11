@@ -578,7 +578,7 @@ class AlarmDecoder(object):
 
         return self._power_status
 
-    def _update_alarm_status(self, message):
+    def _update_alarm_status(self, message=None, status=None, zone=None, user=None):
         """
         Uses the provided message to update the alarm state.
 
@@ -588,18 +588,29 @@ class AlarmDecoder(object):
         :returns: bool indicating the new status
         """
 
-        if message.alarm_sounding != self._alarm_status:
-            self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
+        alarm_status = status
+        alarm_zone = zone
+        if isinstance(message, Message):
+            alarm_status = message.alarm_sounding
+            try:
+                alarm_zone = int(message.numeric_code)
+            except ValueError:
+                alarm_zone = int(message.numeric_code, 16)
 
-            if old_status is not None:
+        print("_update_alarm_status: status={} zone={} user={}".format(alarm_status, alarm_zone, user))
+
+        if alarm_status != self._alarm_status:
+            self._alarm_status, old_status = alarm_status, self._alarm_status
+
+            if old_status is not None or status is not None:
                 if self._alarm_status:
-                    self.on_alarm(zone=message.numeric_code)
+                    self.on_alarm(zone=alarm_zone)
                 else:
-                    self.on_alarm_restored(zone=message.numeric_code)
+                    self.on_alarm_restored(zone=alarm_zone, user=user)
 
         return self._alarm_status
 
-    def _update_zone_bypass_status(self, message=None, status=None):
+    def _update_zone_bypass_status(self, message=None, status=None, zone=None):
         """
         Uses the provided message to update the zone bypass state.
 
@@ -609,8 +620,13 @@ class AlarmDecoder(object):
         :returns: bool indicating the new status
         """
         bypass_status = status
+        bypass_zone = zone
         if isinstance(message, Message):
             bypass_status = message.zone_bypassed
+            try:
+                bypass_zone = int(message.numeric_code)
+            except ValueError:
+                bypass_zone = int(message.numeric_code, 16)
 
         if bypass_status is None:
             return
@@ -618,8 +634,8 @@ class AlarmDecoder(object):
         if bypass_status != self._bypass_status:
             self._bypass_status, old_status = bypass_status, self._bypass_status
 
-            if old_status is not None:
-                self.on_bypass(status=self._bypass_status)
+            if old_status is not None or message is None:
+                self.on_bypass(status=self._bypass_status, zone=bypass_zone)
 
         return self._bypass_status
 
@@ -638,6 +654,8 @@ class AlarmDecoder(object):
         if isinstance(message, Message):
             arm_status = message.armed_away
             stay_status = message.armed_home
+
+        print("_update_armed_status: status={} status_stay={} - arm_status={} stay_status={}".format(status, status_stay, arm_status, stay_status))
 
         if arm_status is None or stay_status is None:
             return
@@ -694,7 +712,7 @@ class AlarmDecoder(object):
             fire_status = message.fire_alarm
 
         last_status, last_update = self._fire_status
-        print("_update_fire_status: fire_status={fire_status} last_status={last_status} last_update={last_update}".format(fire_status=fire_status, last_status=last_status, last_update=last_update))
+        #print("_update_fire_status: fire_status={fire_status} last_status={last_status} last_update={last_update}".format(fire_status=fire_status, last_status=last_status, last_update=last_update))
 
 
         if self._fire_state == FireState.NONE:
