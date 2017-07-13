@@ -11,8 +11,6 @@ class LRRSystem(object):
     def update(self, message):
         handled = False
 
-        print("LRR Message: {0}".format(message.dict()))
-
         if message.version == 1:
             if msg.event_type == 'ALARM_PANIC':
                 self._alarmdecoder._update_panic_status(True)
