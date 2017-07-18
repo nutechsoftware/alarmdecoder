@@ -177,7 +177,7 @@ class Zonetracker(object):
                 self._last_zone_fault = 0
 
             # Process fault
-            elif message.check_zone or message.text.startswith("FAULT") or message.text.startswith("ALARM"):
+            elif self.alarmdecoder_object.mode != DSC and (message.check_zone or message.text.startswith("FAULT") or message.text.startswith("ALARM")):
                 # Apparently this representation can be both base 10
                 # or base 16, depending on where the message came
                 # from.
