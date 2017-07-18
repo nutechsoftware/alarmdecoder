@@ -230,7 +230,9 @@ class LRR_CID_EVENT:
     STATUS_AUTO_ARM_TIME_EXTENDED = 0x464
     STATUS_PANIC_ALARM_RESET = 0x465
     ACCESS_SERVICE_ONOFF_PREMISES = 0x466
-    # 467-479: ?
+    # 467-469: ?
+    OPENCLOSE_PARTIAL_CLOSING = 0x470   # HACK: This is from DSC, and is named far too closely to 0
+    # 471-479: ?
     OPENCLOSE_PARTIAL_CLOSE = 0x480
     # 481-500: ?
     DISABLE_ACCESS_READER = 0x501
@@ -546,6 +548,7 @@ LRR_CID_MAP = {
     LRR_CID_EVENT.STATUS_AUTO_ARM_TIME_EXTENDED: 'Status: Auto-arm Time Extended',
     LRR_CID_EVENT.STATUS_PANIC_ALARM_RESET: 'Status: Panic Alarm Reset',
     LRR_CID_EVENT.ACCESS_SERVICE_ONOFF_PREMISES: 'Status: Service On/Off Premises',
+    LRR_CID_EVENT.OPENCLOSE_PARTIAL_CLOSING: 'Open/Close: Partial Closing',
     LRR_CID_EVENT.OPENCLOSE_PARTIAL_CLOSE: 'Open/Close: Partial Close',
     LRR_CID_EVENT.DISABLE_ACCESS_READER: 'Disable: Access Reader',
     LRR_CID_EVENT.DISABLE_SOUNDER: 'Disable: Sounder',
