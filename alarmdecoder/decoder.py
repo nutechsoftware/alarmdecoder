@@ -122,7 +122,7 @@ class AlarmDecoder(object):
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
         self._alarm_status = None
-        self._bypass_status = None
+        self._bypass_status = {}
         self._armed_status = None
         self._armed_stay = False
         self._fire_status = (False, 0)
@@ -618,24 +618,24 @@ class AlarmDecoder(object):
         :returns: bool indicating the new status
         """
         bypass_status = status
-        bypass_zone = zone
         if isinstance(message, Message):
             bypass_status = message.zone_bypassed
-            try:
-                bypass_zone = int(message.numeric_code)
-            except ValueError:
-                bypass_zone = int(message.numeric_code, 16)
 
         if bypass_status is None:
             return
 
-        if bypass_status != self._bypass_status:
-            self._bypass_status, old_status = bypass_status, self._bypass_status
+        old_bypass_status = self._bypass_status.get(zone, None)
 
-            if old_status is not None or message is None:
-                self.on_bypass(status=self._bypass_status, zone=bypass_zone)
+        if bypass_status != old_bypass_status:
+            if bypass_status == False and zone is None:
+                self._bypass_status = {}
+            else:
+                self._bypass_status[zone] = bypass_status
 
-        return self._bypass_status
+            if old_bypass_status is not None or message is None or (old_bypass_status is None and bypass_status is True):
+                self.on_bypass(status=bypass_status, zone=zone)
+
+        return bypass_status
 
     def _update_armed_status(self, message=None, status=None, status_stay=None):
         """
