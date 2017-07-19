@@ -592,10 +592,7 @@ class AlarmDecoder(object):
         alarm_zone = zone
         if isinstance(message, Message):
             alarm_status = message.alarm_sounding
-            try:
-                alarm_zone = int(message.numeric_code)
-            except ValueError:
-                alarm_zone = int(message.numeric_code, 16)
+            alarm_zone = message.parse_numeric_code()
 
         if alarm_status != self._alarm_status:
             self._alarm_status, old_status = alarm_status, self._alarm_status

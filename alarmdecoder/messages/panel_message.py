@@ -130,6 +130,35 @@ class Message(BaseMessage):
                 # Current cursor location on the alpha display.
                 self.cursor_location = int(self.panel_data[21:23], 16)
 
+    def parse_numeric_code(self, force_hex=False):
+        """
+        Parses and returns the numeric code as an integer.
+
+        The numeric code can be either base 10 or base 16, depending on
+        where the message came from.
+
+        :param force_hex: force the numeric code to be processed as base 16.
+        :type force_hex: boolean
+
+        :raises: ValueError
+        """
+        code = None
+        got_error = False
+
+        if not force_hex:
+            try:
+                code = int(self.numeric_code)
+            except ValueError:
+                got_error = True
+
+        if force_hex or got_error:
+            try:
+                code = int(self.numeric_code, 16)
+            except ValueError:
+                raise
+
+        return code
+
     def dict(self, **kwargs):
         """
         Dictionary representation.

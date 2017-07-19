@@ -178,13 +178,7 @@ class Zonetracker(object):
 
             # Process fault
             elif self.alarmdecoder_object.mode != DSC and (message.check_zone or message.text.startswith("FAULT") or message.text.startswith("ALARM")):
-                # Apparently this representation can be both base 10
-                # or base 16, depending on where the message came
-                # from.
-                try:
-                    zone = int(message.numeric_code)
-                except ValueError:
-                    zone = int(message.numeric_code, 16)
+                zone = message.parse_numeric_code()
 
                 # NOTE: Odd case for ECP failures.  Apparently they report as
                 #       zone 191 (0xBF) regardless of whether or not the

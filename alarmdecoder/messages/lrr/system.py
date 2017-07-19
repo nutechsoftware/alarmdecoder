@@ -109,8 +109,6 @@ class LRRSystem(object):
 
     def _handle_unknown_message(self, message):
         # TODO: Log this somewhere useful.
-        print("UNKNOWN LRR EVENT: {0}".format(message))
-
         return False
 
     def _get_event_status(self, message):
