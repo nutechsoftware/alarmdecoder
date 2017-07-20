@@ -12,7 +12,7 @@ devices.
 from .. import BaseMessage
 from ...util import InvalidMessageError
 
-from .events import LRR_EVENT_TYPE, get_event_description
+from .events import LRR_EVENT_TYPE, get_event_description, get_event_source
 
 
 class LRRMessage(BaseMessage):
@@ -70,18 +70,22 @@ class LRRMessage(BaseMessage):
 
             _, values = data.split(':')
             values = values.split(',')
+
+            # Handle older-format events
             if len(values) <= 3:
                 self.event_data, self.partition, self.event_type = values
                 self.version = 1
+
+            # Newer-format events
             else:
                 self.event_data, self.partition, self.event_type, self.report_code = values
                 self.version = 2
 
                 event_type_data = self.event_type.split('_')
-                self.event_prefix = event_type_data[0]
-                self.event_source = _get_event_source(self.event_prefix)
-                self.event_status = int(event_type_data[1][0])
-                self.event_code = int(event_type_data[1][1:], 16)
+                self.event_prefix = event_type_data[0]                      # Ex: CID
+                self.event_source = get_event_source(self.event_prefix)     # Ex: LRR_EVENT_TYPE.CID
+                self.event_status = int(event_type_data[1][0])              # Ex: 1 or 3
+                self.event_code = int(event_type_data[1][1:], 16)           # Ex: 0x100 = Medical
 
                 # replace last 2 digits of event_code with report_code, if applicable.
                 if not self.skip_report_override and self.report_code not in ['00', 'ff']:
@@ -94,7 +98,7 @@ class LRRMessage(BaseMessage):
 
     def dict(self, **kwargs):
         """
-        Dictionary representation.
+        Dictionary representation
         """
         return dict(
             time                  = self.timestamp,
@@ -109,18 +113,3 @@ class LRRMessage(BaseMessage):
             event_description     = self.event_description,
             **kwargs
         )
-
-
-def _get_event_source(prefix):
-    source = LRR_EVENT_TYPE.UNKNOWN
-
-    if prefix == 'CID':
-        source = LRR_EVENT_TYPE.CID
-    elif prefix == 'DSC':
-        source = LRR_EVENT_TYPE.DSC
-    elif prefix == 'AD2':
-        source = LRR_EVENT_TYPE.ALARMDECODER
-    elif prefix == 'ADEMCO':
-        source = LRR_EVENT_TYPE.ADEMCO
-
-    return source

@@ -92,6 +92,8 @@ class AlarmDecoder(object):
     """The status of message deduplication as configured on the device."""
     mode = ADEMCO
     """The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC."""
+    emulate_com = False
+    """The status of the devices COM emulation."""
 
     #Version Information
     serial_number = 0xFFFFFFFF
@@ -101,10 +103,6 @@ class AlarmDecoder(object):
     version_flags = ""
     """Device flags enabled"""
 
-    FIRE_STATE_NONE = 0
-    FIRE_STATE_FIRE = 1
-    FIRE_STATE_ACKNOWLEDGED = 2
-
     def __init__(self, device, ignore_message_states=False):
         """
         Constructor
@@ -112,6 +110,8 @@ class AlarmDecoder(object):
         :param device: The low-level device used for this `AlarmDecoder`_
                        interface.
         :type device: Device
+        :param ignore_message_states: Ignore regular panel messages when updating internal states
+        :type ignore_message_states: bool
         """
         self._device = device
         self._zonetracker = Zonetracker(self)
@@ -142,6 +142,7 @@ class AlarmDecoder(object):
         self.emulate_lrr = False
         self.deduplicate = False
         self.mode = ADEMCO
+        self.emulate_com = False
 
         self.serial_number = 0xFFFFFFFF
         self.version_number = 'Unknown'
@@ -284,6 +285,12 @@ class AlarmDecoder(object):
         self.send("C{0}\r".format(self.get_config_string()))
 
     def get_config_string(self):
+        """
+        Build a configuration string that's compatible with the AlarmDecoder configuration
+        command from the current values in the object.
+
+        :returns: string
+        """
         config_entries = []
 
         # HACK: This is ugly.. but I can't think of an elegant way of doing it.
@@ -297,6 +304,7 @@ class AlarmDecoder(object):
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
         config_entries.append(('MODE', list(PANEL_TYPES)[list(PANEL_TYPES.values()).index(self.mode)]))
+        config_entries.append(('COM', 'Y' if self.emulate_com else 'N'))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -515,6 +523,8 @@ class AlarmDecoder(object):
                 self.deduplicate = (val == 'Y')
             elif key == 'MODE':
                 self.mode = PANEL_TYPES[val]
+            elif key == 'COM':
+                self.emulate_com = (val == 'Y')
 
         self.on_config_received()
 
@@ -560,6 +570,8 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: power status, overrides message bits.
+        :type status: bool
 
         :returns: bool indicating the new status
         """
@@ -584,6 +596,10 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: alarm status, overrides message bits.
+        :type status: bool
+        :param user: user associated with alarm event
+        :type user: string
 
         :returns: bool indicating the new status
         """
@@ -611,6 +627,10 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: bypass status, overrides message bits.
+        :type status: bool
+        :param zone: zone associated with bypass event
+        :type zone: int
 
         :returns: bool indicating the new status
         """
@@ -640,6 +660,10 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: armed status, overrides message bits
+        :type status: bool
+        :param status_stay: armed stay status, overrides message bits
+        :type status_stay: bool
 
         :returns: bool indicating the new status
         """
@@ -670,6 +694,8 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: battery status, overrides message bits
+        :type status: bool
 
         :returns: boolean indicating the new status
         """
@@ -696,6 +722,8 @@ class AlarmDecoder(object):
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: fire status, overrides message bits
+        :type status: bool
 
         :returns: boolean indicating the new status
         """
@@ -807,7 +835,6 @@ class AlarmDecoder(object):
         Internal handler for opening the device.
         """
         self.get_config()
-
         self.get_version()
 
         self.on_open()

@@ -495,6 +495,11 @@ class USBDevice(Device):
             pass
 
     def fileno(self):
+        """
+        File number not supported for USB devices.
+    
+        :raises: NotImplementedError
+        """
         raise NotImplementedError('USB devices do not support fileno()')
 
     def write(self, data):
@@ -788,6 +793,11 @@ class SerialDevice(Device):
             pass
 
     def fileno(self):
+        """
+        Returns the file number associated with the device
+    
+        :returns: int
+        """
         return self._device.fileno()
 
     def write(self, data):
@@ -1103,6 +1113,11 @@ class SocketDevice(Device):
         Device.close(self)
 
     def fileno(self):
+        """
+        Returns the file number associated with the device
+    
+        :returns: int
+        """
         return self._device.fileno()
 
     def write(self, data):

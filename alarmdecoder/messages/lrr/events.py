@@ -4,35 +4,76 @@ Constants and utility functions used for LRR event handling.
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-def get_event_description(event_type, value):
+def get_event_description(event_type, event_code):
+    """
+    Retrieves the human-readable description of an LRR event.
+
+    :param event_type: Base LRR event type.  Use LRR_EVENT_TYPE.*
+    :type event_type: int
+    :param event_code: LRR event code
+    :type event_code: int
+
+    :returns: string
+    """
     description = 'Unknown'
-    lookup_map = None
+    lookup_map = LRR_TYPE_MAP.get(event_type, None)
 
-    if event_type in LRR_TYPE_MAP.keys():
-        lookup_map = LRR_TYPE_MAP[event_type]
-
-        if value in lookup_map.keys():
-            description = lookup_map[value]
+    if lookup_map is not None:
+        description = lookup_map.get(event_code, description)
 
     return description
 
+def get_event_source(prefix):
+    """
+    Retrieves the LRR_EVENT_TYPE corresponding to the prefix provided.abs
+
+    :param prefix: Prefix to convert to event type
+    :type prefix: string
+
+    :returns: int
+    """
+    source = LRR_EVENT_TYPE.UNKNOWN
+
+    if prefix == 'CID':
+        source = LRR_EVENT_TYPE.CID
+    elif prefix == 'DSC':
+        source = LRR_EVENT_TYPE.DSC
+    elif prefix == 'AD2':
+        source = LRR_EVENT_TYPE.ALARMDECODER
+    elif prefix == 'ADEMCO':
+        source = LRR_EVENT_TYPE.ADEMCO
+
+    return source
+
+
 class LRR_EVENT_TYPE:
+    """
+    Base LRR event types
+    """
     CID = 1
     DSC = 2
     ADEMCO = 3
     ALARMDECODER = 4
     UNKNOWN = 5
 
+
 class LRR_EVENT_STATUS:
+    """
+    LRR event status codes
+    """
     TRIGGER = 1
     RESTORE = 3
 
+
 class LRR_CID_EVENT:
+    """
+    ContactID event codes
+    """
     MEDICAL = 0x100
     MEDICAL_PENDANT = 0x101
     MEDICAL_FAIL_TO_REPORT = 0x102
     # 103-108: ?
-    TAMPER_ZONE = 0x109     # Where did we find this?
+    TAMPER_ZONE = 0x109     # NOTE: Where did we find this?
     FIRE = 0x110
     FIRE_SMOKE = 0x111
     FIRE_COMBUSTION = 0x112
@@ -231,7 +272,8 @@ class LRR_CID_EVENT:
     STATUS_PANIC_ALARM_RESET = 0x465
     ACCESS_SERVICE_ONOFF_PREMISES = 0x466
     # 467-469: ?
-    OPENCLOSE_PARTIAL_CLOSING = 0x470   # HACK: This is from DSC, and is named far too closely to 0
+    OPENCLOSE_PARTIAL_CLOSING = 0x470   # HACK: This is from our DSC firmware implementation, 
+                                        #       and is named far too closely to 0x480.
     # 471-479: ?
     OPENCLOSE_PARTIAL_CLOSE = 0x480
     # 481-500: ?
@@ -343,6 +385,9 @@ class LRR_CID_EVENT:
 
 
 class LRR_DSC_EVENT:
+    """
+    DSC event codes
+    """
     ZONE_EXPANDER_SUPERVISORY_ALARM = 0x04c
     ZONE_EXPANDER_SUPERVISORY_RESTORE = 0x04d
     AUX_INPUT_ALARM = 0x051
@@ -354,18 +399,28 @@ class LRR_DSC_EVENT:
 
 
 class LRR_ADEMCO_EVENT:
+    """
+    ADEMCO event codes
+    """
     pass
 
 
 class LRR_ALARMDECODER_EVENT:
+    """
+    AlarmDecoder event codes
+    """
     CUSTOM_PROG_MSG = 0x0
     CUSTOM_PROG_KEY = 0x1
 
 
 class LRR_UNKNOWN_EVENT:
+    """
+    Unknown event codes.  Realistically there shouldn't ever be anything here.
+    """
     pass
 
 
+# Map of ContactID event codes to human-readable text.
 LRR_CID_MAP = {
     LRR_CID_EVENT.MEDICAL: 'Medical Emergency: Non-specific',
     LRR_CID_EVENT.MEDICAL_PENDANT: 'Emergency Assistance Request',
@@ -640,6 +695,7 @@ LRR_CID_MAP = {
     LRR_CID_EVENT.OTHER_NO_READ_LOG: 'Other: No Read Log',
 }
 
+# Map of DSC event codes to human-readable text.
 LRR_DSC_MAP = {
     LRR_DSC_EVENT.ZONE_EXPANDER_SUPERVISORY_ALARM: 'Zone Expander Supervisory Alarm',
     LRR_DSC_EVENT.ZONE_EXPANDER_SUPERVISORY_RESTORE: 'Zone Expander Supervisory Restore',
@@ -651,6 +707,7 @@ LRR_DSC_MAP = {
     LRR_DSC_EVENT.REPORT_DSC_USER_LOG_EVENT: 'Report DSC User Log Event',
 }
 
+# Map of ADEMCO event codes to human-readable text.
 LRR_ADEMCO_MAP = {
 
 }
@@ -660,10 +717,12 @@ LRR_ALARMDECODER_MAP = {
     LRR_ALARMDECODER_EVENT.CUSTOM_PROG_KEY: 'Custom Programming Key'
 }
 
+# Map of UNKNOWN event codes to human-readable text.
 LRR_UNKNOWN_MAP = {
 
 }
 
+# Map of event type codes to text maps.
 LRR_TYPE_MAP = {
     LRR_EVENT_TYPE.CID: LRR_CID_MAP,
     LRR_EVENT_TYPE.DSC: LRR_DSC_MAP,
@@ -672,6 +731,7 @@ LRR_TYPE_MAP = {
     LRR_EVENT_TYPE.UNKNOWN: LRR_UNKNOWN_MAP,
 }
 
+# LRR events that should be considered Fire events.
 LRR_FIRE_EVENTS = [
     LRR_CID_EVENT.FIRE,
     LRR_CID_EVENT.FIRE_SMOKE,
@@ -681,9 +741,10 @@ LRR_FIRE_EVENTS = [
     LRR_CID_EVENT.FIRE_PULL_STATION,
     LRR_CID_EVENT.FIRE_DUCT,
     LRR_CID_EVENT.FIRE_FLAME,
-    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER
+    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER              # HACK: Don't really like having this here
 ]
 
+# LRR events that should be considered Alarm events.
 LRR_ALARM_EVENTS = [
     LRR_CID_EVENT.BURGLARY,
     LRR_CID_EVENT.BURGLARY_PERIMETER,
@@ -704,23 +765,27 @@ LRR_ALARM_EVENTS = [
     LRR_CID_EVENT.ALARM_LOW_TEMP,
     LRR_CID_EVENT.ALARM_LOSS_OF_AIR_FLOW,
     LRR_CID_EVENT.ALARM_CARBON_MONOXIDE,
-    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER
+    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER              # HACK: Don't really like having this here
 ]
 
+# LRR events that should be considered Power events.
 LRR_POWER_EVENTS = [
     LRR_CID_EVENT.TROUBLE_AC_LOSS
 ]
 
+# LRR events that should be considered Bypass events.
 LRR_BYPASS_EVENTS = [
     LRR_CID_EVENT.BYPASS_ZONE,
     LRR_CID_EVENT.BYPASS_24HOUR_ZONE,
     LRR_CID_EVENT.BYPASS_BURGLARY
 ]
 
+# LRR events that should be considered Battery events.
 LRR_BATTERY_EVENTS = [
     LRR_CID_EVENT.TROUBLE_LOW_BATTERY
 ]
 
+# LRR events that should be considered Panic events.
 LRR_PANIC_EVENTS = [
     LRR_CID_EVENT.MEDICAL,
     LRR_CID_EVENT.MEDICAL_PENDANT,
@@ -731,9 +796,10 @@ LRR_PANIC_EVENTS = [
     LRR_CID_EVENT.PANIC_AUDIBLE,
     LRR_CID_EVENT.PANIC_DURESS_ACCESS_GRANTED,
     LRR_CID_EVENT.PANIC_DURESS_EGRESS_GRANTED,
-    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER # Canceled panic
+    LRR_CID_EVENT.OPENCLOSE_CANCEL_BY_USER              # HACK: Don't really like having this here
 ]
 
+# LRR events that should be considered Arm events.
 LRR_ARM_EVENTS = [
     LRR_CID_EVENT.OPENCLOSE,
     LRR_CID_EVENT.OPENCLOSE_BY_USER,
@@ -742,10 +808,11 @@ LRR_ARM_EVENTS = [
     LRR_CID_EVENT.OPENCLOSE_REMOTE_ARMDISARM,
     LRR_CID_EVENT.OPENCLOSE_QUICK_ARM,
     LRR_CID_EVENT.OPENCLOSE_KEYSWITCH,
-    LRR_CID_EVENT.OPENCLOSE_ARMED_STAY,
+    LRR_CID_EVENT.OPENCLOSE_ARMED_STAY,                 # HACK: Not sure if I like having these in here.
     LRR_CID_EVENT.OPENCLOSE_KEYSWITCH_ARMED_STAY
 ]
 
+# LRR events that should be considered Arm Stay events.
 LRR_STAY_EVENTS = [
     LRR_CID_EVENT.OPENCLOSE_ARMED_STAY,
     LRR_CID_EVENT.OPENCLOSE_KEYSWITCH_ARMED_STAY
