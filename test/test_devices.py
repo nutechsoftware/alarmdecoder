@@ -48,12 +48,14 @@ class TestUSBDevice(TestCase):
     def tearDown(self):
         self._device.close()
 
+    ### Library events
     def attached_event(self, sender, *args, **kwargs):
         self._attached = True
 
     def detached_event(self, sender, *args, **kwargs):
         self._detached = True
 
+    ### Tests
     def test_find_default_param(self):
         with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
             device = USBDevice.find()
@@ -69,8 +71,8 @@ class TestUSBDevice(TestCase):
             self.assertEqual(device.interface, 'AD2-2')
 
     def test_events(self):
-        self.assertEqual(self._attached, False)
-        self.assertEqual(self._detached, False)
+        self.assertFalse(self._attached)
+        self.assertFalse(self._detached)
 
         # this is ugly, but it works.
         with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
@@ -81,8 +83,8 @@ class TestUSBDevice(TestCase):
                 time.sleep(1)
                 USBDevice.stop_detection()
 
-        self.assertEqual(self._attached, True)
-        self.assertEqual(self._detached, True)
+        self.assertTrue(self._attached)
+        self.assertTrue(self._detached)
 
     def test_find_all(self):
         with patch.object(USBDevice, 'find_all', return_value=[]) as mock:
@@ -149,6 +151,7 @@ class TestSerialDevice(TestCase):
     def tearDown(self):
         self._device.close()
 
+    ### Tests
     def test_open(self):
         self._device.interface = '/dev/ttyS0'
 
@@ -249,6 +252,7 @@ class TestSocketDevice(TestCase):
     def tearDown(self):
         self._device.close()
 
+    ### Tests
     def test_open(self):
         with patch.object(socket.socket, '__init__', return_value=None):
             with patch.object(socket.socket, 'connect', return_value=None) as mock:
@@ -411,12 +415,14 @@ if have_pyftdi:
         def tearDown(self):
             self._device.close()
 
+        ### Library events
         def attached_event(self, sender, *args, **kwargs):
             self._attached = True
 
         def detached_event(self, sender, *args, **kwargs):
             self._detached = True
 
+        ### Tests
         def test_find_default_param(self):
             with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
                 device = USBDevice.find()
@@ -432,8 +438,8 @@ if have_pyftdi:
                 self.assertEquals(device.interface, 'AD2-2')
 
         def test_events(self):
-            self.assertEquals(self._attached, False)
-            self.assertEquals(self._detached, False)
+            self.assertFalse(self._attached)
+            self.assertFalse(self._detached)
 
             # this is ugly, but it works.
             with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
@@ -444,8 +450,8 @@ if have_pyftdi:
                     time.sleep(1)
                     USBDevice.stop_detection()
 
-            self.assertEquals(self._attached, True)
-            self.assertEquals(self._detached, True)
+            self.assertTrue(self._attached)
+            self.assertTrue(self._detached)
 
         def test_find_all(self):
             with patch.object(USBDevice, 'find_all', return_value=[]) as mock:

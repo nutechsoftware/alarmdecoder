@@ -23,18 +23,21 @@ class TestZonetracking(TestCase):
     def tearDown(self):
         pass
 
+    ### Library events
     def fault_event(self, sender, *args, **kwargs):
         self._faulted = True
 
     def restore_event(self, sender, *args, **kwargs):
         self._restored = True
 
+    ### Util
     def _build_expander_message(self, msg):
         msg = ExpanderMessage(msg)
         zone = self._zonetracker.expander_to_zone(msg.address, msg.channel)
 
         return zone, msg
 
+    ### Tests
     def test_zone_fault(self):
         zone, msg = self._build_expander_message('!EXP:07,01,01')
         self._zonetracker.update(msg)
