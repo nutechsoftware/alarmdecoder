@@ -1,3 +1,11 @@
+"""
+This module contains the base device type for the `AlarmDecoder`_ (AD2) family.
+
+.. _AlarmDecoder: http://www.alarmdecoder.com
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
+"""
+
 import threading
 
 from ..util import CommError, TimeoutError, InvalidMessageError

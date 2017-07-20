@@ -1,3 +1,14 @@
+"""
+This module contains :py:class:`SocketDevice` interface for `AlarmDecoder`_ devices 
+that are exposed through `ser2sock`_ or another IP to serial solution.  Also supports 
+SSL if using `ser2sock`_.
+
+.. _ser2sock: http://github.com/nutechsoftware/ser2sock
+.. _AlarmDecoder: http://www.alarmdecoder.com
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
+"""
+
 import threading
 import socket
 import select

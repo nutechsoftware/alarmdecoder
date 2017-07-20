@@ -1,3 +1,11 @@
+"""
+This module contains the :py:class:`USBDevice` interface for the `AD2USB`_.
+
+.. _AD2USB: http://www.alarmdecoder.com
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
+"""
+
 import time
 import threading
 from .base_device import Device

@@ -1,3 +1,13 @@
+"""
+This module contains the :py:class:`SerialDevice` interface for the `AD2USB`_, `AD2SERIAL`_ or `AD2PI`_.
+
+.. _AD2USB: http://www.alarmdecoder.com
+.. _AD2SERIAL: http://www.alarmdecoder.com
+.. _AD2PI: http://www.alarmdecoder.com
+
+.. moduleauthor:: Scott Petersen <scott@nutech.com>
+"""
+
 import threading
 import serial
 import serial.tools.list_ports
