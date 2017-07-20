@@ -9,6 +9,7 @@ Provides utility classes for the `AlarmDecoder`_ (AD2) devices.
 import time
 import threading
 import select
+import sys
 import alarmdecoder
 
 from io import open
@@ -78,6 +79,19 @@ def bytes_available(device):
         bytes_avail = 4096
 
     return bytes_avail
+
+def bytes_hack(buf):
+    """
+    Hacky workaround for old installs of the library on systems without python-future that were
+    keeping the 2to3 update from working after auto-update.
+    """
+    ub = None
+    if sys.version_info > (3,):
+        ub = buf
+    else:
+        ub = bytes(buf)
+
+    return ub
 
 def read_firmware_file(file_path):
     """
