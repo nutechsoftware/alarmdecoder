@@ -11,6 +11,24 @@ import threading
 from ..util import CommError, TimeoutError, InvalidMessageError
 from ..event import event
 
+try:
+    from OpenSSL import SSL, crypto
+
+    have_openssl = True
+
+except ImportError:
+    class SSL:
+        class Error(BaseException):
+            pass
+
+        class WantReadError(BaseException):
+            pass
+
+        class SysCallError(BaseException):
+            pass
+
+    have_openssl = False
+
 
 class Device(object):
     """
