@@ -9,6 +9,7 @@ Provides utility classes for the `AlarmDecoder`_ (AD2) devices.
 import time
 import threading
 import select
+import sys
 import alarmdecoder
 
 from io import open
@@ -58,6 +59,15 @@ class UploadChecksumError(UploadError):
 
 
 def bytes_available(device):
+    """
+    Determines the number of bytes available for reading from an
+    AlarmDecoder device
+
+    :param device: the AlarmDecoder device
+    :type device: :py:class:`~alarmdecoder.devices.Device`
+
+    :returns: int
+    """
     bytes_avail = 0
 
     if isinstance(device, alarmdecoder.devices.SerialDevice):
@@ -70,7 +80,28 @@ def bytes_available(device):
 
     return bytes_avail
 
+def bytes_hack(buf):
+    """
+    Hacky workaround for old installs of the library on systems without python-future that were
+    keeping the 2to3 update from working after auto-update.
+    """
+    ub = None
+    if sys.version_info > (3,):
+        ub = buf
+    else:
+        ub = bytes(buf)
+
+    return ub
+
 def read_firmware_file(file_path):
+    """
+    Reads a firmware file into a dequeue for processing.
+
+    :param file_path: Path to the firmware file
+    :type file_path: string
+
+    :returns: deque
+    """
     data_queue = deque()
 
     with open(file_path) as firmware_handle:
@@ -99,6 +130,14 @@ class Firmware(object):
 
     @staticmethod
     def read(device):
+        """
+        Reads data from the specified device.
+
+        :param device: the AlarmDecoder device
+        :type device: :py:class:`~alarmdecoder.devices.Device`
+
+        :returns: string
+        """
         response = None
         bytes_avail = bytes_available(device)
 

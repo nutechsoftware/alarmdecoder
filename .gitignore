@@ -8,3 +8,4 @@ tmp
 *.egg-info
 bin/ad2-test
 *~
+.vscode

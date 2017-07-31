@@ -17,9 +17,11 @@ except ImportError:
 
 from .event import event
 from .util import InvalidMessageError
-from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
+from .messages import Message, ExpanderMessage, RFMessage, LRRMessage, AUIMessage
+from .messages.lrr import LRRSystem
 from .zonetracking import Zonetracker
 from .panels import PANEL_TYPES, ADEMCO, DSC
+from .states import FireState
 
 
 class AlarmDecoder(object):
@@ -49,6 +51,7 @@ class AlarmDecoder(object):
     on_lrr_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_rfx_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_sending_received = event.Event("This event is called when a !Sending.done message is received from the AlarmDecoder.\n\n**Callback definition:** *def callback(device, status, message)*")
+    on_aui_message = event.Event("This event is called when an :py:class`~alarmdecoder.messages.AUIMessage` is received\n\n**Callback definition:** *def callback(device, message)*")
 
     # Low-level Events
     on_open = event.Event("This event is called when the device has been opened.\n\n**Callback definition:** *def callback(device)*")
@@ -90,6 +93,8 @@ class AlarmDecoder(object):
     """The status of message deduplication as configured on the device."""
     mode = ADEMCO
     """The panel mode that the AlarmDecoder is in.  Currently supports ADEMCO and DSC."""
+    emulate_com = False
+    """The status of the devices COM emulation."""
 
     #Version Information
     serial_number = 0xFFFFFFFF
@@ -99,25 +104,32 @@ class AlarmDecoder(object):
     version_flags = ""
     """Device flags enabled"""
 
-    def __init__(self, device):
+    def __init__(self, device, ignore_message_states=False):
         """
         Constructor
 
         :param device: The low-level device used for this `AlarmDecoder`_
                        interface.
         :type device: Device
+        :param ignore_message_states: Ignore regular panel messages when updating internal states
+        :type ignore_message_states: bool
         """
         self._device = device
         self._zonetracker = Zonetracker(self)
+        self._lrr_system = LRRSystem(self)
 
+        self._ignore_message_states = ignore_message_states
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
         self._alarm_status = None
-        self._bypass_status = None
+        self._bypass_status = {}
         self._armed_status = None
         self._armed_stay = False
         self._fire_status = (False, 0)
+        self._fire_alarming = False
+        self._fire_alarming_changed = 0
+        self._fire_state = FireState.NONE
         self._battery_status = (False, 0)
         self._panic_status = False
         self._relay_status = {}
@@ -134,6 +146,7 @@ class AlarmDecoder(object):
         self.emulate_lrr = False
         self.deduplicate = False
         self.mode = ADEMCO
+        self.emulate_com = False
 
         self.serial_number = 0xFFFFFFFF
         self.version_number = 'Unknown'
@@ -276,6 +289,12 @@ class AlarmDecoder(object):
         self.send("C{0}\r".format(self.get_config_string()))
 
     def get_config_string(self):
+        """
+        Build a configuration string that's compatible with the AlarmDecoder configuration
+        command from the current values in the object.
+
+        :returns: string
+        """
         config_entries = []
 
         # HACK: This is ugly.. but I can't think of an elegant way of doing it.
@@ -289,6 +308,7 @@ class AlarmDecoder(object):
         config_entries.append(('LRR', 'Y' if self.emulate_lrr else 'N'))
         config_entries.append(('DEDUPLICATE', 'Y' if self.deduplicate else 'N'))
         config_entries.append(('MODE', list(PANEL_TYPES)[list(PANEL_TYPES.values()).index(self.mode)]))
+        config_entries.append(('COM', 'Y' if self.emulate_com else 'N'))
 
         config_string = '&'.join(['='.join(t) for t in config_entries])
 
@@ -382,6 +402,9 @@ class AlarmDecoder(object):
         elif header == '!LRR':
             msg = self._handle_lrr(data)
 
+        elif header == '!AUI':
+            msg = self._handle_aui(data)
+
         elif data.startswith('!Ready'):
             self.on_boot()
 
@@ -405,10 +428,14 @@ class AlarmDecoder(object):
 
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
+
         msg = Message(data)
 
         if self._internal_address_mask & msg.mask > 0:
-            self._update_internal_states(msg)
+            if not self._ignore_message_states:
+                self._update_internal_states(msg)
+            else:
+                self._update_fire_status(status=None)
 
             self.on_message(message=msg)
 
@@ -456,16 +483,23 @@ class AlarmDecoder(object):
         """
         msg = LRRMessage(data)
 
-        if msg.event_type == 'ALARM_PANIC':
-            self._panic_status = True
-            self.on_panic(status=True)
-
-        elif msg.event_type == 'CANCEL':
-            if self._panic_status is True:
-                self._panic_status = False
-                self.on_panic(status=False)
-
+        self._lrr_system.update(msg)
         self.on_lrr_message(message=msg)
+
+        return msg
+
+    def _handle_aui(self, data):
+        """
+        Handle AUI messages.
+
+        :param data: RF message to parse
+        :type data: string
+
+        :returns: :py:class`~alarmdecoder.messages.AUIMessage`
+        """
+        msg = AUIMessage(data)
+
+        self.on_aui_message(message=msg)
 
         return msg
 
@@ -511,6 +545,8 @@ class AlarmDecoder(object):
                 self.deduplicate = (val == 'Y')
             elif key == 'MODE':
                 self.mode = PANEL_TYPES[val]
+            elif key == 'COM':
+                self.emulate_com = (val == 'Y')
 
         self.on_config_received()
 
@@ -537,7 +573,7 @@ class AlarmDecoder(object):
         :param message: :py:class:`~alarmdecoder.messages.Message` to update internal states with
         :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`
         """
-        if isinstance(message, Message):
+        if isinstance(message, Message) and not self._ignore_message_states:
             self._update_power_status(message)
             self._update_alarm_status(message)
             self._update_zone_bypass_status(message)
@@ -550,122 +586,237 @@ class AlarmDecoder(object):
 
         self._update_zone_tracker(message)
 
-    def _update_power_status(self, message):
+    def _update_power_status(self, message=None, status=None):
         """
         Uses the provided message to update the AC power state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: power status, overrides message bits.
+        :type status: bool
 
         :returns: bool indicating the new status
         """
-        if message.ac_power != self._power_status:
-            self._power_status, old_status = message.ac_power, self._power_status
+        power_status = status
+        if isinstance(message, Message):
+            power_status = message.ac_power
+
+        if power_status is None:
+            return
+
+        if power_status != self._power_status:
+            self._power_status, old_status = power_status, self._power_status
 
             if old_status is not None:
                 self.on_power_changed(status=self._power_status)
 
         return self._power_status
 
-    def _update_alarm_status(self, message):
+    def _update_alarm_status(self, message=None, status=None, zone=None, user=None):
         """
         Uses the provided message to update the alarm state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: alarm status, overrides message bits.
+        :type status: bool
+        :param user: user associated with alarm event
+        :type user: string
 
         :returns: bool indicating the new status
         """
 
-        if message.alarm_sounding != self._alarm_status:
-            self._alarm_status, old_status = message.alarm_sounding, self._alarm_status
+        alarm_status = status
+        alarm_zone = zone
+        if isinstance(message, Message):
+            alarm_status = message.alarm_sounding
+            alarm_zone = message.parse_numeric_code()
 
-            if old_status is not None:
+        if alarm_status != self._alarm_status:
+            self._alarm_status, old_status = alarm_status, self._alarm_status
+
+            if old_status is not None or status is not None:
                 if self._alarm_status:
-                    self.on_alarm(zone=message.numeric_code)
+                    self.on_alarm(zone=alarm_zone)
                 else:
-                    self.on_alarm_restored(zone=message.numeric_code)
+                    self.on_alarm_restored(zone=alarm_zone, user=user)
 
         return self._alarm_status
 
-    def _update_zone_bypass_status(self, message):
+    def _update_zone_bypass_status(self, message=None, status=None, zone=None):
         """
         Uses the provided message to update the zone bypass state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: bypass status, overrides message bits.
+        :type status: bool
+        :param zone: zone associated with bypass event
+        :type zone: int
 
         :returns: bool indicating the new status
         """
+        bypass_status = status
+        if isinstance(message, Message):
+            bypass_status = message.zone_bypassed
 
-        if message.zone_bypassed != self._bypass_status:
-            self._bypass_status, old_status = message.zone_bypassed, self._bypass_status
+        if bypass_status is None:
+            return
 
-            if old_status is not None:
-                self.on_bypass(status=self._bypass_status)
+        old_bypass_status = self._bypass_status.get(zone, None)
 
-        return self._bypass_status
+        if bypass_status != old_bypass_status:
+            if bypass_status == False and zone is None:
+                self._bypass_status = {}
+            else:
+                self._bypass_status[zone] = bypass_status
 
-    def _update_armed_status(self, message):
+            if old_bypass_status is not None or message is None or (old_bypass_status is None and bypass_status is True):
+                self.on_bypass(status=bypass_status, zone=zone)
+
+        return bypass_status
+
+    def _update_armed_status(self, message=None, status=None, status_stay=None):
         """
         Uses the provided message to update the armed state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: armed status, overrides message bits
+        :type status: bool
+        :param status_stay: armed stay status, overrides message bits
+        :type status_stay: bool
 
         :returns: bool indicating the new status
         """
+        arm_status = status
+        stay_status = status_stay
 
-        self._armed_status, old_status = message.armed_away, self._armed_status
-        self._armed_stay, old_stay = message.armed_home, self._armed_stay
-        if message.armed_away != old_status or message.armed_home != old_stay:
-            if old_status is not None:
+        if isinstance(message, Message):
+            arm_status = message.armed_away
+            stay_status = message.armed_home
+
+        if arm_status is None or stay_status is None:
+            return
+
+        self._armed_status, old_status = arm_status, self._armed_status
+        self._armed_stay, old_stay = stay_status, self._armed_stay
+        if arm_status != old_status or stay_status != old_stay:
+            if old_status is not None or message is None:
                 if self._armed_status or self._armed_stay:
-                    self.on_arm(stay=message.armed_home)
+                    self.on_arm(stay=stay_status)
                 else:
                     self.on_disarm()
 
         return self._armed_status or self._armed_stay
 
-    def _update_battery_status(self, message):
+    def _update_battery_status(self, message=None, status=None):
         """
         Uses the provided message to update the battery state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: battery status, overrides message bits
+        :type status: bool
 
         :returns: boolean indicating the new status
         """
+        battery_status = status
+        if isinstance(message, Message):
+            battery_status = message.battery_low
+
+        if battery_status is None:
+            return
 
         last_status, last_update = self._battery_status
-        if message.battery_low == last_status:
+        if battery_status == last_status:
             self._battery_status = (last_status, time.time())
         else:
-            if message.battery_low is True or time.time() > last_update + self._battery_timeout:
-                self._battery_status = (message.battery_low, time.time())
-                self.on_low_battery(status=message.battery_low)
+            if battery_status is True or time.time() > last_update + self._battery_timeout:
+                self._battery_status = (battery_status, time.time())
+                self.on_low_battery(status=battery_status)
 
         return self._battery_status[0]
 
-    def _update_fire_status(self, message):
+    def _update_fire_status(self, message=None, status=None):
         """
         Uses the provided message to update the fire alarm state.
 
         :param message: message to use to update
         :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: fire status, overrides message bits
+        :type status: bool
 
         :returns: boolean indicating the new status
         """
+        is_lrr = status is not None
+        fire_status = status
+        if isinstance(message, Message):
+            fire_status = message.fire_alarm
 
         last_status, last_update = self._fire_status
-        if message.fire_alarm == last_status:
-            self._fire_status = (last_status, time.time())
-        else:
-            if message.fire_alarm is True or time.time() > last_update + self._fire_timeout:
-                self._fire_status = (message.fire_alarm, time.time())
-                self.on_fire(status=message.fire_alarm)
 
-        return self._fire_status[0]
+        if self._fire_state == FireState.NONE:
+            # Always move to a FIRE state if detected
+            if fire_status == True:
+                self._fire_state = FireState.ALARM
+                self._fire_status = (fire_status, time.time())
+
+                self.on_fire(status=FireState.ALARM)
+
+        elif self._fire_state == FireState.ALARM:
+            # If we've received an LRR CANCEL message, move to ACKNOWLEDGED
+            if is_lrr and fire_status == False:
+                self._fire_state = FireState.ACKNOWLEDGED
+                self._fire_status = (fire_status, time.time())
+                self.on_fire(status=FireState.ACKNOWLEDGED)
+            else:
+                # Handle bouncing status changes and timeout in order to revert back to NONE.
+                if last_status != fire_status or fire_status == True:
+                    self._fire_status = (fire_status, time.time())
+                
+                if fire_status == False and time.time() > last_update + self._fire_timeout:
+                    self._fire_state = FireState.NONE
+                    self.on_fire(status=FireState.NONE)
+
+        elif self._fire_state == FireState.ACKNOWLEDGED:
+            # If we've received a second LRR FIRE message after a CANCEL, revert back to FIRE and trigger another event.
+            if is_lrr and fire_status == True:
+                self._fire_state = FireState.ALARM
+                self._fire_status = (fire_status, time.time())
+
+                self.on_fire(status=FireState.ALARM)
+            else:
+                # Handle bouncing status changes and timeout in order to revert back to NONE.
+                if last_status != fire_status or fire_status == True:
+                    self._fire_status = (fire_status, time.time())
+
+                if fire_status != True and time.time() > last_update + self._fire_timeout:
+                    self._fire_state = FireState.NONE
+                    self.on_fire(status=FireState.NONE)
+
+        return self._fire_state == FireState.ALARM
+
+
+    def _update_panic_status(self, status=None):
+        """
+        Updates the panic status of the alarm panel.
+
+        :param status: status to use to update
+        :type status: boolean
+
+        :returns: boolean indicating the new status
+        """
+        if status is None:
+            return
+
+        if status != self._panic_status:
+            self._panic_status, old_status = status, self._panic_status
+
+            if old_status is not None:
+                self.on_panic(status=self._panic_status)
+
+        return self._panic_status
 
     def _update_expander_status(self, message):
         """
@@ -708,7 +859,6 @@ class AlarmDecoder(object):
         Internal handler for opening the device.
         """
         self.get_config()
-
         self.get_version()
 
         self.on_open()
