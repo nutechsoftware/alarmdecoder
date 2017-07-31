@@ -38,7 +38,7 @@ class ExpanderMessage(BaseMessage):
         :param data: message data to parse
         :type data: string
         """
-        BaseMessage.__init__(self)
+        BaseMessage.__init__(self, data)
 
         if data is not None:
             self._parse_message(data)
@@ -56,7 +56,6 @@ class ExpanderMessage(BaseMessage):
             header, values = data.split(':')
             address, channel, value = values.split(',')
 
-            self.raw = data
             self.address = int(address)
             self.channel = int(channel)
             self.value = int(value)

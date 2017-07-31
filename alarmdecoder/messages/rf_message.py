@@ -35,7 +35,7 @@ class RFMessage(BaseMessage):
         :param data: message data to parse
         :type data: string
         """
-        BaseMessage.__init__(self)
+        BaseMessage.__init__(self, data)
 
         if data is not None:
             self._parse_message(data)
@@ -50,8 +50,6 @@ class RFMessage(BaseMessage):
         :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         try:
-            self.raw = data
-
             _, values = data.split(':')
             self.serial_number, self.value = values.split(',')
             self.value = int(self.value, 16)

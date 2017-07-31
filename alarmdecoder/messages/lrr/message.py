@@ -49,7 +49,7 @@ class LRRMessage(BaseMessage):
         :param data: message data to parse
         :type data: string
         """
-        BaseMessage.__init__(self)
+        BaseMessage.__init__(self, data)
 
         self.skip_report_override = skip_report_override
 
@@ -66,8 +66,6 @@ class LRRMessage(BaseMessage):
         :raises: :py:class:`~alarmdecoder.util.InvalidMessageError`
         """
         try:
-            self.raw = data
-
             _, values = data.split(':')
             values = values.split(',')
 

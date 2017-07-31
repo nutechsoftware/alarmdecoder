@@ -17,7 +17,7 @@ except ImportError:
 
 from .event import event
 from .util import InvalidMessageError
-from .messages import Message, ExpanderMessage, RFMessage, LRRMessage
+from .messages import Message, ExpanderMessage, RFMessage, LRRMessage, AUIMessage
 from .messages.lrr import LRRSystem
 from .zonetracking import Zonetracker
 from .panels import PANEL_TYPES, ADEMCO, DSC
@@ -51,6 +51,7 @@ class AlarmDecoder(object):
     on_lrr_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.LRRMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_rfx_message = event.Event("This event is called when an :py:class:`~alarmdecoder.messages.RFMessage` is received.\n\n**Callback definition:** *def callback(device, message)*")
     on_sending_received = event.Event("This event is called when a !Sending.done message is received from the AlarmDecoder.\n\n**Callback definition:** *def callback(device, status, message)*")
+    on_aui_message = event.Event("This event is called when an :py:class`~alarmdecoder.messages.AUIMessage` is received\n\n**Callback definition:** *def callback(device, message)*")
 
     # Low-level Events
     on_open = event.Event("This event is called when the device has been opened.\n\n**Callback definition:** *def callback(device)*")
@@ -398,6 +399,9 @@ class AlarmDecoder(object):
         elif header == '!LRR':
             msg = self._handle_lrr(data)
 
+        elif header == '!AUI':
+            msg = self._handle_aui(data)
+
         elif data.startswith('!Ready'):
             self.on_boot()
 
@@ -478,6 +482,21 @@ class AlarmDecoder(object):
 
         self._lrr_system.update(msg)
         self.on_lrr_message(message=msg)
+
+        return msg
+
+    def _handle_aui(self, data):
+        """
+        Handle AUI messages.
+
+        :param data: RF message to parse
+        :type data: string
+
+        :returns: :py:class`~alarmdecoder.messages.AUIMessage`
+        """
+        msg = AUIMessage(data)
+
+        self.on_aui_message(message=msg)
 
         return msg
 

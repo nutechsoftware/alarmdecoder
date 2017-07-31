@@ -76,7 +76,7 @@ class Message(BaseMessage):
         :param data: message data to parse
         :type data: string
         """
-        BaseMessage.__init__(self)
+        BaseMessage.__init__(self, data)
 
         self._regex = re.compile('^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
 
@@ -101,7 +101,6 @@ class Message(BaseMessage):
 
         is_bit_set = lambda bit: not self.bitfield[bit] == "0"
 
-        self.raw = data
         self.ready = is_bit_set(1)
         self.armed_away = is_bit_set(2)
         self.armed_home = is_bit_set(3)

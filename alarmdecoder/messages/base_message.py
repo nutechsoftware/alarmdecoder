@@ -16,11 +16,12 @@ class BaseMessage(object):
     timestamp = None
     """The timestamp of the message"""
 
-    def __init__(self):
+    def __init__(self, data=None):
         """
         Constructor
         """
         self.timestamp = datetime.datetime.now()
+        self.raw = data
 
     def __str__(self):
         """
