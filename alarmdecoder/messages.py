@@ -118,6 +118,8 @@ class Message(BaseMessage):
     panel_data = None
     """The panel data field associated with this message."""
 
+    _regex = re.compile('^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
+
     def __init__(self, data=None):
         """
         Constructor
@@ -126,8 +128,6 @@ class Message(BaseMessage):
         :type data: string
         """
         BaseMessage.__init__(self)
-
-        self._regex = re.compile('^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
 
         if data is not None:
             self._parse_message(data)
