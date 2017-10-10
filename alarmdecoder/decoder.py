@@ -135,7 +135,7 @@ class AlarmDecoder(object):
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
         
-        self.last_fault_time = 0
+        self.last_fault_expansion = 0
         self.fault_expansion_time_limit = 30  # Seconds
 
         self.address = 18
