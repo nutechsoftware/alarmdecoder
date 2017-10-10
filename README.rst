@@ -61,7 +61,7 @@ Examples
 --------
 
 A basic example is included below. Please see the `examples`_ directory for
-more.:
+more.::
 
     import time
     from alarmdecoder import AlarmDecoder
