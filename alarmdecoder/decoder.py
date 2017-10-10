@@ -68,8 +68,26 @@ class AlarmDecoder(object):
     """Represents panel function key #3"""
     KEY_F4 = chr(4) + chr(4) + chr(4)
     """Represents panel function key #4"""
-    KEY_PANIC = chr(5) + chr(5) + chr(5)
+    KEY_PANIC = chr(2) + chr(2) + chr(2)
     """Represents a panic keypress"""
+    KEY_S1 = chr(1) + chr(1) + chr(1)
+    """Represents panel special key #1"""
+    KEY_S2 = chr(2) + chr(2) + chr(2)
+    """Represents panel special key #2"""
+    KEY_S3 = chr(3) + chr(3) + chr(3)
+    """Represents panel special key #3"""
+    KEY_S4 = chr(4) + chr(4) + chr(4)
+    """Represents panel special key #4"""
+    KEY_S5 = chr(5) + chr(5) + chr(5)
+    """Represents panel special key #5"""
+    KEY_S6 = chr(6) + chr(6) + chr(6)
+    """Represents panel special key #6"""
+    KEY_S7 = chr(7) + chr(7) + chr(7)
+    """Represents panel special key #7"""
+    KEY_S8 = chr(8) + chr(8) + chr(8)
+    """Represents panel special key #8"""
+
+
 
     BATTERY_TIMEOUT = 30
     """Default timeout (in seconds) before the battery status reverts."""
