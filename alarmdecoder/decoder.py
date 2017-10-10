@@ -30,7 +30,7 @@ class AlarmDecoder(object):
     """
 
     # High-level Events
-    on_arm = event.Event("This event is called when the panel is armed.\n\n**Callback definition:** *def callback(device)*")
+    on_arm = event.Event("This event is called when the panel is armed.\n\n**Callback definition:** *def callback(device, stay)*")
     on_disarm = event.Event("This event is called when the panel is disarmed.\n\n**Callback definition:** *def callback(device)*")
     on_power_changed = event.Event("This event is called when panel power switches between AC and DC.\n\n**Callback definition:** *def callback(device, status)*")
     on_alarm = event.Event("This event is called when the alarm is triggered.\n\n**Callback definition:** *def callback(device, zone)*")

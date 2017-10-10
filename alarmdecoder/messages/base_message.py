@@ -1,7 +1,7 @@
 import datetime
 
 try:
-    from repr import repr
+    from reprlib import repr
 except ImportError:
     from repr import repr
 

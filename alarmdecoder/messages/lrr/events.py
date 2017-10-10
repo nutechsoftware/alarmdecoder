@@ -660,7 +660,7 @@ LRR_CID_MAP = {
     LRR_CID_EVENT.STATUS_LATCHKEY_SUPERVISION: 'Status: Latch-key Supervision',
     LRR_CID_EVENT.SPECIAL_ADT_AUTHORIZATION: 'Special: ADT Authorization',
     LRR_CID_EVENT.RESERVED_652: 'Reserved: For Ademco Use',
-    LRR_CID_EVENT.RESERVED_652: 'Reserved: For Ademco Use',
+    LRR_CID_EVENT.RESERVED_653: 'Reserved: For Ademco Use',
     LRR_CID_EVENT.TROUBLE_SYSTEM_INACTIVITY: 'Trouble: System Inactivity',
     LRR_CID_EVENT.TROUBLE_UNABLE_TO_OUTPUT_SIGNAL: 'Trouble: Unable To Output Signal (Derived Channel)',
     LRR_CID_EVENT.TROUBLE_STU_CONTROLLER_DOWN: 'Trouble: STU Controller Down (Derived Channel)',
