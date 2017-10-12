@@ -65,6 +65,10 @@ class EventHandler(object):
         self._getfunctionlist().remove(func)
         return self
 
+    def clear(self):
+        del self._getfunctionlist()[:]
+        return self
+
     def fire(self, *args, **kwargs):
 
         """Fire event and call all handler functions
