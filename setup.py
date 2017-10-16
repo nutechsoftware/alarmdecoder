@@ -34,7 +34,7 @@ setup(name='alarmdecoder',
     author='Nu Tech Software Solutions, Inc.',
     author_email='general@support.nutech.com',
     license='MIT',
-    packages=['alarmdecoder', 'alarmdecoder.event'],
+    packages=['alarmdecoder', 'alarmdecoder.devices', 'alarmdecoder.event', 'alarmdecoder.messages', 'alarmdecoder.messages.lrr'],
     install_requires=[
         'pyserial==2.7',
     ] + extra_requirements,
