@@ -1,11 +1,6 @@
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
 from serial import Serial, SerialException
-try:
-    from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
-except:
-    from pyftdi.ftdi import Ftdi, FtdiError
-from usb.core import USBError, Device as USBCoreDevice
 import sys
 import socket
 import time
