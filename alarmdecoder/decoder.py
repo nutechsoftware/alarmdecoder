@@ -152,7 +152,6 @@ class AlarmDecoder(object):
         self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
-
         self.last_fault_expansion = 0
         self.fault_expansion_time_limit = 30  # Seconds
 
@@ -253,7 +252,7 @@ class AlarmDecoder(object):
     def open(self, baudrate=None, no_reader_thread=False):
         """Opens the device.
 
-        If the device cannot be opened, an except is thrown.  In that
+        If the device cannot be opened, an exception is thrown.  In that
         case, open() can be called repeatedly to try and open the
         connection.
 
@@ -796,7 +795,6 @@ class AlarmDecoder(object):
             if fire_status == True:
                 self._fire_state = FireState.ALARM
                 self._fire_status = (fire_status, time.time())
-
                 self.on_fire(status=FireState.ALARM)
 
         elif self._fire_state == FireState.ALARM:
