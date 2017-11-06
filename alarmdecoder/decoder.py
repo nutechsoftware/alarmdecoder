@@ -152,6 +152,7 @@ class AlarmDecoder(object):
         self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
+        
         self.last_fault_expansion = 0
         self.fault_expansion_time_limit = 30  # Seconds
 
@@ -795,6 +796,7 @@ class AlarmDecoder(object):
             if fire_status == True:
                 self._fire_state = FireState.ALARM
                 self._fire_status = (fire_status, time.time())
+                
                 self.on_fire(status=FireState.ALARM)
 
         elif self._fire_state == FireState.ALARM:
@@ -807,7 +809,7 @@ class AlarmDecoder(object):
                 # Handle bouncing status changes and timeout in order to revert back to NONE.
                 if last_status != fire_status or fire_status == True:
                     self._fire_status = (fire_status, time.time())
-
+                
                 if fire_status == False and time.time() > last_update + self._fire_timeout:
                     self._fire_state = FireState.NONE
                     self.on_fire(status=FireState.NONE)
