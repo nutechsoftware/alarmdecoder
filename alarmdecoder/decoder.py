@@ -262,7 +262,6 @@ class AlarmDecoder(object):
         :param no_reader_thread: Specifies whether or not the automatic reader
                                  thread should be started.
         :type no_reader_thread: bool
-
         """
         self._wire_events()
         try:
