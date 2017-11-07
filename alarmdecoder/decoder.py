@@ -251,8 +251,11 @@ class AlarmDecoder(object):
         self._internal_address_mask = value
 
     def open(self, baudrate=None, no_reader_thread=False):
-        """
-        Opens the device.
+        """Opens the device.
+
+        If the device cannot be opened, an exception is thrown.  In that
+        case, open() can be called repeatedly to try and open the
+        connection.
 
         :param baudrate: baudrate used for the device.  Defaults to the lower-level device default.
         :type baudrate: int
@@ -261,7 +264,12 @@ class AlarmDecoder(object):
         :type no_reader_thread: bool
         """
         self._wire_events()
-        self._device.open(baudrate=baudrate, no_reader_thread=no_reader_thread)
+        try:
+            self._device.open(baudrate=baudrate,
+                              no_reader_thread=no_reader_thread)
+        except:
+            self._unwire_events
+            raise
 
         return self
 
@@ -269,11 +277,8 @@ class AlarmDecoder(object):
         """
         Closes the device.
         """
-        if self._device:
-            self._device.close()
-
-        del self._device
-        self._device = None
+        self._device.close()
+        self._unwire_events()
 
     def send(self, data):
         """
@@ -386,6 +391,17 @@ class AlarmDecoder(object):
         self._device.on_write += self._on_write
         self._zonetracker.on_fault += self._on_zone_fault
         self._zonetracker.on_restore += self._on_zone_restore
+
+    def _unwire_events(self):
+        """
+        Wires up the internal device events.
+        """
+        self._device.on_open -= self._on_open
+        self._device.on_close -= self._on_close
+        self._device.on_read -= self._on_read
+        self._device.on_write -= self._on_write
+        self._zonetracker.on_fault -= self._on_zone_fault
+        self._zonetracker.on_restore -= self._on_zone_restore
 
     def _handle_message(self, data):
         """
