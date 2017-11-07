@@ -795,7 +795,7 @@ class AlarmDecoder(object):
             if fire_status == True:
                 self._fire_state = FireState.ALARM
                 self._fire_status = (fire_status, time.time())
-                
+
                 self.on_fire(status=FireState.ALARM)
 
         elif self._fire_state == FireState.ALARM:
