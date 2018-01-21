@@ -11,6 +11,9 @@
 AlarmDecoder
 ============
 
+.. image:: https://travis-ci.org/nutechsoftware/alarmdecoder.svg?branch=master
+    :target: https://travis-ci.org/nutechsoftware/alarmdecoder
+
 -------
 Summary
 -------
