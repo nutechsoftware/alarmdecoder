@@ -29,114 +29,6 @@ except ImportError:
     have_openssl = False
 
 
-class TestUSBDevice(TestCase):
-    def setUp(self):
-        self._device = USBDevice()
-        self._device._device = Mock(spec=Ftdi)
-        self._device._device.usb_dev = Mock(spec=USBCoreDevice)
-        self._device._device.usb_dev.bus = 0
-        self._device._device.usb_dev.address = 0
-
-        self._attached = False
-        self._detached = False
-
-    def tearDown(self):
-        self._device.close()
-
-    ### Library events
-    def attached_event(self, sender, *args, **kwargs):
-        self._attached = True
-
-    def detached_event(self, sender, *args, **kwargs):
-        self._detached = True
-
-    ### Tests
-    def test_find_default_param(self):
-        with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2', 1, 'AD2')]):
-            device = USBDevice.find()
-
-            self.assertEqual(device.interface, 'AD2')
-
-    def test_find_with_param(self):
-        with patch.object(Ftdi, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            device = USBDevice.find((0, 0, 'AD2-1', 1, 'AD2'))
-            self.assertEqual(device.interface, 'AD2-1')
-
-            device = USBDevice.find((0, 0, 'AD2-2', 1, 'AD2'))
-            self.assertEqual(device.interface, 'AD2-2')
-
-    def test_events(self):
-        self.assertFalse(self._attached)
-        self.assertFalse(self._detached)
-
-        # this is ugly, but it works.
-        with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-1', 1, 'AD2'), (0, 0, 'AD2-2', 1, 'AD2')]):
-            USBDevice.start_detection(on_attached=self.attached_event, on_detached=self.detached_event)
-
-            with patch.object(USBDevice, 'find_all', return_value=[(0, 0, 'AD2-2', 1, 'AD2')]):
-                USBDevice.find_all()
-                time.sleep(1)
-                USBDevice.stop_detection()
-
-        self.assertTrue(self._attached)
-        self.assertTrue(self._detached)
-
-    def test_find_all(self):
-        with patch.object(USBDevice, 'find_all', return_value=[]) as mock:
-            devices = USBDevice.find_all()
-
-        self.assertEqual(devices, [])
-
-    def test_find_all_exception(self):
-        with patch.object(Ftdi, 'find_all', side_effect=[USBError('testing'), FtdiError]) as mock:
-            with self.assertRaises(CommError):
-                devices = USBDevice.find_all()
-
-            with self.assertRaises(CommError):
-                devices = USBDevice.find_all()
-
-    def test_interface_serial_number(self):
-        self._device.interface = 'AD2USB'
-
-        self.assertEqual(self._device.interface, 'AD2USB')
-        self.assertEqual(self._device.serial_number, 'AD2USB')
-        self.assertEqual(self._device._device_number, 0)
-
-    def test_interface_index(self):
-        self._device.interface = 1
-
-        self.assertEqual(self._device.interface, 1)
-        self.assertEqual(self._device.serial_number, None)
-        self.assertEqual(self._device._device_number, 1)
-
-    def test_open(self):
-        self._device.interface = 'AD2USB'
-
-        with patch.object(self._device._device, 'open') as mock:
-            self._device.open(no_reader_thread=True)
-
-            mock.assert_any_call()
-
-    def test_open_failed(self):
-        self._device.interface = 'AD2USB'
-
-        with patch.object(self._device._device, 'open', side_effect=[USBError('testing'), FtdiError]):
-            with self.assertRaises(NoDeviceError):
-                self._device.open(no_reader_thread=True)
-
-            with self.assertRaises(NoDeviceError):
-                self._device.open(no_reader_thread=True)
-
-    def test_write(self):
-        self._device.interface = 'AD2USB'
-        self._device.open(no_reader_thread=True)
-
-        with patch.object(self._device._device, 'write_data') as mock:
-            self._device.write('test')
-
-            mock.assert_called_with('test')
-
-
 class TestSerialDevice(TestCase):
     def setUp(self):
         self._device = SerialDevice()
@@ -482,7 +374,7 @@ if have_pyftdi:
             with patch.object(self._device._device, 'open') as mock:
                 self._device.open(no_reader_thread=True)
 
-                mock.assert_any_call()
+                mock.assert_called()
 
         def test_open_failed(self):
             self._device.interface = 'AD2USB'
