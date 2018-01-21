@@ -1,11 +1,6 @@
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
 from serial import Serial, SerialException
-try:
-    from pyftdi.pyftdi.ftdi import Ftdi, FtdiError
-except:
-    from pyftdi.ftdi import Ftdi, FtdiError
-from usb.core import USBError, Device as USBCoreDevice
 import sys
 import socket
 import time
@@ -120,7 +115,7 @@ class TestUSBDevice(TestCase):
         with patch.object(self._device._device, 'open') as mock:
             self._device.open(no_reader_thread=True)
 
-            mock.assert_any_calls()
+            mock.assert_any_call()
 
     def test_open_failed(self):
         self._device.interface = 'AD2USB'
@@ -487,7 +482,7 @@ if have_pyftdi:
             with patch.object(self._device._device, 'open') as mock:
                 self._device.open(no_reader_thread=True)
 
-                mock.assert_any_calls()
+                mock.assert_any_call()
 
         def test_open_failed(self):
             self._device.interface = 'AD2USB'

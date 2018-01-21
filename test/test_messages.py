@@ -73,7 +73,7 @@ class TestMessages(TestCase):
         self.assertEqual(msg.event_type, 'ARM_STAY')
 
     def test_lrr_message_parse_v2(self):
-        msg = LRRMessage(b'!LRR:001,1,CID_3401,ff')
+        msg = LRRMessage('!LRR:001,1,CID_3401,ff')
         self.assertIsInstance(msg, LRRMessage)
         self.assertEquals(msg.event_data, '001')
         self.assertEquals(msg.partition, '1')
@@ -84,7 +84,7 @@ class TestMessages(TestCase):
         self.assertEquals(msg.report_code, 'ff')
 
     def test_lrr_event_code_override(self):
-        msg = LRRMessage(b'!LRR:001,1,CID_3400,01')
+        msg = LRRMessage('!LRR:001,1,CID_3400,01')
         self.assertEquals(msg.event_code, LRR_CID_EVENT.OPENCLOSE_BY_USER)  # 400 -> 401
 
     def test_lrr_message_parse_fail(self):

@@ -130,13 +130,13 @@ class TestAlarmDecoder(TestCase):
     ### Tests
     def test_open(self):
         self._decoder.open()
-        self._device.open.assert_any_calls()
+        self._device.open.assert_any_call()
 
     def test_close(self):
         self._decoder.open()
 
         self._decoder.close()
-        self._device.close.assert_any_calls()
+        self._device.close.assert_any_call()
 
     def test_send(self):
         self._decoder.send('test')
@@ -148,7 +148,7 @@ class TestAlarmDecoder(TestCase):
 
     def test_save_config(self):
         self._decoder.save_config()
-        self._device.write.assert_any_calls()
+        self._device.write.assert_any_call()
 
     def test_reboot(self):
         self._decoder.reboot()
