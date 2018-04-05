@@ -33,6 +33,7 @@ class AlarmDecoder(object):
     on_arm = event.Event("This event is called when the panel is armed.\n\n**Callback definition:** *def callback(device, stay)*")
     on_disarm = event.Event("This event is called when the panel is disarmed.\n\n**Callback definition:** *def callback(device)*")
     on_power_changed = event.Event("This event is called when panel power switches between AC and DC.\n\n**Callback definition:** *def callback(device, status)*")
+    on_ready_changed = event.Event("This event is called when panel ready state changes.\n\n**Callback definition:** *def callback(device, status)*")
     on_alarm = event.Event("This event is called when the alarm is triggered.\n\n**Callback definition:** *def callback(device, zone)*")
     on_alarm_restored = event.Event("This event is called when the alarm stops sounding.\n\n**Callback definition:** *def callback(device, zone)*")
     on_fire = event.Event("This event is called when a fire is detected.\n\n**Callback definition:** *def callback(device, status)*")
@@ -140,6 +141,7 @@ class AlarmDecoder(object):
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
+        self._ready_status = None
         self._alarm_status = None
         self._bypass_status = {}
         self._armed_status = None
@@ -609,6 +611,7 @@ class AlarmDecoder(object):
         """
         if isinstance(message, Message) and not self._ignore_message_states:
             self._update_power_status(message)
+            self._update_ready_status(message)
             self._update_alarm_status(message)
             self._update_zone_bypass_status(message)
             self._update_armed_status(message)
@@ -645,6 +648,32 @@ class AlarmDecoder(object):
                 self.on_power_changed(status=self._power_status)
 
         return self._power_status
+
+    def _update_ready_status(self, message=None, status=None):
+        """
+        Uses the provided message to update the ready state.
+
+        :param message: message to use to update
+        :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: ready status, overrides message bits.
+        :type status: bool
+
+        :returns: bool indicating the new status
+        """
+        ready_status = status
+        if isinstance(message, Message):
+            ready_status = message.ready
+
+        if ready_status is None:
+            return
+
+        if ready_status != self._ready_status:
+            self._ready_status, old_status = ready_status, self._ready_status
+
+            if old_status is not None:
+                self.on_ready_changed(status=self._ready_status)
+
+        return self._ready_status
 
     def _update_alarm_status(self, message=None, status=None, zone=None, user=None):
         """

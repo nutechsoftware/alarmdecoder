@@ -20,6 +20,7 @@ class TestAlarmDecoder(TestCase):
         self._panicked = False
         self._relay_changed = False
         self._power_changed = False
+        self._ready_changed = False
         self._alarmed = False
         self._bypassed = False
         self._battery = False
@@ -46,6 +47,7 @@ class TestAlarmDecoder(TestCase):
         self._decoder.on_panic += self.on_panic
         self._decoder.on_relay_changed += self.on_relay_changed
         self._decoder.on_power_changed += self.on_power_changed
+        self._decoder.on_ready_changed += self.on_ready_changed
         self._decoder.on_alarm += self.on_alarm
         self._decoder.on_alarm_restored += self.on_alarm_restored
         self._decoder.on_bypass += self.on_bypass
@@ -78,6 +80,9 @@ class TestAlarmDecoder(TestCase):
 
     def on_power_changed(self, sender, *args, **kwargs):
         self._power_changed = kwargs['status']
+
+    def on_ready_changed(self, sender, *args, **kwargs):
+        self._ready_changed = kwargs['status']
 
     def on_alarm(self, sender, *args, **kwargs):
         self._alarmed = True
@@ -239,6 +244,17 @@ class TestAlarmDecoder(TestCase):
 
         msg = self._decoder._handle_message(b'[0000000100000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertTrue(self._power_changed)
+
+    def test_ready_changed_event(self):
+        msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertFalse(self._ready_changed)   # Not set first time we hit it.
+
+        msg = self._decoder._handle_message(b'[1000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertFalse(self._ready_changed)
+
+        msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertTrue(self._ready_changed)
+
 
     def test_alarm_event(self):
         msg = self._decoder._handle_message(b'[0000000000100000----],000,[f707000600e5800c0c020000],"                                "')
