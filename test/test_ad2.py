@@ -253,7 +253,7 @@ class TestAlarmDecoder(TestCase):
         self.assertTrue(self._ready_changed)
 
         msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-        self.assertTrue(self._ready_changed)
+        self.assertFalse(self._ready_changed)
 
 
     def test_alarm_event(self):
