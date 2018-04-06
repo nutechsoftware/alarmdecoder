@@ -304,32 +304,23 @@ class TestAlarmDecoder(TestCase):
             self.assertFalse(self._battery)
 
     def test_fire_alarm_event(self):
-        self._fire = FireState.NONE
+        msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertTrue(self._fire)   # Not set the first time we hit it.
 
         msg = self._decoder._handle_message(b'[0000000000000100----],000,[f707000600e5800c0c020000],"                                "')
-        self.assertEquals(self._fire, FireState.ALARM)
-
-        # force the timeout to expire.
-        with patch.object(time, 'time', return_value=self._decoder._fire_status[1] + 35):
-            msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-            self.assertEquals(self._fire, FireState.NONE)
+        self.assertTrue(self._fire)
 
     def test_fire_lrr(self):
-        self._fire = FireState.NONE
+        self._fire = False
 
         msg = self._decoder._handle_message(b'!LRR:095,1,CID_1110,ff') # Fire: Non-specific
 
         self.assertIsInstance(msg, LRRMessage)
-        self.assertEquals(self._fire, FireState.ALARM)
+        self.assertTrue(self._fire)
 
         msg = self._decoder._handle_message(b'!LRR:001,1,CID_1406,ff') # Open/Close: Cancel
         self.assertIsInstance(msg, LRRMessage)
-        self.assertEquals(self._fire, FireState.ACKNOWLEDGED)
-
-        # force the timeout to expire.
-        with patch.object(time, 'time', return_value=self._decoder._fire_status[1] + 35):
-            msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-            self.assertEquals(self._fire, FireState.NONE)
+        self.assertFalse(self._fire)
 
     def test_hit_for_faults(self):
         self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"Hit * for faults                "')

@@ -123,7 +123,7 @@ class AlarmDecoder(object):
     version_flags = ""
     """Device flags enabled"""
 
-    def __init__(self, device, ignore_message_states=False):
+    def __init__(self, device, ignore_message_states=False, ignore_lrr_states=True):
         """
         Constructor
 
@@ -132,12 +132,15 @@ class AlarmDecoder(object):
         :type device: Device
         :param ignore_message_states: Ignore regular panel messages when updating internal states
         :type ignore_message_states: bool
+        :param ignore_lrr_states: Ignore LRR panel messages when updating internal states
+        :type ignore_lrr_states: bool
         """
         self._device = device
         self._zonetracker = Zonetracker(self)
         self._lrr_system = LRRSystem(self)
 
         self._ignore_message_states = ignore_message_states
+        self._ignore_lrr_states = ignore_lrr_states
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
@@ -146,10 +149,7 @@ class AlarmDecoder(object):
         self._bypass_status = {}
         self._armed_status = None
         self._armed_stay = False
-        self._fire_status = (False, 0)
-        self._fire_alarming = False
-        self._fire_alarming_changed = 0
-        self._fire_state = FireState.NONE
+        self._fire_status = False
         self._battery_status = (False, 0)
         self._panic_status = False
         self._relay_status = {}
@@ -470,8 +470,6 @@ class AlarmDecoder(object):
         if self._internal_address_mask & msg.mask > 0:
             if not self._ignore_message_states:
                 self._update_internal_states(msg)
-            else:
-                self._update_fire_status(status=None)
 
             self.on_message(message=msg)
 
@@ -519,7 +517,8 @@ class AlarmDecoder(object):
         """
         msg = LRRMessage(data)
 
-        self._lrr_system.update(msg)
+        if not self._ignore_lrr_states:
+            self._lrr_system.update(msg)
         self.on_lrr_message(message=msg)
 
         return msg
@@ -812,54 +811,26 @@ class AlarmDecoder(object):
 
         :returns: boolean indicating the new status
         """
-        is_lrr = status is not None
         fire_status = status
+        last_status = self._fire_status
         if isinstance(message, Message):
-            fire_status = message.fire_alarm
-
-        last_status, last_update = self._fire_status
-
-        if self._fire_state == FireState.NONE:
-            # Always move to a FIRE state if detected
-            if fire_status == True:
-                self._fire_state = FireState.ALARM
-                self._fire_status = (fire_status, time.time())
-
-                self.on_fire(status=FireState.ALARM)
-
-        elif self._fire_state == FireState.ALARM:
-            # If we've received an LRR CANCEL message, move to ACKNOWLEDGED
-            if is_lrr and fire_status == False:
-                self._fire_state = FireState.ACKNOWLEDGED
-                self._fire_status = (fire_status, time.time())
-                self.on_fire(status=FireState.ACKNOWLEDGED)
+            # Quirk in Ademco panels. The fire bit drops on "SYSTEM LO BAT" messages.
+            # needs to be done for different languages.
+            if self.mode == ADEMCO and message.text.startswith("SYSTEM"):
+                fire_status = last_status
             else:
-                # Handle bouncing status changes and timeout in order to revert back to NONE.
-                if last_status != fire_status or fire_status == True:
-                    self._fire_status = (fire_status, time.time())
-                
-                if fire_status == False and time.time() > last_update + self._fire_timeout:
-                    self._fire_state = FireState.NONE
-                    self.on_fire(status=FireState.NONE)
+                fire_status = message.fire_alarm
 
-        elif self._fire_state == FireState.ACKNOWLEDGED:
-            # If we've received a second LRR FIRE message after a CANCEL, revert back to FIRE and trigger another event.
-            if is_lrr and fire_status == True:
-                self._fire_state = FireState.ALARM
-                self._fire_status = (fire_status, time.time())
+        if fire_status is None:
+            return
 
-                self.on_fire(status=FireState.ALARM)
-            else:
-                # Handle bouncing status changes and timeout in order to revert back to NONE.
-                if last_status != fire_status or fire_status == True:
-                    self._fire_status = (fire_status, time.time())
+        if fire_status != self._fire_status:
+            self._fire_status, old_status = fire_status, self._fire_status
 
-                if fire_status != True and time.time() > last_update + self._fire_timeout:
-                    self._fire_state = FireState.NONE
-                    self.on_fire(status=FireState.NONE)
+            if old_status is not None:
+                self.on_fire(status=self._fire_status)
 
-        return self._fire_state == FireState.ALARM
-
+        return self._fire_status
 
     def _update_panic_status(self, status=None):
         """
