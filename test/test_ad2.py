@@ -43,7 +43,7 @@ class TestAlarmDecoder(TestCase):
         self._device.on_read = EventHandler(Event(), self._device)
         self._device.on_write = EventHandler(Event(), self._device)
 
-        self._decoder = AlarmDecoder(self._device)
+        self._decoder = AlarmDecoder(self._device, ignore_lrr_states=False)
         self._decoder.on_panic += self.on_panic
         self._decoder.on_relay_changed += self.on_relay_changed
         self._decoder.on_power_changed += self.on_power_changed
@@ -305,7 +305,7 @@ class TestAlarmDecoder(TestCase):
 
     def test_fire_alarm_event(self):
         msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
-        self.assertTrue(self._fire)   # Not set the first time we hit it.
+        self.assertFalse(self._fire)   # Not set the first time we hit it.
 
         msg = self._decoder._handle_message(b'[0000000000000100----],000,[f707000600e5800c0c020000],"                                "')
         self.assertTrue(self._fire)
