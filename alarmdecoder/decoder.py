@@ -609,11 +609,10 @@ class AlarmDecoder(object):
         :type message: :py:class:`~alarmdecoder.messages.Message`, :py:class:`~alarmdecoder.messages.ExpanderMessage`, :py:class:`~alarmdecoder.messages.LRRMessage`, or :py:class:`~alarmdecoder.messages.RFMessage`
         """
         if isinstance(message, Message) and not self._ignore_message_states:
+            self._update_armed_ready_status(message)
             self._update_power_status(message)
-            self._update_ready_status(message)
             self._update_alarm_status(message)
             self._update_zone_bypass_status(message)
-            self._update_armed_status(message)
             self._update_battery_status(message)
             self._update_fire_status(message)
 
@@ -738,6 +737,52 @@ class AlarmDecoder(object):
 
         return bypass_status
 
+    def _update_armed_ready_status(self, message=None):
+        """
+        Uses the provided message to update the armed state
+        and ready state at once as they can change in the same
+        message and we want both events to have the same states.
+        :param message: message to use to update
+        :type message: :py:class:`~alarmdecoder.messages.Message`
+
+        """
+
+        arm_status = None
+        stay_status = None
+        ready_status = None
+
+        send_ready = False
+        send_arm = False
+
+        if isinstance(message, Message):
+            arm_status = message.armed_away
+            stay_status = message.armed_home
+            ready_status = message.ready
+
+        if arm_status is None or stay_status is None or ready_status is None:
+            return
+
+        self._armed_stay, old_stay = stay_status, self._armed_stay
+        self._armed_status, old_arm = arm_status, self._armed_status
+        self._ready_status, old_ready_status = ready_status, self._ready_status
+
+        if old_arm is not None:
+            if arm_status != old_arm or stay_status != old_stay:
+                send_arm = True
+
+        if old_ready_status is not None:
+            if ready_status != old_ready_status:
+                send_ready = True
+
+        if send_ready:
+            self.on_ready_changed(status=self._ready_status)
+
+        if send_arm:
+            if self._armed_status or self._armed_stay:
+                self.on_arm(stay=stay_status)
+            else:
+                self.on_disarm()
+
     def _update_armed_status(self, message=None, status=None, status_stay=None):
         """
         Uses the provided message to update the armed state.
@@ -757,10 +802,8 @@ class AlarmDecoder(object):
         if isinstance(message, Message):
             arm_status = message.armed_away
             stay_status = message.armed_home
-
         if arm_status is None or stay_status is None:
             return
-
         self._armed_status, old_status = arm_status, self._armed_status
         self._armed_stay, old_stay = stay_status, self._armed_stay
         if arm_status != old_status or stay_status != old_stay:
@@ -815,7 +858,7 @@ class AlarmDecoder(object):
         last_status = self._fire_status
         if isinstance(message, Message):
             # Quirk in Ademco panels. The fire bit drops on "SYSTEM LO BAT" messages.
-            # needs to be done for different languages.
+            # FIXME: does not support non english panels.
             if self.mode == ADEMCO and message.text.startswith("SYSTEM"):
                 fire_status = last_status
             else:
