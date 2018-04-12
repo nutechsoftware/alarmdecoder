@@ -776,8 +776,10 @@ class AlarmDecoder(object):
         if isinstance(message, Message):
             arm_status = message.armed_away
             stay_status = message.armed_home
+
         if arm_status is None or stay_status is None:
             return
+
         self._armed_status, old_status = arm_status, self._armed_status
         self._armed_stay, old_stay = stay_status, self._armed_stay
         if arm_status != old_status or stay_status != old_stay:
