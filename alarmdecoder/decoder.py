@@ -647,32 +647,6 @@ class AlarmDecoder(object):
 
         return self._power_status
 
-    def _update_ready_status(self, message=None, status=None):
-        """
-        Uses the provided message to update the ready state.
-
-        :param message: message to use to update
-        :type message: :py:class:`~alarmdecoder.messages.Message`
-        :param status: ready status, overrides message bits.
-        :type status: bool
-
-        :returns: bool indicating the new status
-        """
-        ready_status = status
-        if isinstance(message, Message):
-            ready_status = message.ready
-
-        if ready_status is None:
-            return
-
-        if ready_status != self._ready_status:
-            self._ready_status, old_status = ready_status, self._ready_status
-
-            if old_status is not None:
-                self.on_ready_changed(status=self._ready_status)
-
-        return self._ready_status
-
     def _update_alarm_status(self, message=None, status=None, zone=None, user=None):
         """
         Uses the provided message to update the alarm state.
