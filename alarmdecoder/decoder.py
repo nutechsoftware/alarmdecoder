@@ -415,7 +415,10 @@ class AlarmDecoder(object):
         :returns: :py:class:`~alarmdecoder.messages.Message`
         """
 
-        data = data.decode('utf-8')
+        try:
+            data = data.decode('utf-8')
+        except:
+            raise InvalidMessageError('Decode failed for message: {0}'.format(data))
 
         if data is not None:
             data = data.lstrip('\0')
