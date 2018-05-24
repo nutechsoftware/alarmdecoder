@@ -20,6 +20,7 @@ class TestAlarmDecoder(TestCase):
         self._panicked = False
         self._relay_changed = False
         self._power_changed = False
+        self._chime_changed = False
         self._ready_changed = False
         self._alarmed = False
         self._bypassed = False
@@ -48,6 +49,7 @@ class TestAlarmDecoder(TestCase):
         self._decoder.on_relay_changed += self.on_relay_changed
         self._decoder.on_power_changed += self.on_power_changed
         self._decoder.on_ready_changed += self.on_ready_changed
+        self._decoder.on_chime_changed += self.on_chime_changed
         self._decoder.on_alarm += self.on_alarm
         self._decoder.on_alarm_restored += self.on_alarm_restored
         self._decoder.on_bypass += self.on_bypass
@@ -83,6 +85,9 @@ class TestAlarmDecoder(TestCase):
 
     def on_ready_changed(self, sender, *args, **kwargs):
         self._ready_changed = kwargs['status']
+
+    def on_chime_changed(self, sender, *args, **kwargs):
+        self._chime_changed = kwargs['status']
 
     def on_alarm(self, sender, *args, **kwargs):
         self._alarmed = True
@@ -255,6 +260,15 @@ class TestAlarmDecoder(TestCase):
         msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
         self.assertFalse(self._ready_changed)
 
+    def test_chime_changed_event(self):
+        msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertFalse(self._chime_changed)   # Not set first time we hit it.
+
+        msg = self._decoder._handle_message(b'[0000000010000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertTrue(self._chime_changed)
+
+        msg = self._decoder._handle_message(b'[0000000000000000----],000,[f707000600e5800c0c020000],"                                "')
+        self.assertFalse(self._chime_changed)
 
     def test_alarm_event(self):
         msg = self._decoder._handle_message(b'[0000000000100000----],000,[f707000600e5800c0c020000],"                                "')
