@@ -45,6 +45,7 @@ class AlarmDecoder(object):
     on_low_battery = event.Event("This event is called when the device detects a low battery.\n\n**Callback definition:** *def callback(device, status)*")
     on_panic = event.Event("This event is called when the device detects a panic.\n\n**Callback definition:** *def callback(device, status)*")
     on_relay_changed = event.Event("This event is called when a relay is opened or closed on an expander board.\n\n**Callback definition:** *def callback(device, message)*")
+    on_chime_changed = event.Event("This event is called when chime state changes.\n\n**Callback definition:** *def callback(device, message)*")
 
     # Mid-level Events
     on_message = event.Event("This event is called when standard panel :py:class:`~alarmdecoder.messages.Message` is received.\n\n**Callback definition:** *def callback(device, message)*")
@@ -144,6 +145,7 @@ class AlarmDecoder(object):
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
         self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
+        self._chime_status = None
         self._ready_status = None
         self._alarm_status = None
         self._bypass_status = {}
@@ -154,7 +156,7 @@ class AlarmDecoder(object):
         self._panic_status = False
         self._relay_status = {}
         self._internal_address_mask = 0xFFFFFFFF
-        
+
         self.last_fault_expansion = 0
         self.fault_expansion_time_limit = 30  # Seconds
 
@@ -614,6 +616,7 @@ class AlarmDecoder(object):
         if isinstance(message, Message) and not self._ignore_message_states:
             self._update_armed_ready_status(message)
             self._update_power_status(message)
+            self._update_chime_status(message)
             self._update_alarm_status(message)
             self._update_zone_bypass_status(message)
             self._update_battery_status(message)
@@ -649,6 +652,32 @@ class AlarmDecoder(object):
                 self.on_power_changed(status=self._power_status)
 
         return self._power_status
+
+    def _update_chime_status(self, message=None, status=None):
+        """
+        Uses the provided message to update the Chime state.
+
+        :param message: message to use to update
+        :type message: :py:class:`~alarmdecoder.messages.Message`
+        :param status: chime status, overrides message bits.
+        :type status: bool
+
+        :returns: bool indicating the new status
+        """
+        chime_status = status
+        if isinstance(message, Message):
+            chime_status = message.chime_on
+
+        if chime_status is None:
+            return
+
+        if chime_status != self._chime_status:
+            self._chime_status, old_status = chime_status, self._chime_status
+
+            if old_status is not None:
+                self.on_chime_changed(status=self._chime_status)
+
+        return self._chime_status
 
     def _update_alarm_status(self, message=None, status=None, zone=None, user=None):
         """
@@ -692,7 +721,9 @@ class AlarmDecoder(object):
         :param zone: zone associated with bypass event
         :type zone: int
 
-        :returns: bool indicating the new status
+        :returns: dictionary {Zone:True|False,...}
+           Zone can be None if LRR CID Bypass checking is disabled
+           or we do not know what zones but know something is bypassed.
         """
         bypass_status = status
         if isinstance(message, Message):
