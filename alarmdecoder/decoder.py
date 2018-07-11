@@ -117,7 +117,7 @@ class AlarmDecoder(object):
     """The status of the devices COM emulation."""
 
     #Version Information
-    serial_number = 0xFFFFFFFF
+    serial_number = 'Unknown'
     """The device serial number"""
     version_number = 'Unknown'
     """The device firmware version"""
