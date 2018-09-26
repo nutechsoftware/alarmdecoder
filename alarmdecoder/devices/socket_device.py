@@ -1,6 +1,6 @@
 """
-This module contains :py:class:`SocketDevice` interface for `AlarmDecoder`_ devices 
-that are exposed through `ser2sock`_ or another IP to serial solution.  Also supports 
+This module contains :py:class:`SocketDevice` interface for `AlarmDecoder`_ devices
+that are exposed through `ser2sock`_ or another IP to serial solution.  Also supports
 SSL if using `ser2sock`_.
 
 .. _ser2sock: http://github.com/nutechsoftware/ser2sock
@@ -136,6 +136,25 @@ class SocketDevice(Device):
         """
         self._ssl_ca = value
 
+    @property
+    def ssl_allow_self_signed(self):
+        """
+        Retrieves whether this socket is to allow self signed SSL certificates.
+
+        :returns: True if self signed certificates are allowed, otherwise False
+        """
+        return self._ssl_allow_self_signed
+
+    @ssl_allow_self_signed.setter
+    def ssl_allow_self_signed(self, value):
+        """
+        Sets whether this socket is to allow self signed SSL certificates.
+
+        :param value: True if self signed certificates are to be allowed, otherwise False (or don't set it at all)
+        :type value: bool
+        """
+        self._ssl_allow_self_signed = value
+
     def __init__(self, interface=("localhost", 10000)):
         """
         Constructor
@@ -150,6 +169,7 @@ class SocketDevice(Device):
         self._ssl_certificate = None
         self._ssl_key = None
         self._ssl_ca = None
+        self._ssl_allow_self_signed = False
 
     def open(self, baudrate=None, no_reader_thread=False):
         """
@@ -217,7 +237,7 @@ class SocketDevice(Device):
     def fileno(self):
         """
         Returns the file number associated with the device
-    
+
         :returns: int
         """
         return self._device.fileno()
@@ -385,7 +405,11 @@ class SocketDevice(Device):
             else:
                 ctx.load_verify_locations(self.ssl_ca, None)
 
-            ctx.set_verify(SSL.VERIFY_PEER, self._verify_ssl_callback)
+            verify_method = SSL.VERIFY_PEER
+            if (self._ssl_allow_self_signed):
+                verify_method = SSL.VERIFY_NONE
+
+            ctx.set_verify(verify_method, self._verify_ssl_callback)
 
             self._device = SSL.Connection(ctx, self._device)
 
