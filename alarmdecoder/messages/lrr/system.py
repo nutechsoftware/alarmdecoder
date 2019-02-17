@@ -4,7 +4,7 @@ Primary system for handling LRR events.
 .. moduleauthor:: Scott Petersen <scott@nutech.com>
 """
 
-from .events import LRR_EVENT_TYPE, LRR_EVENT_STATUS, LRR_CID_EVENT
+from .events import LRR_EVENT_TYPE, LRR_EVENT_STATUS, LRR_CID_EVENT, LRR_DATA_TYPE
 from .events import LRR_FIRE_EVENTS, LRR_POWER_EVENTS, LRR_BYPASS_EVENTS, LRR_BATTERY_EVENTS, \
                     LRR_PANIC_EVENTS, LRR_ARM_EVENTS, LRR_STAY_EVENTS, LRR_ALARM_EVENTS
 

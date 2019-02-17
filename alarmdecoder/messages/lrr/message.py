@@ -12,14 +12,15 @@ devices.
 from .. import BaseMessage
 from ...util import InvalidMessageError
 
-from .events import LRR_EVENT_TYPE, get_event_description, get_event_source
+from .events import LRR_EVENT_TYPE, get_event_description, get_event_data_type, get_event_source
 
 
 class LRRMessage(BaseMessage):
     """
     Represent a message from a Long Range Radio or emulated Long Range Radio.
     """
-
+    event_data_type = None
+    """Data Type for specific LRR message. User or Zone"""
     event_data = None
     """Data associated with the LRR message.  Usually user ID or zone."""
     partition = -1
@@ -89,6 +90,7 @@ class LRRMessage(BaseMessage):
                 if not self.skip_report_override and self.report_code not in ['00', 'ff']:
                     self.event_code = int(event_type_data[1][1] + self.report_code, 16)
                 self.event_description = get_event_description(self.event_source, self.event_code)
+                self.event_data_type = get_event_data_type(self.event_source, self.event_code)
 
         except ValueError:
             raise InvalidMessageError('Received invalid message: {0}'.format(data))
@@ -101,6 +103,7 @@ class LRRMessage(BaseMessage):
         return dict(
             time                  = self.timestamp,
             event_data            = self.event_data,
+            event_data_type       = self.event_data_type,
             event_type            = self.event_type,
             partition             = self.partition,
             report_code           = self.report_code,

@@ -150,6 +150,8 @@ class AlarmDecoder(object):
         self._alarm_status = None
         self._bypass_status = {}
         self._armed_status = None
+        self._entry_delay_off_status = None
+        self._perimeter_only_status = None
         self._armed_stay = False
         self._fire_status = False
         self._battery_status = (False, 0)
@@ -758,7 +760,8 @@ class AlarmDecoder(object):
         arm_status = None
         stay_status = None
         ready_status = None
-
+        entry_delay_off_status = None
+        perimeter_only_status = None
         send_ready = False
         send_arm = False
 
@@ -766,6 +769,8 @@ class AlarmDecoder(object):
             arm_status = message.armed_away
             stay_status = message.armed_home
             ready_status = message.ready
+            entry_delay_off_status = message.entry_delay_off
+            perimeter_only_status = message.perimeter_only
 
         if arm_status is None or stay_status is None or ready_status is None:
             return
@@ -773,9 +778,24 @@ class AlarmDecoder(object):
         self._armed_stay, old_stay = stay_status, self._armed_stay
         self._armed_status, old_arm = arm_status, self._armed_status
         self._ready_status, old_ready_status = ready_status, self._ready_status
+        self._entry_delay_off_status, old_entry_delay_off_status = entry_delay_off_status, self._entry_delay_off_status
+        self._perimeter_only_status, old_perimeter_only_status = perimeter_only_status, self._perimeter_only_status
 
         if old_arm is not None:
             if arm_status != old_arm or stay_status != old_stay:
+                send_arm = True
+
+        # This bit is expected to change only when the ARMED bit changes.
+        # But just in case watch for it to change
+        if old_entry_delay_off_status is not None:
+            if entry_delay_off_status != old_entry_delay_off_status:
+                send_arm = True
+
+        # This bit can change after the armed bit is set
+        # this will treat it like AWAY/Stay transition as an additional
+        # arming event.
+        if old_perimeter_only_status is not None:
+            if perimeter_only_status != old_perimeter_only_status:
                 send_arm = True
 
         if old_ready_status is not None:
