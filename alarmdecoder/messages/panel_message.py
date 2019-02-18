@@ -52,8 +52,8 @@ class Message(BaseMessage):
     """Indicates whether or not there are zones that require attention."""
     perimeter_only = False
     """Indicates whether or not the perimeter is armed."""
-    system_fault = False
-    """Indicates whether a system fault has occurred."""
+    system_fault = -1
+    """Indicates if any panel specific system fault exists."""
     panel_type = ADEMCO
     """Indicates which panel type was the source of this message."""
     numeric_code = None
@@ -118,7 +118,7 @@ class Message(BaseMessage):
         self.fire_alarm = is_bit_set(14)
         self.check_zone = is_bit_set(15)
         self.perimeter_only = is_bit_set(16)
-        self.system_fault = is_bit_set(17)
+        self.system_fault = int(self.bitfield[17], 16)
         if self.bitfield[18] in list(PANEL_TYPES):
             self.panel_type = PANEL_TYPES[self.bitfield[18]]
         # pos 20-21 - Unused.
