@@ -33,7 +33,7 @@ class TestMessages(TestCase):
         self.assertFalse(msg.fire_alarm)
         self.assertFalse(msg.check_zone)
         self.assertFalse(msg.perimeter_only)
-        self.assertFalse(msg.system_fault)
+        self.assertEqual(msg.system_fault, -1)
         self.assertFalse(msg.panel_type, ADEMCO)
         self.assertEqual(msg.numeric_code, '001')
         self.assertEqual(msg.mask, int('07000600', 16))

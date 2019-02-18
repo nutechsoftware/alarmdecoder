@@ -154,6 +154,7 @@ class AlarmDecoder(object):
         self._perimeter_only_status = None
         self._armed_stay = False
         self._fire_status = False
+        self._fire_status_timeout = 0
         self._battery_status = (False, 0)
         self._panic_status = False
         self._relay_status = {}
@@ -885,23 +886,49 @@ class AlarmDecoder(object):
         :returns: boolean indicating the new status
         """
         fire_status = status
-        last_status = self._fire_status
+
+        last_status  = self._fire_status
+        last_update = self._fire_status_timeout
+
+        # Quirk in Ademco panels. Fire bit goes on/off if other alarms are on or a system fault
         if isinstance(message, Message):
-            # Quirk in Ademco panels. The fire bit drops on "SYSTEM LO BAT" messages.
-            # FIXME: does not support non english panels.
-            if self.mode == ADEMCO and message.text.startswith("SYSTEM"):
-                fire_status = last_status
+            if self.mode == ADEMCO:
+                # ignore sticky bit on these messages :(
+                if not message.text.startswith("SYSTEM") and not message.text.startswith("CHECK"):
+
+                    # if we had an alarm and the sticky bit was cleared then clear the alarm
+                    if self._fire_status and not message.alarm_event_occurred:
+                        # fire restore
+                        fire_status = False
+
+                    # if we had a fire event and it went away and we still have a sticky alarm bit
+                    # then it is not gone yet just restore it
+                    if not message.fire_alarm and self._fire_status:
+                        if message.alarm_event_occurred:
+                            fire_status = self._fire_status
+
+                    # if we did not have an alarm and we do now send event
+                    if message.fire_alarm and message.fire_alarm != self._fire_status:
+                        fire_status = message.fire_alarm
+
+                    # if we had an alarm already send and we get it again extend the timeout
+                    if message.fire_alarm and message.fire_alarm == self._fire_status:
+                        self._fire_status = message.fire_alarm
+                        self._fire_status_timeout = time.time()
+
+                else:
+                    # if we timeout with an alarm set restore it
+                    if time.time() > last_update + self._fire_timeout:
+                        fire_status = False
+
             else:
                 fire_status = message.fire_alarm
 
-        if fire_status is None:
-            return
-
         if fire_status != self._fire_status:
-            self._fire_status, old_status = fire_status, self._fire_status
-
-            if old_status is not None:
-                self.on_fire(status=self._fire_status)
+            if fire_status is not None:
+                self._fire_status = fire_status
+                self._fire_status_timeout = time.time()
+                self.on_fire(status=fire_status)
 
         return self._fire_status
 
