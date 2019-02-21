@@ -173,7 +173,7 @@ class AlarmDecoder(object):
         self.mode = ADEMCO
         self.emulate_com = False
 
-        self.serial_number = 0xFFFFFFFF
+        self.serial_number = 'Unknown'
         self.version_number = 'Unknown'
         self.version_flags = ""
 
