@@ -153,6 +153,7 @@ class AlarmDecoder(object):
         self._entry_delay_off_status = None
         self._perimeter_only_status = None
         self._armed_stay = False
+        self._exit = False
         self._fire_status = False
         self._fire_status_timeout = 0
         self._battery_status = (False, 0)
@@ -760,6 +761,7 @@ class AlarmDecoder(object):
 
         arm_status = None
         stay_status = None
+        exit = None
         ready_status = None
         entry_delay_off_status = None
         perimeter_only_status = None
@@ -776,11 +778,32 @@ class AlarmDecoder(object):
         if arm_status is None or stay_status is None or ready_status is None:
             return
 
+        # if we are armed we may be in exit mode
+        if arm_status or stay_status:
+            exit = False
+            messageUp = message.text.upper()
+            
+            if self.mode == ADEMCO:
+                # skip these messages
+                if not messageUp.startswith("SYSTEM") and not messageUp.startswith("CHECK"):
+                    if "MAY EXIT NOW" in messageUp:
+                        exit = True
+                else:
+                    # preserve last state
+                    exit = self._exit
+                            
+            if self.mode == DSC:
+                if "QUICK EXIT" in messageUp:
+                    exit = True
+        else:
+            exit = False
+
         self._armed_stay, old_stay = stay_status, self._armed_stay
         self._armed_status, old_arm = arm_status, self._armed_status
         self._ready_status, old_ready_status = ready_status, self._ready_status
         self._entry_delay_off_status, old_entry_delay_off_status = entry_delay_off_status, self._entry_delay_off_status
         self._perimeter_only_status, old_perimeter_only_status = perimeter_only_status, self._perimeter_only_status
+        self._exit, old_exit = exit, self._exit
 
         if old_arm is not None:
             if arm_status != old_arm or stay_status != old_stay:
@@ -805,6 +828,11 @@ class AlarmDecoder(object):
 
         if send_ready:
             self.on_ready_changed(status=self._ready_status)
+
+        # Force sending a new ARMED event if the exit status changes while armed
+        if old_exit is not None:
+            if exit != old_exit:
+                send_arm = True
 
         if send_arm:
             if self._armed_status or self._armed_stay:
