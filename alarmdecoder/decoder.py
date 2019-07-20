@@ -813,26 +813,26 @@ class AlarmDecoder(object):
         # But just in case watch for it to change
         if old_entry_delay_off_status is not None:
             if entry_delay_off_status != old_entry_delay_off_status:
-                send_arm = True
+                send_ready = True
 
         # This bit can change after the armed bit is set
         # this will treat it like AWAY/Stay transition as an additional
         # arming event.
         if old_perimeter_only_status is not None:
             if perimeter_only_status != old_perimeter_only_status:
-                send_arm = True
+                send_ready = True
 
         if old_ready_status is not None:
             if ready_status != old_ready_status:
                 send_ready = True
 
-        if send_ready:
-            self.on_ready_changed(status=self._ready_status)
-
-        # Force sending a new ARMED event if the exit status changes while armed
+        # Send exist status updates in ready event
         if old_exit is not None:
             if exit != old_exit:
-                send_arm = True
+                send_ready = True
+
+        if send_ready:
+            self.on_ready_changed(status=self._ready_status)
 
         if send_arm:
             if self._armed_status or self._armed_stay:
