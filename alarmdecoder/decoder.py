@@ -793,7 +793,7 @@ class AlarmDecoder(object):
                     exit = self._exit
                             
             if self.mode == DSC:
-                if "QUICK EXIT" in messageUp:
+                if any(s in messageUp for s in ("QUICK EXIT", "EXIT DELAY")):
                     exit = True
         else:
             exit = False
