@@ -782,7 +782,7 @@ class AlarmDecoder(object):
         if arm_status or stay_status:
             exit = False
             messageUp = message.text.upper()
-            
+
             if self.mode == ADEMCO:
                 # skip these messages
                 if not messageUp.startswith("SYSTEM") and not messageUp.startswith("CHECK"):
@@ -791,7 +791,7 @@ class AlarmDecoder(object):
                 else:
                     # preserve last state
                     exit = self._exit
-                            
+
             if self.mode == DSC:
                 if any(s in messageUp for s in ("QUICK EXIT", "EXIT DELAY")):
                     exit = True
@@ -922,7 +922,9 @@ class AlarmDecoder(object):
         if isinstance(message, Message):
             if self.mode == ADEMCO:
                 # ignore sticky bit on these messages :(
-                if not message.text.startswith("SYSTEM") and not message.text.startswith("CHECK"):
+                if (not message.text.startswith("SYSTEM") and
+                    not message.text.startswith("CHECK") and
+                    message.system_fault != 3):
 
                     # if we had an alarm and the sticky bit was cleared then clear the alarm
                     if self._fire_status and not message.alarm_event_occurred:
@@ -948,6 +950,9 @@ class AlarmDecoder(object):
                     # if we timeout with an alarm set restore it
                     if time.time() > last_update + self._fire_timeout:
                         fire_status = False
+                    else:
+                        # Keep the current fire state do not update for SYSTEM messages.
+                        fire_status = self._fire_status
 
             else:
                 fire_status = message.fire_alarm
