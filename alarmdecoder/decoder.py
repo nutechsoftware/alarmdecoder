@@ -93,6 +93,8 @@ class AlarmDecoder(object):
 
     BATTERY_TIMEOUT = 30
     """Default timeout (in seconds) before the battery status reverts."""
+    FIRE_TIMEOUT = 30
+    """Default tTimeout (in seconds) before the fire status reverts."""
 
     # Attributes
     address = 18
@@ -141,6 +143,7 @@ class AlarmDecoder(object):
         self._ignore_message_states = ignore_message_states
         self._ignore_lrr_states = ignore_lrr_states
         self._battery_timeout = AlarmDecoder.BATTERY_TIMEOUT
+        self._fire_timeout = AlarmDecoder.FIRE_TIMEOUT
         self._power_status = None
         self._chime_status = None
         self._ready_status = None
@@ -152,6 +155,7 @@ class AlarmDecoder(object):
         self._armed_stay = False
         self._exit = False
         self._fire_status = False
+        self._fire_status_timeout = 0
         self._battery_status = (False, 0)
         self._panic_status = False
         self._relay_status = {}
@@ -215,6 +219,25 @@ class AlarmDecoder(object):
         :type value: int
         """
         self._battery_timeout = value
+
+    @property
+    def fire_timeout(self):
+        """
+        Retrieves the timeout for restoring the fire status, in seconds.
+
+        :returns: fire status timeout
+        """
+        return self._fire_timeout
+
+    @fire_timeout.setter
+    def fire_timeout(self, value):
+        """
+        Sets the timeout for restoring the fire status, in seconds.
+
+        :param value: timeout in seconds
+        :type value: int
+        """
+        self._fire_timeout = value
 
     @property
     def internal_address_mask(self):
@@ -893,21 +916,38 @@ class AlarmDecoder(object):
         fire_status = status
 
         last_status  = self._fire_status
+        last_update = self._fire_status_timeout
 
         # Quirk in Ademco panels. Fire bit goes on/off if other alarms are on or a system fault
         if isinstance(message, Message):
             if self.mode == ADEMCO:
-                # ignore sticky bit on these messages :(
-                if (not message.text.startswith("SYSTEM") and
-                    not message.text.startswith("CHECK") and
-                    message.system_fault != 3):
-
-                    # if we did not have an alarm and we do now send event
+                # if we did not have an alarm and we do now send event
+                if message.fire_alarm and message.fire_alarm != self._fire_status:
                     fire_status = message.fire_alarm
 
-                else:
-                    # Keep the current fire state do not update for SYSTEM messages.
-                    fire_status = self._fire_status
+                # if we had an alarm and the sticky bit was cleared then clear the alarm
+                ## ignore sticky bit on these messages :(
+                if (not message.text.startswith("SYSTEM") and
+                    not message.text.startswith("CHECK")):
+                    if self._fire_status and not message.alarm_event_occurred:
+                        # fire restore
+                        fire_status = False
+
+                # if we had a fire event and it went away and we still have a sticky alarm bit
+                # then it is not gone yet just restore it
+                if not message.fire_alarm and self._fire_status:
+                    if message.alarm_event_occurred:
+                        fire_status = self._fire_status
+
+                # if we had an alarm already and we get it again extend the timeout
+                if message.fire_alarm and message.fire_alarm == self._fire_status:
+                    self._fire_status = message.fire_alarm
+                    self._fire_status_timeout = time.time()
+
+                # if we timeout with an alarm set restore it
+                if self._fire_status:
+                    if time.time() > last_update + self._fire_timeout:
+                        fire_status = False
 
             else:
                 fire_status = message.fire_alarm
@@ -915,6 +955,7 @@ class AlarmDecoder(object):
         if fire_status != self._fire_status:
             if fire_status is not None:
                 self._fire_status = fire_status
+                self._fire_status_timeout = time.time()
                 self.on_fire(status=fire_status)
 
         return self._fire_status
