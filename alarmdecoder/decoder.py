@@ -782,7 +782,7 @@ class AlarmDecoder(object):
         if arm_status or stay_status:
             exit = False
             messageUp = message.text.upper()
-            
+
             if self.mode == ADEMCO:
                 # skip these messages
                 if not messageUp.startswith("SYSTEM") and not messageUp.startswith("CHECK"):
@@ -791,7 +791,7 @@ class AlarmDecoder(object):
                 else:
                     # preserve last state
                     exit = self._exit
-                            
+
             if self.mode == DSC:
                 if any(s in messageUp for s in ("QUICK EXIT", "EXIT DELAY")):
                     exit = True
@@ -921,31 +921,31 @@ class AlarmDecoder(object):
         # Quirk in Ademco panels. Fire bit goes on/off if other alarms are on or a system fault
         if isinstance(message, Message):
             if self.mode == ADEMCO:
-                # ignore sticky bit on these messages :(
-                if not message.text.startswith("SYSTEM") and not message.text.startswith("CHECK"):
+                # if we did not have an alarm and we do now send event
+                if message.fire_alarm and message.fire_alarm != self._fire_status:
+                    fire_status = message.fire_alarm
 
-                    # if we had an alarm and the sticky bit was cleared then clear the alarm
+                # if we had an alarm and the sticky bit was cleared then clear the alarm
+                ## ignore sticky bit on these messages :(
+                if (not message.text.startswith("SYSTEM") and
+                    not message.text.startswith("CHECK")):
                     if self._fire_status and not message.alarm_event_occurred:
                         # fire restore
                         fire_status = False
 
-                    # if we had a fire event and it went away and we still have a sticky alarm bit
-                    # then it is not gone yet just restore it
-                    if not message.fire_alarm and self._fire_status:
-                        if message.alarm_event_occurred:
-                            fire_status = self._fire_status
+                # if we had a fire event and it went away and we still have a sticky alarm bit
+                # then it is not gone yet just restore it
+                if not message.fire_alarm and self._fire_status:
+                    if message.alarm_event_occurred:
+                        fire_status = self._fire_status
 
-                    # if we did not have an alarm and we do now send event
-                    if message.fire_alarm and message.fire_alarm != self._fire_status:
-                        fire_status = message.fire_alarm
+                # if we had an alarm already and we get it again extend the timeout
+                if message.fire_alarm and message.fire_alarm == self._fire_status:
+                    self._fire_status = message.fire_alarm
+                    self._fire_status_timeout = time.time()
 
-                    # if we had an alarm already send and we get it again extend the timeout
-                    if message.fire_alarm and message.fire_alarm == self._fire_status:
-                        self._fire_status = message.fire_alarm
-                        self._fire_status_timeout = time.time()
-
-                else:
-                    # if we timeout with an alarm set restore it
+                # if we timeout with an alarm set restore it
+                if self._fire_status:
                     if time.time() > last_update + self._fire_timeout:
                         fire_status = False
 
