@@ -11,10 +11,10 @@ def readme():
 
 extra_requirements = []
 if sys.version_info < (3,):
-    extra_requirements.append('future==0.14.3')
+    extra_requirements.append('future>=0.14.3')
 
 setup(name='alarmdecoder',
-    version='1.13.8',
+    version='1.13.9',
     description='Python interface for the AlarmDecoder (AD2) family '
                 'of alarm devices which includes the AD2USB, AD2SERIAL and AD2PI.',
     long_description=readme(),
@@ -36,7 +36,7 @@ setup(name='alarmdecoder',
     license='MIT',
     packages=['alarmdecoder', 'alarmdecoder.devices', 'alarmdecoder.event', 'alarmdecoder.messages', 'alarmdecoder.messages.lrr'],
     install_requires=[
-        'pyserial==2.7',
+        'pyserial>=2.7',
     ] + extra_requirements,
     test_suite='nose.collector',
     tests_require=['nose', 'mock'],
