@@ -198,6 +198,9 @@ class Zonetracker(object):
                     self._update_zone(zone)
                     self._clear_zones(zone)
 
+                    # Save our spot for the next message.
+                    self._last_zone_fault = zone
+
                 else:
                     status = Zone.FAULT
                     if message.check_zone:
@@ -207,8 +210,8 @@ class Zonetracker(object):
                     self._zones_faulted.append(zone)
                     self._zones_faulted.sort()
 
-                # Save our spot for the next message.
-                self._last_zone_fault = zone
+                    # A new zone fault, so it is out of sequence.
+                    self._last_zone_fault = 0
 
             self._clear_expired_zones()
 
@@ -245,6 +248,11 @@ class Zonetracker(object):
         :param zone: current zone being processed
         :type zone: int
         """
+
+        if self._last_zone_fault == 0:
+            # We don't know what the last faulted zone was, nothing to do
+            return
+
         cleared_zones = []
         found_last_faulted = found_current = at_end = False
 
