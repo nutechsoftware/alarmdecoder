@@ -14,7 +14,7 @@ import serial.tools.list_ports
 import select
 import sys
 from .base_device import Device
-from ..util import CommError, TimeoutError, NoDeviceError, bytes_hack
+from ..util import CommError, TimeoutError, NoDeviceError, bytes_hack, filter_ad2prot_byte
 
 
 class SerialDevice(Device):
@@ -141,7 +141,7 @@ class SerialDevice(Device):
     def fileno(self):
         """
         Returns the file number associated with the device
-    
+
         :returns: int
         """
         return self._device.fileno()
@@ -178,18 +178,18 @@ class SerialDevice(Device):
         :returns: character read from the device
         :raises: :py:class:`~alarmdecoder.util.CommError`
         """
-        data = ''
+        data = b''
 
         try:
             read_ready, _, _ = select.select([self._device.fileno()], [], [], 0.5)
 
             if len(read_ready) != 0:
-                data = self._device.read(1)
+                data = filter_ad2prot_byte(self._device.read(1))
 
         except serial.SerialException as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
-        return data.decode('utf-8')
+        return data
 
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
@@ -213,54 +213,38 @@ class SerialDevice(Device):
         if purge_buffer:
             self._buffer = b''
 
-        got_line, data = False, ''
+        got_line, ret = False, None
 
         timer = threading.Timer(timeout, timeout_event)
         if timeout > 0:
             timer.start()
 
-        leftovers = b''
         try:
-            while timeout_event.reading and not got_line:
+            while timeout_event.reading:
                 read_ready, _, _ = select.select([self._device.fileno()], [], [], 0.5)
+
                 if len(read_ready) == 0:
                     continue
 
-                bytes_avail = 0
-                if hasattr(self._device, "in_waiting"):
-                    bytes_avail = self._device.in_waiting
-                else:
-                    bytes_avail = self._device.inWaiting()
+                buf = filter_ad2prot_byte(self._device.read(1))
 
-                buf = self._device.read(bytes_avail)
+                if buf != b'':
+                    self._buffer +=  buf[0]
 
-                for idx in range(len(buf)):
-                    c = buf[idx]
+                    if buf == b"\n":
+                        self._buffer = self._buffer.rstrip(b"\r\n")
 
-                    ub = bytes_hack(c)
-                    if sys.version_info > (3,):
-                        ub = bytes([ub])
-
-                    # NOTE: AD2SERIAL and AD2PI apparently sends down \xFF on boot.
-                    if ub != b'' and ub != b"\xff":
-                        self._buffer += ub
-
-                        if ub == b"\n":
-                            self._buffer = self._buffer.strip(b"\r\n")
-
-                            if len(self._buffer) > 0:
-                                got_line = True
-                                leftovers = buf[idx:]
-                                break
-
+                        if len(self._buffer) > 0:
+                            got_line = True
+                            break
         except (OSError, serial.SerialException) as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
             if got_line:
-                data, self._buffer = self._buffer, leftovers
+                ret, self._buffer = self._buffer, b''
 
-                self.on_read(data=data)
+                self.on_read(data=ret)
 
             else:
                 raise TimeoutError('Timeout while waiting for line terminator.')
@@ -268,7 +252,7 @@ class SerialDevice(Device):
         finally:
             timer.cancel()
 
-        return data.decode('utf-8')
+        return ret
 
     def purge(self):
         """
