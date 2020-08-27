@@ -210,14 +210,8 @@ class SerialDevice(Device):
             timeout_event.reading = False
         timeout_event.reading = True
 
-        buf = b''
-        if not purge_buffer:
-            #Add previous leftovers to front of buf so leftovers can be searched for newlines
-            #If there were no leftovers then self._buffer will be empty
-            buf = self._buffer
-
-        self._buffer = b''
-
+        if purge_buffer:
+            self._buffer = b''
 
         got_line, data = False, ''
 
@@ -228,27 +222,17 @@ class SerialDevice(Device):
         leftovers = b''
         try:
             while timeout_event.reading and not got_line:
-                #If there is leftover data then only perform a poll to set the read_ready flag
-                #otherwise block here until short timeout waiting for more data
-                select_timeout = 0.5
-                if len(self._buffer) > 0:
-                    select_timeout = 0.1
-                read_ready, _, _ = select.select([self._device.fileno()], [], [], select_timeout)
-                if len(read_ready) == 0 and len(self._buffer) == 0:
+                read_ready, _, _ = select.select([self._device.fileno()], [], [], 0.5)
+                if len(read_ready) == 0:
                     continue
 
-                #Only read data if there is some waiting
-                if len(read_ready) > 0:
-                    bytes_avail = 0
-                    if hasattr(self._device, "in_waiting"):
-                        bytes_avail = self._device.in_waiting
-                    else:
-                        bytes_avail = self._device.inWaiting()
+                bytes_avail = 0
+                if hasattr(self._device, "in_waiting"):
+                    bytes_avail = self._device.in_waiting
+                else:
+                    bytes_avail = self._device.inWaiting()
 
-                    device_data = self._device.read(bytes_avail)
-
-                    #Append new data to previous leftovers, if any
-                    buf = buf + device_data
+                buf = self._device.read(bytes_avail)
 
                 for idx in range(len(buf)):
                     c = buf[idx]
@@ -258,14 +242,15 @@ class SerialDevice(Device):
                         ub = bytes([ub])
 
                     # NOTE: AD2SERIAL and AD2PI apparently sends down \xFF on boot.
-                    if ub != b'' and ub != b"\xff" and ub != b"\r":
-                        if ub != b"\n":
-                            self._buffer += ub
-                        else:
-                            #found end of line
+                    if ub != b'' and ub != b"\xff":
+                        self._buffer += ub
+
+                        if ub == b"\n":
+                            self._buffer = self._buffer.strip(b"\r\n")
+
                             if len(self._buffer) > 0:
                                 got_line = True
-                                leftovers = buf[idx+1:]
+                                leftovers = buf[idx:]
                                 break
 
         except (OSError, serial.SerialException) as err:
