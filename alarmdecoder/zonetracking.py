@@ -151,9 +151,7 @@ class Zonetracker(object):
                     status = Zone.CHECK
 
                 # NOTE: Expander zone faults are handled differently than
-                #       regular messages.  We don't include them in
-                #       self._zones_faulted because they are not reported
-                #       by the panel in it's rolling list of faults.
+                #       regular messages.
                 try:
                     self._update_zone(zone, status=status)
 
@@ -296,7 +294,9 @@ class Zonetracker(object):
 
         # Actually remove the zones and trigger the restores.
         for z in cleared_zones:
-            self._update_zone(z, Zone.CLEAR)
+            # Don't clear expander zones, expander messages will fix this
+            if self._zones[z].expander is False:
+                self._update_zone(z, Zone.CLEAR)
 
     def _clear_expired_zones(self):
         """
