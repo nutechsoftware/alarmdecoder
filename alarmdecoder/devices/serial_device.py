@@ -229,7 +229,7 @@ class SerialDevice(Device):
                 buf = filter_ad2prot_byte(self._device.read(1))
 
                 if buf != b'':
-                    self._buffer +=  buf[0]
+                    self._buffer += buf
 
                     if buf == b"\n":
                         self._buffer = self._buffer.rstrip(b"\r\n")
