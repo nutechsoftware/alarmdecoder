@@ -189,7 +189,7 @@ class SerialDevice(Device):
         except serial.SerialException as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
-        return data
+        return data.decode('utf-8')
 
     def read_line(self, timeout=0.0, purge_buffer=False):
         """
@@ -229,7 +229,7 @@ class SerialDevice(Device):
                 buf = filter_ad2prot_byte(self._device.read(1))
 
                 if buf != b'':
-                    self._buffer +=  buf[0]
+                    self._buffer += buf
 
                     if buf == b"\n":
                         self._buffer = self._buffer.rstrip(b"\r\n")
@@ -252,7 +252,7 @@ class SerialDevice(Device):
         finally:
             timer.cancel()
 
-        return ret
+        return ret.decode('utf-8')
 
     def purge(self):
         """
