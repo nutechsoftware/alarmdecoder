@@ -81,7 +81,7 @@ class TestSerialDevice(TestCase):
         self._device.interface = '/dev/ttyS0'
         self._device.open(no_reader_thread=True)
 
-        with patch.object(self._device._device, 'read') as mock:
+        with patch.object(self._device._device, 'read', return_value=[1]) as mock:
             with patch('serial.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     ret = self._device.read()
