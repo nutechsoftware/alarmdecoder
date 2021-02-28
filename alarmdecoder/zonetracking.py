@@ -79,8 +79,6 @@ class Zonetracker(object):
     on_fault = event.Event("This event is called when the device detects a zone fault.\n\n**Callback definition:** *def callback(device, zone)*")
     on_restore = event.Event("This event is called when the device detects that a fault is restored.\n\n**Callback definition:** *def callback(device, zone)*")
 
-    EXPIRE = 30
-    """Zone expiration timeout."""
 
     @property
     def zones(self):
@@ -211,7 +209,6 @@ class Zonetracker(object):
                     # A new zone fault, so it is out of sequence.
                     self._last_zone_fault = 0
 
-            self._clear_expired_zones()
 
     def expander_to_zone(self, address, channel, panel_type=ADEMCO):
         """
@@ -306,18 +303,6 @@ class Zonetracker(object):
             if self._zones[z].expander is False:
                 self._update_zone(z, Zone.CLEAR)
 
-    def _clear_expired_zones(self):
-        """
-        Update zone status for all expired zones.
-        """
-        zones = []
-
-        for z in list(self._zones.keys()):
-            zones += [z]
-
-        for z in zones:
-            if self._zones[z].status != Zone.CLEAR and self._zone_expired(z):
-                self._update_zone(z, Zone.CLEAR)
 
     def _add_zone(self, zone, name='', status=Zone.CLEAR, expander=False):
         """
@@ -365,13 +350,3 @@ class Zonetracker(object):
             if old_status != status and status is not None:
                 self.on_fault(zone=zone)
 
-    def _zone_expired(self, zone):
-        """
-        Determine if a zone is expired or not.
-
-        :param zone: zone number
-        :type zone: int
-
-        :returns: whether or not the zone is expired
-        """
-        return (time.time() > self._zones[zone].timestamp + Zonetracker.EXPIRE) and self._zones[zone].expander is False
