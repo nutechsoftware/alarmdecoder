@@ -93,6 +93,22 @@ def bytes_hack(buf):
 
     return ub
 
+def filter_ad2prot_byte(buf):
+    """
+    Return the byte sent in back if valid visible terminal characters or line terminators.
+    """
+    if sys.version_info > (3,):
+        c = buf[0]
+    else:
+        c = ord(buf)
+
+    if (c == 10 or c == 13):
+        return buf
+    if (c > 31 and c < 127):
+        return buf
+    else:
+        return b''
+
 def read_firmware_file(file_path):
     """
     Reads a firmware file into a dequeue for processing.
