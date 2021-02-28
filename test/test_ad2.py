@@ -363,4 +363,6 @@ class TestAlarmDecoder(TestCase):
         self.assertEquals(self._zone_faulted, 5)
 
         self._decoder._on_read(self, data=b'[00010001000000000A--],004,[f70000051003000008020000000000],"FAULT 04                        "')
+        self._decoder._on_read(self, data=b'[00010001000000000A--],004,[f70000051003000008020000000000],"FAULT 05                        "')
+        self._decoder._on_read(self, data=b'[00010001000000000A--],004,[f70000051003000008020000000000],"FAULT 04                        "')
         self.assertEquals(self._zone_restored, 3)

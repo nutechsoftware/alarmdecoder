@@ -97,7 +97,10 @@ def filter_ad2prot_byte(buf):
     """
     Return the byte sent in back if valid visible terminal characters or line terminators.
     """
-    c = buf[0]
+    if sys.version_info > (3,):
+        c = buf[0]
+    else:
+        c = ord(buf)
 
     if (c == 10 or c == 13):
         return buf

@@ -80,8 +80,11 @@ class TestSerialDevice(TestCase):
     def test_read(self):
         self._device.interface = '/dev/ttyS0'
         self._device.open(no_reader_thread=True)
+        side_effect = ["t"]
+        if sys.version_info > (3,):
+            side_effect = ["t".encode('utf-8')]
 
-        with patch.object(self._device._device, 'read') as mock:
+        with patch.object(self._device._device, 'read', side_effect=side_effect) as mock:
             with patch('serial.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     ret = self._device.read()
