@@ -76,7 +76,7 @@ class TestZonetracking(TestCase):
         msg = Message('[00000000000000100A--],0bf,[f707000600e5800c0c020000],"CHECK 1                         "')
         self._zonetracker.update(msg)
 
-        self.assertEqual(self._zonetracker._zones['1'].status, Zone.CHECK)
+        self.assertEqual(self._zonetracker._zones[1].status, Zone.CHECK)
 
     def test_zone_restore_skip(self):
         panel_messages = [

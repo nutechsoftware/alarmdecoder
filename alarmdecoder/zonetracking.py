@@ -189,7 +189,7 @@ class Zonetracker(object):
                     if match is None:
                         return
 
-                    zone = match.group(1)
+                    zone = int(match.group(1))
 
                 # Add new zones and clear expired ones.
                 if zone in self._zones_faulted:
