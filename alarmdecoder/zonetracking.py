@@ -154,6 +154,7 @@ class Zonetracker(object):
                 #       regular messages.
                 try:
                     self._update_zone(zone, status=status)
+                    self.zones[zone].expander = True
 
                 except IndexError:
                     self._add_zone(zone, status=status, expander=True)
