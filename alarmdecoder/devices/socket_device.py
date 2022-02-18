@@ -339,7 +339,7 @@ class SocketDevice(Device):
                             got_line = True
                             break
 
-        except socket.error as err:
+        except (socket.error, ValueError) as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         except SSL.SysCallError as err:
