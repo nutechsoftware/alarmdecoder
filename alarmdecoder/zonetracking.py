@@ -183,7 +183,7 @@ class Zonetracker(object):
                 #       3-digit mode is enabled... so we have to pull it out
                 #       of the alpha message.
                 if zone == 191:
-                    zone_regex = re.compile('^CHECK (\d+).*$')
+                    zone_regex = re.compile(r'^CHECK (\d+).*$')
 
                     match = zone_regex.match(message.text)
                     if match is None:
