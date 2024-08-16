@@ -70,7 +70,7 @@ class Message(BaseMessage):
     """The panel data field associated with this message."""
 
 
-    _regex = re.compile('^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
+    _regex = re.compile(r'^(!KPM:){0,1}(\[[a-fA-F0-9\-]+\]),([a-fA-F0-9]+),(\[[a-fA-F0-9]+\]),(".+")$')
 
     def __init__(self, data=None):
         """
