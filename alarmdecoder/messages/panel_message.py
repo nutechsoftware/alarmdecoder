@@ -118,7 +118,8 @@ class Message(BaseMessage):
         self.fire_alarm = is_bit_set(14)
         self.check_zone = is_bit_set(15)
         self.perimeter_only = is_bit_set(16)
-        self.system_fault = int(self.bitfield[17], 16)
+        if self.bitfield[17] != '-':
+            self.system_fault = int(self.bitfield[17], 16)
         if self.bitfield[18] in list(PANEL_TYPES):
             self.panel_type = PANEL_TYPES[self.bitfield[18]]
         # pos 20-21 - Unused.
