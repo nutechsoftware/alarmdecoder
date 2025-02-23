@@ -141,7 +141,7 @@ class Zonetracker(object):
             zone = -1
 
             if message.type == ExpanderMessage.ZONE:
-                zone = self.expander_to_zone(message.address, message.channel, self.alarmdecoder_object.mode)
+                zone = self.expander_to_zone(message.address, message.channel, self.alarmdecoder_object.mode, self.alarmdecoder_object.address)
 
             if zone != -1:
                 status = Zone.CLEAR
@@ -213,7 +213,8 @@ class Zonetracker(object):
 
             self._clear_expired_zones()
 
-    def expander_to_zone(self, address, channel, panel_type=ADEMCO):
+    def expander_to_zone(self, address, channel, panel_type=ADEMCO,
+                         dev_addr=0):
         """
         Convert an address and channel into a zone number.
 
@@ -221,6 +222,8 @@ class Zonetracker(object):
         :type address: int
         :param channel: channel
         :type channel: int
+        :param dev_addr: device address
+        :type address: int
 
         :returns: zone number associated with an address and channel
         """
@@ -230,9 +233,15 @@ class Zonetracker(object):
         if panel_type == ADEMCO:
             # TODO: This is going to need to be reworked to support the larger
             #       panels without fixed addressing on the expanders.
-
-            idx = address - 7   # Expanders start at address 7.
-            zone = address + channel + (idx * 7) + 1
+            if dev_addr != 31:
+                idx = address - 7   # Expanders start at address 7.
+                zone = address + channel + (idx * 7) + 1
+            else:
+                # SE panels use address 31, this is probably not the most
+                # fool-proof test, but it works reasonably well.
+                # SE panel address is 1 for the first expander 2 for the next
+                # and the first zone address for an expander zone is 9
+                zone = (address * 8) + channel + 1
 
         elif panel_type == DSC:
             zone = (address * 8) + channel
