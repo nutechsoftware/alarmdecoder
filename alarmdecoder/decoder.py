@@ -602,7 +602,7 @@ class AlarmDecoder(object):
         :type data: string
         """
 
-        matches = re.match('^!Sending(\.{1,5})done.*', data)
+        matches = re.match(r'^!Sending(\.{1,5})done.*', data)
         if matches is not None:
             good_send = False
             if len(matches.group(1)) < 5:
