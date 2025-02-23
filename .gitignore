@@ -9,3 +9,5 @@ tmp
 bin/ad2-test
 *~
 .vscode
+venv
+.venv
