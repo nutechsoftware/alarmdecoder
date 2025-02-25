@@ -169,7 +169,7 @@ class Zonetracker(object):
             # NOTE: SYSTEM messages provide inconsistent ready statuses.  This
             #       may need to be extended later for other panels.
             if message.ready and not message.text.startswith("SYSTEM"):
-                for zone in self._zones_faulted:
+                for zone in self._zones_faulted[:]:
                     self._update_zone(zone, Zone.CLEAR)
 
                 self._last_zone_fault = 0
