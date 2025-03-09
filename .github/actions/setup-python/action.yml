@@ -1,4 +1,6 @@
 name: build-and-test
+description: |
+  This action lets the Python version for CI be specified in a single place.
 
 runs:
   using: composite
