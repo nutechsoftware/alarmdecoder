@@ -11,4 +11,5 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-      - uses: ./.github/actions/build-and-test
+      - name: Build and test
+        uses: ./.github/actions/build-and-test
