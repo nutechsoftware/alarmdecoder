@@ -6,7 +6,7 @@ It summarizes information about the automated processes involved with the reposi
 
 ## GitHub Actions Automation
 
-This section describes how GitHub Actions is used to automate test and release processes for the `nutechsoftware/alarmdecoder` repository.
+This section describes how GitHub Actions is used to automate test and release processes for the `nutechsoftware/alarmdecoder` repository. GitHub Actions is free for public repositories. More information about GitHub Actions can be found on their official documentation site here: https://docs.github.com/en/actions.
 
 ### Reusable Actions
 
@@ -16,7 +16,7 @@ These actions are found in the [.github/actions](./.github/actions) directory. E
 
 ### Workflows
 
-The GitHub Actions workflows can be found in the [./.github/workflows](./.github/workflows) directory. Each workflow has a comment at the top of the file that describes its purpose.
+The GitHub Actions workflows can be found in the [.github/workflows](./.github/workflows) directory. Each workflow has a comment at the top of the file that describes its purpose.
 
 The sections below further delineate between automated and manual workflows that are in use. More information on triggering workflows (both automatically and manually) can be found here: https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/triggering-a-workflow.
 
