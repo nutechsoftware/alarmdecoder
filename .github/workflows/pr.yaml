@@ -1,3 +1,5 @@
+# This workflow builds and tests code in pull requests.
+
 name: pr
 
 on: pull_request

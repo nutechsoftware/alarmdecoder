@@ -1,3 +1,5 @@
+# This workflow initiates a release of the project.
+
 name: release
 
 on:

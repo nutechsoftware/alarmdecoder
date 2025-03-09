@@ -1,6 +1,6 @@
 name: build-and-test
 description: |
-  Set up Python and run build and test steps.
+  Set up Python and run the build and test steps.
 
 runs:
   using: composite

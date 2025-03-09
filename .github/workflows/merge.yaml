@@ -1,3 +1,5 @@
+# This workflow builds and tests code that is pushed to the `master` branch.
+
 name: merge
 
 on:
