@@ -1,0 +1,27 @@
+name: build-and-test
+description: |
+  Set up Python and run the build and test steps.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: ./.github/actions/setup-python
+    # TODO: move dependencies to a separate file (e.g. a requirements.txt file)
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install pytest mock build
+    - name: Run build
+      shell: bash
+      run: python -m build
+    - name: Show dist files
+      shell: bash
+      run: |
+        echo "Dist files:"
+        ls -lh dist/
+    - name: Run pytest
+      shell: bash
+      run: |
+        python -m pip install -e .
+        pytest

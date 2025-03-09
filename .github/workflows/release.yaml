@@ -1,0 +1,51 @@
+# This workflow initiates a release of the project.
+
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (e.g. `1.13.12`)
+        type: string
+        required: true
+
+jobs:
+  release:
+    permissions:
+      # `contents: write` is required to create tags and create releases
+      contents: write
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Create local lightweight tag
+        run: git tag "${RELEASE_VERSION}"
+      - name: Build and test
+        uses: ./.github/actions/build-and-test
+      - name: Push tag
+        run: git push origin "${RELEASE_VERSION}"
+      - name: Create release from tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            --method POST \
+            "/repos/${GITHUB_REPOSITORY}/releases" \
+            -f "tag_name=${RELEASE_VERSION}" \
+            -f "name=${RELEASE_VERSION}" \
+            -F "draft=false" \
+            -F "prerelease=false" \
+            -F "generate_release_notes=true"
+      - name: Publish package distributions to PyPI
+        # TODO: setup attestations and trusted publishing.
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # attestations require trusted publishing which isn't setup yet
+          attestations: false
+          password: ${{ secrets.PYPI_TOKEN }}

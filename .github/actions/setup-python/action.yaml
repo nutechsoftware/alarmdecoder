@@ -1,0 +1,12 @@
+name: build-and-test
+description: |
+  This action lets the Python version for CI be specified in a single place.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip

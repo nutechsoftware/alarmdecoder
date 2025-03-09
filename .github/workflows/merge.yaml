@@ -1,11 +1,14 @@
-# This workflow builds and tests code in pull requests.
+# This workflow builds and tests code that is pushed to the `master` branch.
 
-name: pr
+name: merge
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
 
 jobs:
-  pr:
+  merge:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
