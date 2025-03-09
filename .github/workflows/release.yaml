@@ -1,0 +1,24 @@
+name: release
+
+# on: release
+
+# Temporarily test this workflow in a pull request
+on: pull_request
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: ./github/actions/setup-python
+      - name: Run build
+        run: python -m build
+      # - name: Publish package distributions to PyPI
+      #   # TODO: setup attestations and trusted publishing.
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     # attestations requires trusted publishing which isn't setup yet
+      #     attestations: false
+      #     password: ${{ secrets.PYPI_TOKEN }}

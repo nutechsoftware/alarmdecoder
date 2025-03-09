@@ -1,9 +1,12 @@
-name: pr
+name: merge
 
-on: pull_request
+on:
+  push:
+    branches:
+      - master
 
 jobs:
-  pr:
+  merge:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
