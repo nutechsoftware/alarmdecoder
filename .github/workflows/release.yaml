@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Create local lightweight tag
         run: git tag "${RELEASE_VERSION}"
       - name: Build and test
