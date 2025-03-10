@@ -11,7 +11,9 @@
 AlarmDecoder
 ============
 
-.. image:: https://github.com/nutechsoftware/alarmdecoder/actions/workflows/merge.yaml/badge.svg
+.. image:: https://img.shields.io/pypi/v/alarmdecoder
+    :target: https://pypi.org/project/alarmdecoder/
+.. image:: https://img.shields.io/github/actions/workflow/status/nutechsoftware/alarmdecoder/merge.yaml?label=tests
     :target: https://github.com/nutechsoftware/alarmdecoder/actions/workflows/merge.yaml
 
 -------
