@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mock import Mock, MagicMock, patch
-from serial import Serial, SerialException
+import serialx
 import sys
 import socket
 import time
@@ -32,7 +32,7 @@ except ImportError:
 class TestSerialDevice(TestCase):
     def setUp(self):
         self._device = SerialDevice()
-        self._device._device = Mock(spec=Serial)
+        self._device._device = Mock(spec=serialx.Serial)
         self._device._device.open = Mock()
 
     def tearDown(self):
@@ -56,7 +56,7 @@ class TestSerialDevice(TestCase):
     def test_open_failed(self):
         self._device.interface = '/dev/ttyS0'
 
-        with patch.object(self._device._device, 'open', side_effect=[SerialException, ValueError]):
+        with patch.object(self._device._device, 'open', side_effect=[OSError, ValueError]):
             with self.assertRaises(NoDeviceError):
                 self._device.open(no_reader_thread=True)
 
@@ -73,7 +73,7 @@ class TestSerialDevice(TestCase):
             mock.assert_called_with(b'test')
 
     def test_write_exception(self):
-        with patch.object(self._device._device, 'write', side_effect=SerialException):
+        with patch.object(self._device._device, 'write', side_effect=OSError):
             with self.assertRaises(CommError):
                 self._device.write(b'test')
 
@@ -85,15 +85,15 @@ class TestSerialDevice(TestCase):
             side_effect = ["t".encode('utf-8')]
 
         with patch.object(self._device._device, 'read', side_effect=side_effect) as mock:
-            with patch('serial.Serial.fileno', return_value=1):
+            with patch('serialx.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     ret = self._device.read()
 
             mock.assert_called_with(1)
 
     def test_read_exception(self):
-        with patch.object(self._device._device, 'read', side_effect=SerialException):
-            with patch('serial.Serial.fileno', return_value=1):
+        with patch.object(self._device._device, 'read', side_effect=OSError):
+            with patch('serialx.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     with self.assertRaises(CommError):
                         self._device.read()
@@ -104,7 +104,7 @@ class TestSerialDevice(TestCase):
             side_effect = [chr(x).encode('utf-8') for x in b"testing\r\n"]
 
         with patch.object(self._device._device, 'read', side_effect=side_effect):
-            with patch('serial.Serial.fileno', return_value=1):
+            with patch('serialx.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     ret = None
                     try:
@@ -116,7 +116,7 @@ class TestSerialDevice(TestCase):
 
     def test_read_line_timeout(self):
         with patch.object(self._device._device, 'read', return_value=b'a') as mock:
-            with patch('serial.Serial.fileno', return_value=1):
+            with patch('serialx.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     with self.assertRaises(TimeoutError):
                         self._device.read_line(timeout=0.1)
@@ -124,8 +124,8 @@ class TestSerialDevice(TestCase):
         self.assertIn('a', self._device._buffer.decode('utf-8'))
 
     def test_read_line_exception(self):
-        with patch.object(self._device._device, 'read', side_effect=[OSError, SerialException]):
-            with patch('serial.Serial.fileno', return_value=1):
+        with patch.object(self._device._device, 'read', side_effect=[OSError, OSError]):
+            with patch('serialx.Serial.fileno', return_value=1):
                 with patch.object(select, 'select', return_value=[[1], [], []]):
                     with self.assertRaises(CommError):
                         self._device.read_line()

@@ -9,8 +9,8 @@ This module contains the :py:class:`SerialDevice` interface for the `AD2USB`_, `
 """
 
 import threading
-import serial
-import serial.tools.list_ports
+import serialx
+import serialx.tools.list_ports
 import select
 import sys
 from .base_device import Device
@@ -41,11 +41,11 @@ class SerialDevice(Device):
 
         try:
             if pattern:
-                devices = serial.tools.list_ports.grep(pattern)
+                devices = serialx.tools.list_ports.grep(pattern)
             else:
-                devices = serial.tools.list_ports.comports()
+                devices = serialx.tools.list_ports.comports()
 
-        except serial.SerialException as err:
+        except OSError as err:
             raise CommError('Error enumerating serial devices: {0}'.format(str(err)), err)
 
         return devices
@@ -80,8 +80,6 @@ class SerialDevice(Device):
 
         self._port = interface
         self._id = interface
-        # Timeout = non-blocking to match pyftdi.
-        self._device = serial.Serial(timeout=0, writeTimeout=0)
 
     def open(self, baudrate=BAUDRATE, no_reader_thread=False):
         """
@@ -106,7 +104,7 @@ class SerialDevice(Device):
 
         # Open the device and start up the reader thread.
         try:
-            self._device.port = self._port
+            self._device = serialx.Serial(self._port, read_timeout=0, write_timeout=0)
             self._device.open()
             # NOTE: Setting the baudrate before opening the
             #       port caused issues with Moschip 7840/7820
@@ -116,7 +114,7 @@ class SerialDevice(Device):
             #       all issues with it.
             self._device.baudrate = baudrate
 
-        except (serial.SerialException, ValueError, OSError) as err:
+        except (OSError, ValueError) as err:
             raise NoDeviceError('Error opening device on {0}.'.format(self._port), err)
 
         else:
@@ -162,10 +160,10 @@ class SerialDevice(Device):
 
             self._device.write(data)
 
-        except serial.SerialTimeoutException:
+        except TimeoutError:
             pass
 
-        except serial.SerialException as err:
+        except OSError as err:
             raise CommError('Error writing to device.', err)
 
         else:
@@ -186,7 +184,7 @@ class SerialDevice(Device):
             if len(read_ready) != 0:
                 data = filter_ad2prot_byte(self._device.read(1))
 
-        except serial.SerialException as err:
+        except OSError as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         return data.decode('utf-8')
@@ -237,7 +235,7 @@ class SerialDevice(Device):
                         if len(self._buffer) > 0:
                             got_line = True
                             break
-        except (OSError, serial.SerialException) as err:
+        except OSError as err:
             raise CommError('Error reading from device: {0}'.format(str(err)), err)
 
         else:
@@ -258,5 +256,5 @@ class SerialDevice(Device):
         """
         Purges read/write buffers.
         """
-        self._device.flushInput()
-        self._device.flushOutput()
+        self._device.reset_read_buffer()
+        self._device.reset_write_buffer()
