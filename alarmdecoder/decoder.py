@@ -276,7 +276,7 @@ class AlarmDecoder(object):
             self._device.open(baudrate=baudrate,
                               no_reader_thread=no_reader_thread)
         except:
-            self._unwire_events
+            self._unwire_events()
             raise
 
         return self
@@ -393,6 +393,11 @@ class AlarmDecoder(object):
         """
         Wires up the internal device events.
         """
+        # open() is called again to reconnect after the device closes, and the
+        # event handler lists don't de-duplicate; remove any earlier wiring so
+        # every message is still handled once.
+        self._unwire_events()
+
         self._device.on_open += self._on_open
         self._device.on_close += self._on_close
         self._device.on_read += self._on_read
@@ -402,14 +407,16 @@ class AlarmDecoder(object):
 
     def _unwire_events(self):
         """
-        Wires up the internal device events.
+        Unwires the internal device events.  Safe to call when they aren't wired.
         """
-        self._device.on_open -= self._on_open
-        self._device.on_close -= self._on_close
-        self._device.on_read -= self._on_read
-        self._device.on_write -= self._on_write
-        self._zonetracker.on_fault -= self._on_zone_fault
-        self._zonetracker.on_restore -= self._on_zone_restore
+        for event, handler in ((self._device.on_open, self._on_open),
+                               (self._device.on_close, self._on_close),
+                               (self._device.on_read, self._on_read),
+                               (self._device.on_write, self._on_write),
+                               (self._zonetracker.on_fault, self._on_zone_fault),
+                               (self._zonetracker.on_restore, self._on_zone_restore)):
+            while handler in event:
+                event.remove(handler)
 
     def _handle_message(self, data):
         """

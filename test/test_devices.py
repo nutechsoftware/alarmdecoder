@@ -228,6 +228,31 @@ class TestSocketDevice(TestCase):
                     with self.assertRaises(CommError):
                         self._device.read_line()
 
+    def test_read_line_remote_closed(self):
+        with patch.object(select, 'select', return_value=[[1], [], []]):
+            with patch.object(self._device._device, 'recv', return_value=b''):
+                with self.assertRaises(CommError):
+                    self._device.read_line(timeout=1)
+
+    def test_open_enables_keepalive(self):
+        with patch.object(socket.socket, '__init__', return_value=None):
+            with patch.object(socket.socket, 'connect', return_value=None):
+                with patch.object(socket.socket, 'setsockopt') as setsockopt:
+                    self._device.open(no_reader_thread=True)
+
+        setsockopt.assert_any_call(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+    def test_keepalive_idle_without_tcp_keepidle(self):
+        # macOS has TCP_KEEPALIVE (the idle time) instead of TCP_KEEPIDLE.
+        sock = Mock()
+        self._device._device = sock
+
+        with patch.dict(socket.__dict__, {'TCP_KEEPALIVE': 0x10}):
+            socket.__dict__.pop('TCP_KEEPIDLE', None)
+            self._device._enable_keepalive()
+
+        sock.setsockopt.assert_any_call(socket.IPPROTO_TCP, 0x10, 30)
+
     def test_ssl(self):
         if not have_openssl:
             return

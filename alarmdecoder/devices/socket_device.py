@@ -188,6 +188,7 @@ class SocketDevice(Device):
             self._read_thread = Device.ReadThread(self)
 
             self._device = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._enable_keepalive()
 
             if self._use_ssl:
                 self._init_ssl()
@@ -327,7 +328,13 @@ class SocketDevice(Device):
 
                 buf = self._device.recv(1)
 
-                if buf != b'' and buf != b"\xff":
+                # An empty read on a readable socket means the remote end
+                # closed the connection.  Ignoring it would leave the
+                # reader spinning on a dead socket, and on_close would never fire.
+                if buf == b'':
+                    raise CommError('Connection closed by {0}:{1}'.format(self._host, self._port))
+
+                if buf != b"\xff":
                     ub = bytes_hack(buf)
 
                     self._buffer += ub
@@ -362,6 +369,24 @@ class SocketDevice(Device):
             timer.cancel()
 
         return ret.decode('utf-8')
+
+    def _enable_keepalive(self):
+        """
+        Turns on TCP keepalive so that a peer that vanished without closing the
+        connection is eventually noticed.  Best effort: options the platform
+        doesn't have are skipped.
+        """
+        try:
+            self._device.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+
+            # macOS has no TCP_KEEPIDLE; its TCP_KEEPALIVE is the same setting.
+            idle = 'TCP_KEEPIDLE' if hasattr(socket, 'TCP_KEEPIDLE') else 'TCP_KEEPALIVE'
+            for option, value in ((idle, 30), ('TCP_KEEPINTVL', 10), ('TCP_KEEPCNT', 3)):
+                if hasattr(socket, option):
+                    self._device.setsockopt(socket.IPPROTO_TCP, getattr(socket, option), value)
+
+        except (socket.error, AttributeError):
+            pass
 
     def purge(self):
         """
