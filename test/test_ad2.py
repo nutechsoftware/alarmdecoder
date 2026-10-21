@@ -148,6 +148,23 @@ class TestAlarmDecoder(TestCase):
         self._decoder.close()
         self._device.close.assert_called()
 
+    def test_reopen_does_not_duplicate_handlers(self):
+        self._decoder.open()
+        self._decoder.open()  # e.g. reconnecting after the device closed
+
+        self.assertEqual(list(self._device.on_read).count(self._decoder._on_read), 1)
+        self.assertEqual(list(self._device.on_close).count(self._decoder._on_close), 1)
+
+    def test_failed_open_unwires_events(self):
+        self._device.open.side_effect = Exception('connection refused')
+
+        for _ in range(3):
+            with self.assertRaises(Exception):
+                self._decoder.open()
+
+        self.assertNotIn(self._decoder._on_read, list(self._device.on_read))
+        self.assertNotIn(self._decoder._on_close, list(self._device.on_close))
+
     def test_send(self):
         self._decoder.send('test')
         self._device.write.assert_called_with(b'test')
